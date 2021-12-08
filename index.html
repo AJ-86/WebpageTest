@@ -1,3 +1,19 @@
+<ol>
+<li>test</li>
+
+<li>test 2</li>
+
+<li>test 3
+
+
+<ol>
+<li>test 4</li>
+
+<li>test 5</li>
+3.</ol>
+</li>
+</ol>
+
 <p><strong>T</strong>his edition of Mastering Delphi marks the seventh year of the Delphi era, as it took Bor- land two years to release the latest incarnation of Delphi (along with its Linux twin, Kylix). As it has for many other programmers, Delphi has been my primary interest throughout these years; and writing, consulting, teaching, and speaking at conferences about Delphi have absorbed more and more of my time, leaving other languages and programming tools in the dust of my office. Because my work and my life are quite intertwined, many people have been involved in both, and I wish I had enough space and time to thank them all as they deserve. Instead, I’ll just mention a few particular people and say a warm “Thank You” to the entire Delphi community (especially for the Spirit of Delphi 1999 Award I’ve been happy to share with Bob Swart).</p>
 
 <p>The first official thanks are for the Borland programmers and managers who made Delphi possible and continue to improve it: Chuck Jazdzewski, Danny Thorpe, Eddie Churchill, Allen Bauer, Steve Todd, Mark Edington, Jim Tierney, Ravi Kumar, Jörg Weingarten, Anders Ohlsson, and all the others I have not had a chance to meet. I’d also like to give par- ticular mention to my friends Ben Riga (the current Delphi product manager), John Kaster and David Intersimone (at Borland’s Developer Relations), and others who have worked at Borland, including Charlie Calvert, Zack Urlocker and Nan Borreson.</p>
@@ -142,4 +158,776 @@
 <li><p>The File menu doesn’t include specific items for creating new forms or applications. These commands have been increased in number and grouped under the File ➢ New secondary menu. The Other command of this menu opens the New Item dialog box (the Object Repository) as the File ➢ New command did in the past.</p></li>
 
 <li><p>The Component Palette local menu has a submenu listing all of the palette pages in alphabetic order. You can use it to change the active page, particularly when it is not visible on the screen.</p></li>
+
+<li><p>There is a new toolbar, the Internet toolbar, which is initially disabled. This toolbar supports WebSnap applications.</p></li>
 </ul>
+
+<h5 id="updatedenvironmentoptionsdialogbox">Updated Environment Options Dialog Box</h5>
+
+<p>Quite a few small changes relate to the commonly used Environment Options dialog box. The pages of this dialog box have been rearranged, moving the Form Designer options from the Preferences page to the new Designer page. There are also a few new options and pages:</p>
+
+<ul>
+<li><p>The Preferences page of the Environment Options dialog box has a new check box that prevents Delphi windows from automatically docking with each other. This is a very welcome addition!</p></li>
+
+<li><p>A new page, Environment Variables, allows you to see system environment variables (such as the standard path names and OS settings) and set user-defined variables. The nice point is that you can use both system- and user-defined environment variables in each of the dialog boxes of the IDE—for example, you can avoid hard-coding com- monly used path names, replacing them with a variable. In other words, the environ- ment variables work similarly to the $DELPHI variable, referring to Delphi’s base directory, but can be defined by the user.</p></li>
+
+<li><p>Another new page is called Internet. In this page, you can choose the default file exten- sions used for HTML and XML files (mainly by the WebSnap framework) and also associate an external editor with each extension.</p></li>
+</ul>
+
+<h5 id="delphiextremetoys">Delphi Extreme Toys</h5>
+
+<p>At times, the Delphi team comes up with small enhancements of the IDE that aren’t included in the product because they either aren’t of general use or will require time to be improved in quality, user interface, or robustness. Some of these internal wizards and IDE extensions have now been made available, with the collective name of Delphi Extreme Toys, to registered Delphi 6 users. You should automatically get this add-on as you register your copy of the product (online or through a Borland office).</p>
+
+<p>There isn’t an official list of the content of the Extreme Toys, as Borland plans to keep extending them. The initial release includes an IDE-based search engine for seeking answers on Delphi across the Internet, a wizard for turning on and off specific compiler warnings and an “invokamatic” wizard for accelerating the creation of Web services. The Extreme Toys will, in essence, be <em>unofficial</em> wizards, code utilities, and components from the Delphi team—or useful stuff from various people.</p>
+
+<h2 id="recentideadditions">Recent IDE Additions</h2>
+
+<p>Delphi 5 provided a huge number of new features to the IDE. In case you’ve only used ver- sions of Delphi prior to 5, or need to brush up on some useful added information, this is a short summary of the most important of the features introduced in Delphi 5.</p>
+
+<h4 id="savingthedesktopsettings">Saving the Desktop Settings</h4>
+
+<p>The Delphi IDE allows programmers to customize it in various ways—typically, opening many windows, arranging them, and docking them to each other. However, programmers often need to open one set of windows at design time and a different set at debug time. Simi- larly, programmers might need one layout when working with forms and a completely differ- ent layout when writing components or low-level code using only the editor. Rearranging the IDE for each of these needs is a tedious task.</p>
+
+<p>For this reason, Delphi allows you to save a given arrangement of IDE windows (called a <em>desktop</em>) with a name and restore it easily. Also, you can make one of these groupings your default debugging setting, so that it will be restored automatically when you start the debug- ger. All these features are available in the Desktops toolbar. You can also work with desktop settings using the View ➢ Desktops menu.</p>
+
+<p>Desktop setting information is saved in DST files, which are INI files in disguise. The saved settings include the position of the main window, the Project Manager, the Alignment Palette, the Object Inspector (including its new property category settings), the editor win- dows (with the status of the Code Explorer and the Message View), and many others, plus the docking status of the various windows.</p>
+
+<p>Here is a small excerpt from a DST file, which should be easily readable:</p>
+
+<p>[Main Window] Create=1 Visible=1 State=0 Left=0</p>
+
+<p>Top=0 Width=1024 Height=105</p>
+
+<p>ClientWidth=1016 ClientHeight=78</p>
+
+<p>[ProjectManager] Create=1 Visible=0 State=0</p>
+
+<p>...</p>
+
+<p>Dockable=1</p>
+
+<p>[AlignmentPalette] Create=1 Visible=0</p>
+
+<p>...</p>
+
+<p>Desktop settings override project settings. This helps eliminate the problem of moving a project between machines (or between developers) and having to rearrange the windows to your liking. Delphi 5 separates per-user and per-machine preferences from the project set- tings, to better support team development.</p>
+
+<h4 id="thetodolist">The To-Do List</h4>
+
+<p>Another feature added in Delphi 5 was the to-do list. This is a list of tasks you still have to do to complete a project, a collection of notes for the programmer (or programmers, as this tool can be very handy in a team). While the idea is not new, the key concept of the to-do list in Delphi is that it works as a two-way tool.</p>
+
+<p>In fact, you can add or modify to-do items by adding special TODO comments to the source code of any file of a project; you’ll then see the corresponding entries in the list. But you can also visually edit the items in the list to modify the corresponding source code comment. For example, here is how a to-do list item might look like in the source code:</p>
+
+<p><strong>procedure</strong> TForm1.FormCreate(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p><em>// TODO -oMarco: Add creation code</em></p>
+
+<p><strong>end</strong>;</p>
+
+<p>The same item can be visually edited in the window shown in Figure 1.4.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image067.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 1 . 4 :</strong></p>
+
+<p>The Edit To-Do Item window can be used to modify a to-do item, an operation you can also do directly in the source code.</p>
+
+<p>The exception to this two-way rule is the definition of project-wide to-do items. You must add these items directly to the list. To do that, you can either use the Ctrl+A key combination in the To-Do List window or right-click in the window and select Add from the shortcut menu. These items are saved in a special file with the .TODO extension.</p>
+
+<p>You can use multiple options with a TODO comment. You can use –o (as in the code excerpt above) to indicate the owner, the programmer who entered the comment; the –c option to indicate a category; or simply a number from 1 to 5 to indicate the priority (0, or no number, indicates that no priority level is set). For example, using the Add To-Do Item command on the editor’s shortcut menu (or the Ctrl+Shift+T shortcut) generated this comment:</p>
+
+<p><em>{ TODO 2 -oMarco : Button pressed }</em></p>
+
+<p>Delphi treats everything after the colon, up to the end of line or the closing brace, depending on the type of comment, as the text of the to-do item. Finally, in the To-Do List window you can check off an item to indicate that it has been done. The source code comment will change from TODO to DONE. You can also change the comment in the source code manually to see the check mark appear in the To-Do List window.</p>
+
+<p>One of the most powerful elements of this architecture is the main To-Do List window, which can automatically collect to-do information from the source code files as you type them, sort and filter them, and export them to the Clipboard as plain text or an HTML table.</p>
+
+<h2 id="theappbrowsereditor">The AppBrowser Editor</h2>
+
+<p>The editor included with Delphi hasn’t changed recently, but it has many features that many Delphi programmers don’t know and use. It’s worth briefly examining this tool. The Delphi editor allows you to work on several files at once, using a “notebook with tabs” metaphor, and you can also open multiple editor windows. You can jump from one page of the editor to the next by pressing Ctrl+Tab (or Shift+Ctrl+Tab to move in the opposite direction).</p>
+
+<p>In Delphi 6, you can drag-and-drop the tabs with the unit names in the upper portion of the editor to change their order, so that you can use a single Ctrl+Tab to move between the units you are mostly interested in. The local menu of the editor has also a Pages command, which lists all of the available pages in a submenu, a handy feature when many units are loaded.</p>
+
+<p>Several options affect the editor, located in the new Editor Properties dialog box. You have to go to the Preferences page of the Environment Options dialog box, however, to set the editor’s AutoSave feature, which saves the source code files each time you run the program (preventing data loss in case the program crashes badly).</p>
+
+<p>I won’t discuss the various settings of the editor, as they are quite intuitive and are described in the online Help. A tip to remember is that using the Cut and Paste commands is not the only way to move source code. You can also select and drag words, expressions, or entire lines of code. You can also copy text instead of moving it, by pressing the Ctrl key while dragging.</p>
+
+<h4 id="thecodeexplorer">The Code Explorer</h4>
+
+<p>The Code Explorer window, which is generally docked on the side of the editor, simply lists all of the types, variables, and routines defined in a unit, plus other units appearing in uses statements. For complex types, such as classes, the Code Explorer can list detailed informa- tion, including a list of fields, properties, and methods. All the information is updated as soon as you start typing in the editor. You can use the Code Explorer to navigate in the editor. If you double-click one of the entries in the Code Explorer, the editor jumps to the corre- sponding declaration.</p>
+
+<p>In Delphi 6 you can modify variables, properties, and method names directly in the Code Explorer.</p>
+
+<p>While all that is quite obvious after you’ve used Delphi for a few minutes, some features of the Code Explorer are not so intuitive. One important point is that you have full control of the layout of the information, and you can reduce the depth of the tree usually displayed in this window by customizing the Code Explorer. Collapsing the tree can help you make your selections more quickly. You can configure the Code Explorer by using the corresponding page of the Environment Options, as shown in Figure 1.5.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image076.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 1 . 5 :</strong></p>
+
+<p>You can configure the Code Explorer in the Environment Options dialog box.</p>
+
+<p>Notice that when you deselect one of the Explorer Categories items on the right side of this page of the dialog box, the Explorer doesn’t remove the corresponding elements from view—it simply adds the node in the tree. For example, if you deselect the Uses check box, Delphi doesn’t hide the list of the used units from the Code Explorer. On the contrary, the used units are listed as main nodes instead of being kept in the Uses folder. I generally disable the Types, Classes, and Variables selections.</p>
+
+<p>Because each item of the Code Explorer tree has an icon marking its type, arranging by field and method seems less important than arranging by access specifier. My preference is to show all items in a single group, as this requires the fewest mouse clicks to reach each item. Selecting items in the Code Explorer, in fact, provides a very handy way of navigating the source code of a large unit. When you double-click a method in the Code Explorer, the focus moves to the definition in the class declaration (in the interface portion of the unit). You can use the Ctrl+Shift combination with the Up or Down arrow keys to jump from the definition of a method or procedure in the interface portion of a unit to its complete definition in the implementation portion (or back again).</p>
+
+<p>Some of the Explorer Categories shown in Figure 1.5 are used by the Project Explorer, rather than by the Code Explorer. These include, among others, the Virtuals, Statics, Inherited, and Introduced grouping options.</p>
+
+<h4 id="browsingintheeditor">Browsing in the Editor</h4>
+
+<p>Another feature of the AppBrowser editor is <em>Tooltip symbol insight</em>. Move the mouse over a symbol in the editor, and a Tooltip will show you where the identifier is declared. This fea- ture can be particularly important for tracking identifiers, classes, and functions within an application you are writing, and also for referring to the source code of the Visual Compo- nent Library (VCL).</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* Although it may seem a good idea at first, you cannot use Tooltip symbol insight to find out which unit declares an identifier you want to use. If the corresponding unit is not already included, in fact, the Tooltip won’t appear.</p>
+
+<p>The real bonus of this feature, however, is that you can turn it into a navigational aid. When you hold down the Ctrl key and move the mouse over the identifier, Delphi creates an active link to the definition instead of showing the Tooltip. These links are displayed with the blue color and underline style that are typical of Web browsers, and the pointer changes to a hand whenever it’s positioned on the link.</p>
+
+<p>For example, you can Ctrl+click the TLabel identifier to open its definition in the VCL source code. As you select references, the editor keeps track of the various positions you’ve jumped to, and you can move backward and forward among them—again as in a Web browser. You can also click the drop-down arrows near the Back and Forward buttons to view a detailed list of the lines of the source code files you’ve already jumped to, for more control over the backward and forward movement.</p>
+
+<p>How can you jump directly to the VCL source code if it is not part of your project? The AppBrowser editor can find not only the units in the Search path (which are compiled as part of the project), but also those in Delphi’s Debug Source, Browsing, and Library paths. These directories are searched in the order I’ve just listed, and you can set them in the Directories/ Conditionals page of the Project Options dialog box and in the Library page of the Environ- ment Options dialog box. By default, Delphi adds the VCL source code directories in the Browsing path of the environment.</p>
+
+<h4 id="classcompletion">Class Completion</h4>
+
+<p>The third important feature of Delphi’s AppBrowser editor is <em>class completion</em>, activated by pressing the Ctrl+Shift+C key combination. Adding an event handler to an application is a fast operation, as Delphi automatically adds the declaration of a new method to handle the event in the class and provides you with the skeleton of the method in the implementation portion of the unit. This is part of Delphi’s support for visual programming.</p>
+
+<p>Newer versions of Delphi also simplify life in a similar way for programmers who write a little extra code behind event handlers. The new code-generation feature, in fact, applies to general methods, message-handling methods, and properties. For example, if you type the following code in the class declaration:</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>procedure</strong> Hello (MessageText: string);</p>
+
+<p>and then press Ctrl+Shift+C, Delphi will provide you with the definition of the method in the implementation section of the unit, generating the following lines of code:</p>
+
+<p><em>{ TForm1 }</em></p>
+
+<p><strong>procedure</strong> TForm1.Hello(MessageText: string);</p>
+
+<p><strong>begin end</strong>;</p>
+
+<p>This is really handy, compared with the traditional approach of many Delphi program- mers, which is to copy and paste one or more declarations, add the class names, and finally duplicate the begin...end code for every method copied.</p>
+
+<p>Class completion can also work the other way around. You can write the implementation of the method with its code directly, and then press Ctrl+Shift+C to generate the required entry in the class declaration.</p>
+
+<h4 id="codeinsight">Code Insight</h4>
+
+<p>Besides the Code Explorer, class completion, and the navigational features, the Delphi editor supports the <em>code insight</em> technology. Collectively, the code insight techniques are based on a constant background parsing, both of the source code you write and of the source code of the system units your source code refers to.</p>
+
+<p>Code insight comprises five capabilities: code completion, code templates, code parameters, Tooltip expression evaluation, and Tooltip symbol insight. This last feature was already cov- ered in the section “Browsing in the Editor”; the other four will be discussed in the following subsections. You can enable, disable, and configure each of these features in the Code Insight page of the Editor Options dialog box.</p>
+
+<h5 id="codecompletion">Code Completion</h5>
+
+<p>Code completion allows you to choose the property or method of an object simply by look- ing it up on a list or by typing its initial letters. To activate this list, you just type the name of an object, such as Button1, then add the dot, and wait. To force the display of the list, press Ctrl+spacebar; to remove it when you don’t want it, press Esc. Code completion also lets you look for a proper value in an assignment statement.</p>
+
+<p>In Delphi 6, as you start typing, the list filters its content according to the initial portion of the element you’ve inserted. The code completion list uses colors and shows more details to help you distinguish different items. Another new feature is that in the case of functions with parameters, parentheses are included in the generated code, and the parameters list hint is displayed immediately.</p>
+
+<p>As you type := after a variable or property, Delphi will list all the other variables or objects of the same type, plus the objects having properties of that type. While the list is visible, you can right-click it to change the order of the items, sorting either by scope or by name, and you can also resize the window.</p>
+
+<p>In Delphi 6, code completion also works in the interface section of a unit. If you press Ctrl+spacebar while the cursor is inside the class definition, you’ll get a list of: virtual meth- ods you can override (including abstract methods), the methods of implemented interfaces, the base class properties, and eventually system messages you can handle. Simply selecting one of them will add the proper method to the class declaration. In this particular case, the code completion list allows multiple selection.</p>
+
+<p>When the code you’ve written is incorrect, code insight won’t work, and you may see just a generic error message indicating the situation. It is possible to display specific code insight errors in the Message pane (which must already be open; it doesn’t open automatically to dis- play compilation errors). To activate this feature, you need to set an undocumented registry entry, setting the string key \Delphi\6.0\Compiling\ShowCodeInsiteErrors to the value ‘1’.</p>
+
+<p>There are advanced features of Delphi 6 code completion that aren’t easy to spot. One that I found particularly useful relates to the discovery of symbols in units not used by your project. As you invoke it (with Ctrl+spacebar) over a blank line, the list also includes sym- bols from common units (such as Math, StrUtils, and DateUtils) not already included in the uses statement of the current one. By selecting one of these <em>external</em> symbols, Delphi adds the unit to the uses statement for you. This feature (which doesn’t work inside expres- sions) is driven by a customizable list of extra units, stored in the registry key \Delphi\6.0\ CodeCompletion\ExtraUnits.</p>
+
+<h5 id="codetemplates">Code Templates</h5>
+
+<p>Code templates allow you to insert one of the predefined code templates, such as a complex statement with an inner begin...end block. Code templates must be activated manually, by typing Ctrl+J to show a list of all of the templates. If you type a few letters (such as a key- word) before pressing Ctrl+J, Delphi will list only the templates starting with those letters.</p>
+
+<p>You can add your own custom code templates, so that you can build your own shortcuts for commonly used blocks of code. For example, if you use the MessageDlg function often, you might want to add a template for it. In the Code Insight page of the Environment Options dialog box, click the Add button in the Code Template area, type in a new template name (for example, <strong>mess</strong>), type a description, and then add the following text to the template body in the Code memo control:</p>
+
+<p>MessageDlg (<em>‘|’</em>, mtInformation, [mbOK], 0);</p>
+
+<p>Now every time you need to create a message dialog box, you simply type <strong>mess</strong> and then press Ctrl+J, and you get the full text. The vertical line (or pipe) character indicates the posi- tion within the source code where the cursor will be in the editor after expanding the tem- plate. You should choose the position where you want to start typing to complete the code generated by the template.</p>
+
+<p>Although code templates might seem at first sight to correspond to language keywords, they are in fact a more general mechanism. They are saved in the DELPHI32.DCI file, so it should be possible to copy this file to make your templates available on different machines. Merging two code template files is not documented, though.</p>
+
+<h5 id="codeparameters">Code Parameters</h5>
+
+<p>Code parameters display, in a hint or Tooltip window, the data type of a function’s or method’s parameters while you are typing it. Simply type the function or method name and the open (left) parenthesis, and the parameter names and types appear immediately in a pop-up hint window. To force the display of code parameters, you can press Ctrl+Shift+spacebar. As a fur- ther help, the current parameter appears in bold type.</p>
+
+<h5 id="tooltipexpressionevaluation">Tooltip Expression Evaluation</h5>
+
+<p>Tooltip expression evaluation is a debug-time feature. It shows you the value of the identifier, property, or expression that is under the mouse cursor.</p>
+
+<h4 id="moreeditorshortcutkeys">More Editor Shortcut Keys</h4>
+
+<p>The editor has many more shortcut keys that depend on the editor style you’ve selected. Here are a few of the less-known shortcuts, most of which are useful:</p>
+
+<ul>
+<li><p>Ctrl+Shift plus a number key from 0 to 9 activates a bookmark, indicated in a “gutter” margin on the side of the editor. To jump back to the bookmark, press the Ctrl key plus the number key. The usefulness of bookmarks in the editor is limited by the facts that a new bookmark can override an existing one and that bookmarks are not persistent; they are lost when you close the file.</p></li>
+
+<li><p>Ctrl+E activates the incremental search. You can press Ctrl+E and then directly type the word you want to search for, without the need to go through a special dialog box and click the Enter key to do the actual search.</p></li>
+
+<li><p>Ctrl+Shift+I indents multiple lines of code at once. The number of spaces used is the one set by the Block Indent option in the Editor page of the Environment Options dia- log box. Ctrl+Shift+U is the corresponding key for unindenting the code.</p></li>
+
+<li><p>Ctrl+O+U toggles the case of the selected code; you can also use Ctrl+K+E to switch to lowercase and Ctrl+K+F to switch to uppercase.</p></li>
+
+<li><p>Ctrl+Shift+R starts recording a macro, which you can later play by using the Ctrl+Shift+P shortcut. The macro records all the typing, moving, and deleting operations done in the source code file. Playing the macro simply repeats the sequence—an operation that might have little meaning once you’ve moved on to a different source code file. Editor macros are quite useful for performing multistep operations over and over again, such as refor- matting source code or arranging data more legibly in source code.</p></li>
+
+<li><p>Holding down the Alt key, you can drag the mouse to select rectangular areas of the editor, not just consecutive lines and words.</p></li>
+</ul>
+
+<h2 id="theformdesigner">The Form Designer</h2>
+
+<p>Another Delphi window you’ll interact with very often is the Form Designer, a visual tool for placing components on forms. In the Form Designer, you can select a component directly with the mouse or through the Object Inspector, a handy feature when a control is behind another one or is very small. If one control covers another completely, you can use the Esc key to select the parent control of the current one. You can press Esc one or more times to select the form, or press and hold Shift while you click the selected component. This will deselect the current component and select the form by default.</p>
+
+<p>There are two alternatives to using the mouse to set the position of a component. You can either set values for the Left and Top properties, or you can use the arrow keys while holding down Ctrl. Using arrow keys is particularly useful for fine-tuning an element’s position. (The Snap To Grid option works only for mouse operations.) Similarly, by pressing the arrow keys while you hold down Shift, you can fine-tune the size of a component. (If you press Shift+Ctrl along with an arrow key, the component will be moved only at grid intervals.) Unfortunately, during these fine-tuning operations, the component hints with the position and size are not displayed.</p>
+
+<p>To align multiple components or make them the same size, you can select several compo- nents and set the Top, Left, Width, or Height property for all of them at the same time. To select several components, you can click them with the mouse while holding down the Shift key, or, if all the components fall into a rectangular area, you can drag the mouse to “draw” a rectangle surrounding them. When you’ve selected multiple components, you can also set their relative position using the Alignment dialog box (with the Align command of the form’s shortcut menu) or the Alignment Palette (accessible through the View ➢ Alignment Palette menu command).</p>
+
+<p>When you’ve finished designing a form, you can use the Lock Controls command of the Edit menu to avoid accidentally changing the position of a component in a form. This is par- ticularly helpful, as Undo operations on forms are limited (only an Undelete one), but the setting is not persistent.</p>
+
+<p>Among its other features, the Form Designer offers several Tooltip hints:</p>
+
+<p>·     As you move the pointer over a component, the hint shows you the name and type of the component. Delphi 6 offers extended hints, with details on the control position, size, tab order, and more. This is an addition to the Show Component Captions envi- ronment setting, which I keep active.</p>
+
+<p>·     As you resize a control, the hint shows the current size (the Width and Height proper- ties). Of course, this feature is available only for controls, not for nonvisual compo- nents (which are indicated in the Form Designer by icons).</p>
+
+<p>·     As you move a component, the hint indicates the current position (the Left and Top properties).</p>
+
+<p>Finally, you can save DFM (Delphi Form Module) files in plain text instead of the tradi- tional binary resource format. You can toggle this option for an individual form with the Form Designer’s shortcut menu, or you can set a default value for newly created forms in the Designer page of the Environment Options dialog box. In the same page, you can also spec- ify whether the secondary forms of a program will be automatically created at startup, a deci- sion you can always reverse for each individual form (using the Forms page of the Project Options dialog box).</p>
+
+<p>Having DFM files stored as text was a welcome addition in Delphi 5; it lets you operate more effectively with version-control systems. Programmers won’t get a real advantage from this feature, as you could already open the binary DFM files in the Delphi editor with a spe- cific command of the shortcut menu of the designer. Version-control systems, on the other hand, need to store the textual version of the DFM files to be able to compare them and cap- ture the differences between two versions of the same file.</p>
+
+<p>In any case, note that if you use DFM files as text, Delphi will still convert them into a binary resource format before including them in the executable file of your programs. DFMs are linked into your executable in binary format to reduce the executable size (although they are not really compressed) and to improve run-time performance (they can be loaded faster).</p>
+
+<p>Text DFM files are more portable between versions of Delphi than their binary version. While an older version of Delphi might not accept a new property of a control in a DFM created by a newer version of Delphi, the older Delphis will still be able to read the rest of the text DFM file. If the newer version of Delphi adds a new data type, though, older Delphis will be unable to read the newer Delphi’s binary DFMs at all. Even if this doesn’t sound likely, remember that 64-bit operating systems are just around the corner. When in doubt, save in text DFM format. Also note that all versions of Delphi support text DFMs, using the command-line tool Convert in the bin directory.</p>
+
+<h4 id="theobjectinspectorindelphi6">The Object Inspector in Delphi 6</h4>
+
+<p>Delphi 5 provided new features to the Object Inspector, and Delphi 6 includes even more additions to it. As this is a tool programmers use all the time, along with the editor and the Form Designer, its improvements are really significant.</p>
+
+<p>The most important change in Delphi 6 is the ability of the Object Inspector to expand component references in-place. Properties referring to other components are now displayed in a different color and can be expanded by selecting the + symbol on the left, as it happens with internal subcomponents. You can then modify the properties of that other component without having to select it. See Figure 1.6 for an example.</p>
+
+<p>This interface-expansion feature also supports subcomponents, as demonstrated by the new LabeledEdit control.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image099.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 1 . 6 :</strong></p>
+
+<p>A connected component</p>
+
+<p>(a pop-up menu) expanded in the Object Inspector while working on another component (a list box)</p>
+
+<p>A related feature of the Object Inspector is the ability to select the component referenced by a property. To do this, double-click the property value with the left mouse button while keeping the Ctrl key pressed. For example, if you have a MainMenu component in a form and you are looking at the properties of the form in the Object Inspector, you can select the MainMenu component by moving to the MainMenu property of the form and Ctrl+double-clicking the value of this property. This selects the main menu indicated as the value of the property in the Object Inspector.</p>
+
+<p>Here are some other relevant changes of the Object Inspector:</p>
+
+<p>·     The list at the top of the Object Inspector shows the type of the object and can be removed to save some space (and considering the presence of the Object TreeView).</p>
+
+<p>·     The properties that reference an object are now a different color and may be expanded without changing the selection.</p>
+
+<p>·     You can optionally also view read-only properties in the Object Inspector. Of course, they are grayed out.</p>
+
+<p>·     The Object Inspector has a new Properties dialog box (see Figure 1.7), which allows you to customize the colors of the various types of properties and the overall behavior of this window.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image105.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 1 . 7 :</strong></p>
+
+<p>The new Object Inspector Properties dialog box</p>
+
+<p>·      Since Delphi 5, the drop-down list for a property can include graphical elements. This is used for properties such as Color and Cursor, and is particularly useful for the ImageIndex property of components connected with an ImageList.</p>
+
+<p>Interface properties can now be configured at design time using the Object Inspector. This makes use of the Interfaced Component Reference model introduced in Kylix/Delphi 6, where components may implement and hold references to interfaces as long as the interfaces are implemented by components. Interfaced Component References work like plain old compo- nent references, except that interface properties can be bound to any component that imple- ments the necessary interface. Unlike component properties, interface properties are not limited to a specific component type (a class or its derived classes). When you click the drop- down list in the Object Inspector editor for an interface property, all components on the cur- rent form (and linked forms) that implement the interface are shown.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image110.gif" alt="img" /></p>
+
+<h5 id="propertycategories">Property Categories</h5>
+
+<p>Delphi 5 also introduced the idea of property categories, activated by the Arrange option of the local menu of the Object Inspector. If you set it, properties won’t be listed alphabetically but arranged by group, with each property possibly appearing in multiple groups.</p>
+
+<p>Categories have the benefit of reducing the complexity of the Object Inspector. You can use the View submenu from the shortcut menu to hide properties of given categories, regard- less of the way they are displayed (that is, even if you prefer the traditional arrangement by name, you can still hide the properties of some categories).</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image111.gif" alt="Text Box: 27" /></p>
+
+<p>Secrets of the Component Palette</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image069.gif" alt="img" /></p>
+
+<h2 id="secretsofthecomponentpalette">Secrets of the Component Palette</h2>
+
+<p>The Component Palette is very simple to use, but there are a few things you might not know. There are four simple ways to place a component on a form:</p>
+
+<p>·      After selecting a control in the palette, click within the form to set the position for the control, and press-and-drag the mouse to size it.</p>
+
+<p>·      After selecting any component, simply click within the form to place it with the default height and width.</p>
+
+<p>·      Double-click the icon in the palette to add a component of that type in the center of the form.</p>
+
+<p>·      Shift-click the component icon to place several components of the same kind in the form. To stop this operation, simply click the standard selector (the arrow icon) on the left side of the Component Palette.</p>
+
+<p>You can select the Properties command on the shortcut menu of the palette to completely rearrange the components in the various pages, possibly adding new elements or just moving them from page to page. In the resulting Properties page, you can simply drag a component from the Components list box to the Pages list box to move that component to a different page.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image112.gif" alt="img" /></p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image113.gif" alt="Text Box: TIP" /></p>
+
+<p>When you have too many pages in the Component Palette, you’ll need to scroll them to reach a component. There is a simple trick you can use in this case: Rename the pages with shorter names, so that all the pages will fit on the screen. Obvious—once you’ve thought about it.</p>
+
+<p>The real undocumented feature of the Component Palette is the “hot-track” activation. By setting special keys of the Registry, you can simply select a page of the palette by moving over the tab, without any mouse click. The same feature can be applied to the component scrollers on both sides of the palette, which show up when a page has too many components. To acti- vate this hidden feature, you must add an Extras key under HKEY<em>CURRENT</em>USER\Software\ Borland\Delphi\6.0. Under this key enter two string values, AutoPaletteSelect and AutoPaletteScroll, and set each value to the string ‘1’.</p>
+
+<h4 id="definingeventhandlers">Defining Event Handlers</h4>
+
+<p>There are several techniques you can use to define a handler for an event of a component:</p>
+
+<p>·      Select the component, move to the Events page, and either double-click in the white area on the right side of the event or type a name in that area and press the Enter key.</p>
+
+<p>·      For many controls, you can double-click them to perform the default action, which is to add a handler for the OnClick, OnChange, or OnCreate events.</p>
+
+<p>When you want to remove an event handler you have written from the source code of a Delphi application, you could delete all of the references to it. However, a better way is to delete all of the code from the corresponding procedure, leaving only the declaration and the begin and end keywords. The text should be the same as what Delphi automatically gener- ated when you first decided to handle the event. When you save or compile a project, Delphi removes any empty methods from the source code and from the form description (including the reference to them in the Events page of the Object Inspector). Conversely, to keep an event handler that is still empty, consider adding a comment to it (even just the // charac- ters), so that it will not be removed.</p>
+
+<h4 id="copyingandpastingcomponents">Copying and Pasting Components</h4>
+
+<p>An interesting feature of the Form Designer is the ability to copy and paste components from one form to another or to duplicate the component in the form. During this operation, Delphi duplicates all the properties, keeps the connected event handlers, and, if necessary, changes the name of the control (which must be unique in each form).</p>
+
+<p>It is also possible to copy components from the Form Designer to the editor and vice versa. When you copy a component to the Clipboard, Delphi also places the textual descrip- tion there. You can even edit the text version of a component, copy the text to the Clipboard, and then paste it back into the form as a new component. For example, if you place a button on a form, copy it, and then paste it into an editor (which can be Delphi’s own source-code editor or any word processor), you’ll get the following description:</p>
+
+<p><strong>object</strong> Button1: TButton Left = 152</p>
+
+<p>Top = 104</p>
+
+<p>Width = 75</p>
+
+<p>Height = 25 Caption = <em>‘Button1’</em></p>
+
+<p>TabOrder = 0</p>
+
+<p><strong>end</strong></p>
+
+<p>Now, if you change the name of the object, its caption, or its position, for example, or add a new property, these changes can be copied and pasted back to a form. Here are some sample changes:</p>
+
+<p><strong>object</strong> Button1: TButton Left = 152</p>
+
+<p>Top = 104</p>
+
+<p>Width = 75</p>
+
+<p>Height = 25</p>
+
+<p>Caption = <em>‘My Button’</em> TabOrder = 0 Font.Name = <em>‘Arial’</em></p>
+
+<p><strong>end</strong></p>
+
+<p>Copying this description and pasting it into the form will create a button in the specified position with the caption <em>My Button</em> in an Arial font.</p>
+
+<p>To make use of this technique, you need to know how to edit the textual representation of a component, what properties are valid for that particular component, and how to write the values for string properties, set properties, and other special properties. When Delphi inter- prets the textual description of a component or form, it might also change the values of other properties related to those you’ve changed, and it might change the position of the compo- nent so that it doesn’t overlap a previous copy. Of course, if you write something completely wrong and try to paste it into a form, Delphi will display an error message indicating what has gone wrong.</p>
+
+<p>You can also select several components and copy them all at once, either to another form or to a text editor. This might be useful when you need to work on a series of similar compo- nents. You can copy one to the editor, replicate it a number of times, make the proper changes, and then paste the whole group into the form again.</p>
+
+<h4 id="fromcomponenttemplatestoframes">From Component Templates to Frames</h4>
+
+<p>When you copy one or more components from one form to another, you simply copy all of their properties. A more powerful approach is to create a <em>component template</em>, which makes a copy of both the properties and the source code of the event handlers. As you paste the tem- plate into a new form, by selecting the pseudo-component from the palette, Delphi will replicate the source code of the event handlers in the new form.</p>
+
+<p>To create a component template, select one or more components and issue the Component ➢ Create Component Template menu command. This opens the Component Template Informa- tion dialog box, where you enter the name of the template, the page of the Component Palette where it should appear, and an icon.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image117.jpg" alt="img" /></p>
+
+<p>By default, the template name is the name of the first component you’ve selected followed by the word <em>Template</em>. The default template icon is the icon of the first component you’ve selected, but you can replace it with an icon file. The name you give to the component template will be used to describe it in the Component Palette (when Delphi displays the pop-up hint).</p>
+
+<p>All the information about component templates is stored in a single file, DELPHI32.DCT, but there is apparently no way to retrieve this information and edit a template. What you can do, however, is place the component template in a brand-new form, edit it, and install it again as a component template <em>using the same name</em>. This way you can overwrite the previous definition.</p>
+
+<p>A group of Delphi programmers can share component templates by storing them in a common directory, adding to the Registry the entry CCLibDir under the key \Software\Borland\ Delphi\6.0\Component Templates.</p>
+
+<p>Component templates are handy when different forms need the same group of components and associated event handlers. The problem is that once you place an instance of the template in a form, Delphi makes a copy of the components and their code, which is no longer related to the template. There is no way to modify the template definition itself, and it is certainly not possible to make the same change effective in all the forms that use the template. Am I asking too much? Not at all. This is what the <em>frames</em> technology in Delphi does.</p>
+
+<p>A frame is a sort of panel you can work with at design time in a way similar to a form. You simply create a new frame, place some controls in it, and add code to the event handlers. After the frame is ready, you can open a form, select the Frame pseudo-component from the Stan- dard page of the Component Palette, and choose one of the available frames (of the current project). After placing the frame in a form, you’ll see it as if the components were copied to it. If you modify the original frame (in its own designer), the changes will be reflected in each of the instances of the frame.</p>
+
+<p>You can see a simple example, called Frames1, in Figure 1.8 (its code is available on the companion CD). A screen snapshot doesn’t really mean much; you should open the program or rebuild a similar one if you want to start playing with frames. Like forms, frames define classes, so they fit within the VCL object-oriented model much more easily than component templates. Chapter 4 provides an in-depth look at VCL and includes a more detailed descrip- tion of frames. As you might imagine from this short introduction, frames are a powerful new technique.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image126.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 1 . 8 :</strong></p>
+
+<p>The Frames1 example demonstrates the use of frames. The frame (on the left) and its instance inside a form (on the right) are kept in synch.</p>
+
+<h2 id="managingprojects">Managing Projects</h2>
+
+<p>Delphi’s multitarget Project Manager (View ➢ Project Manager) works on a project <em>group</em>, which can have one or more projects under it. For example, a project group can include a DLL and an executable file, or multiple executable files.</p>
+
+<p>In Delphi 6, all open packages will show up as projects in the Project Manager view, even if they haven’t been added to the project group.</p>
+
+<p>In Figure 1.9, you can see the Project Manager with the project group for the current chapter. As you can see, the Project Manager is based on a tree view, which shows the hierar- chical structure of the project group, the projects, and all of the forms and units that make up each project. You can use the simple toolbar and the more complex shortcut menus of the Project Manager to operate on it. The shortcut menu is context-sensitive; its options depend on the selected item. There are menu items to add a new or existing project to a project group, to compile or build a specific project, or to open a unit.</p>
+
+<p>Of all the projects in the group, only one is active, and this is the project you operate upon when you select a command such as Project ➢ Compile. The Project pull-down of the main menu has two commands you can use to compile or build all the projects of the group. (Strangely enough, these commands are not available in the shortcut menu of the Project Manager for the project group.) When you have multiple projects to build, you can set a relative order by using the Build Sooner and Build Later commands. These two commands basically rearrange the projects in the list.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image130.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 1 . 9 :</strong></p>
+
+<p>Delphi’s multitarget Project Manager</p>
+
+<p>Among its advanced features, you can drag source code files from Windows folders or Win- dows Explorer onto a project in the Project Manager window to add them to that project.</p>
+
+<p>The Project Manager automatically selects as the current project the one you are working with—for example, opening a file. You can easily see which project is selected and change it by using the combo box on the top of the form.</p>
+
+<p>Besides adding Pascal files and projects, you can add Windows resource files to the Project Manager; they are compiled along with the project. Simply move to a project, select the Add shortcut menu, and choose Resource File (*.rc) as the file type. This resource file will be auto- matically bound to the project, even without a corresponding $R directive.</p>
+
+<p>Delphi saves the project groups with the new .BPG extension, which stands for Borland Project Group. This feature comes from C++Builder and from past Borland C++ compilers, a history that is clearly visible as you open the source code of a project group, which is basi- cally that of a makefile in a C/C++ development environment. Here is a simple example:</p>
+
+<p>#————————————————————————————— VERSION = BWS.01 #—————————————</p>
+
+<p>————————————————</p>
+
+<p>!ifndef ROOT</p>
+
+<p>ROOT = $(MAKEDIR)..</p>
+
+<p>!endif #———————————————————————</p>
+
+<p>——————</p>
+
+<p>MAKE = $(ROOT)\bin\make.exe -$(MAKEFLAGS) -f$<em>* DCC = $(ROOT)\bin\dcc32.exe $</em>*</p>
+
+<p>BRCC = $(ROOT)\bin\brcc32.exe $**#——————————————</p>
+
+<p>———————————————</p>
+
+<p>PROJECTS = Project1.exe #———————</p>
+
+<p>——————————————————————</p>
+
+<p>default: $(PROJECTS) #———————————</p>
+
+<p>——————————————————</p>
+
+<p>Project1.exe: Project1.dpr</p>
+
+<p>$(DCC)</p>
+
+<h4 id="projectoptions">Project Options</h4>
+
+<p>The Project Manager doesn’t provide a way to set the options of two different projects at one time. What you can do instead is invoke the Project Options dialog from the Project Manager for each project. The first page of Project Options (Forms) lists the forms that should be cre- ated automatically at program startup and the forms that are created manually by the pro- gram. The next page (Application) is used to set the name of the application and the name of its Help file, and to choose its icon. Other Project Options choices relate to the Delphi com- piler and linker, version information, and the use of run-time packages.</p>
+
+<p>There are two ways to set compiler options. One is to use the Compiler page of the Project Options dialog. The other is to set or remove individual options in the source code with the</p>
+
+<p>{$<em>X</em>+} or {$<em>X</em>-} commands, where you’d replace <em>X</em> with the option you want to set. This sec- ond approach is more flexible, since it allows you to change an option only for a specific source-code file, or even for just a few lines of code. The source-level options override the compile-level options.</p>
+
+<p>All project options are saved automatically with the project, but in a separate file with a</p>
+
+<p>.DOF extension. This is a text file you can easily edit. You should not delete this file if you have changed any of the default options. Delphi also saves the compiler options in another format in a CFG file, for command-line compilation. The two files have similar content but a different format: The <em>dcc</em> command-line compiler, in fact, cannot use .DOF files, but needs the .CFG format.</p>
+
+<p>Another alternative for saving compiler options is to press Ctrl+O+O (press the O key twice while keeping Ctrl pressed). This inserts, at the top of the current unit, compiler direc- tives that correspond to the current project options, as in the following listing:</p>
+
+<p><em>{$A+,B-,C+,D+,E-,F-,G+,H+,I+,J+,K-,L+,M-,N+,O+,P+,Q-,R-,S-,T-,U-,V+, W-,X+,Y+,Z1}</em></p>
+
+<p><em>{$MINSTACKSIZE $00004000}</em></p>
+
+<p><em>{$MAXSTACKSIZE $00100000}</em></p>
+
+<p><em>{$IMAGEBASE $00400000}</em></p>
+
+<p><em>{$APPTYPE GUI}</em></p>
+
+<h4 id="compilingandbuildingprojects">Compiling and Building Projects</h4>
+
+<p>There are several ways to compile a project. If you run it (by pressing F9 or clicking the Run toolbar icon), Delphi will compile it first. When Delphi compiles a project, it compiles only the files that have changed.</p>
+
+<p>If you select Compile ➢ Build All instead, every file is compiled, even if it has not changed. You should only need this second command infrequently, since Delphi can usually determine which files have changed and compile them as required. The only exception is when you change some project options, in which case you have to use the Build All command to put the new options into effect.</p>
+
+<p>To build a project, Delphi first compiles each source code file, generating a Delphi com- piled unit (DCU). (This step is performed only if the DCU file is not already up-to-date.) The second step, performed by the linker, is to merge all the DCU files into the executable file, optionally with compiled code from the VCL library (if you haven’t decided to use pack- ages at run time). The third step is binding into the executable file any optional resource files, such as the RES file of the project, which hosts its main icon, and the DFM files of the forms. You can better understand the compilation steps and follow what happens during this operation if you enable the Show Compiler Progress option (in the Preferences page of the Environment Options dialog box).</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* Delphi doesn’t always properly keep track of when to rebuild units based on other units you’ve modified. This is particularly true for the cases (and there are many) in which user intervention confuses the compiler logic. For example, renaming files, modifying source files outside the IDE, copying older source files or DCU files to disk, or having multiple copies of a unit source file in your search path can break the compilation. Every time the compiler shows some strange error message, the first thing you should try is the Build All command to resynchronize the make feature with the current files on disk.</p>
+
+<p>The Compile command can be used only when you have loaded a project in the editor. If no project is active and you load a Pascal source file, you cannot compile it. However, if you load the source file <em>as if it were a project</em>, that will do the trick and you’ll be able to compile the file. To do this, simply select the Open Project toolbar button and load a PAS file. Now you can check its syntax or compile it, building a DCU.</p>
+
+<p>I’ve mentioned before that Delphi allows you to use run-time packages, which affect the distribution of the program more than the compilation process. Delphi packages are dynamic link libraries (DLLs) containing Delphi components. By using packages, you can make an executable file much smaller. However, the program won’t run unless the proper dynamic link libraries (such as vcl50.bpl, which is quite large) are available on the computer where you want to run the program.</p>
+
+<p>If you add the size of this dynamic library to that of the small executable file, the total amount of disk space required by the apparently smaller program built with run-time pack- ages is much larger than the space required by the apparently bigger stand-alone executable file. Of course, if you have multiple applications on a single system, you’ll end up saving a lot, both in disk space and memory consumption at run time. The use of packages is often but not always recommended. I’ll discuss all the implications of packages in detail in Chapter 12.</p>
+
+<p>In both cases, Delphi executables are extremely fast to compile, and the speed of the result- ing application is comparable to that of a C or C++ program. Delphi compiled code runs at least five times faster than the equivalent code in interpreted or “semicompiled” tools.</p>
+
+<h4 id="exploringaproject">Exploring a Project</h4>
+
+<p>Past versions of Delphi included an Object Browser, which you could use when a project was compiled to see a hierarchical structure of its classes and to look for its symbols and the source-code lines where they are referenced. Delphi now includes a similar but enhanced tool, called Project Explorer. Like the Code Explorer, it is updated automatically as you type, without recompiling the project.</p>
+
+<p>The Project Explorer allows you to list Classes, Units, and Globals, and lets you choose whether to look only for symbols defined within your project or for those from both your project and VCL. You can see an example with only project symbols in Figure 1.10.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image133.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 1 . 1 0 :</strong></p>
+
+<p>The Project Explorer</p>
+
+<p>You can change the settings of this Explorer and those of the Code Explorer in the Explorer page of the Environment Options or by selecting the Properties command in the shortcut menu of the Project Explorer. Some of the Explorer categories you see in this win- dow are specific to the Project Explorer; others relate to both tools.</p>
+
+<h2 id="additionalandexternaldelphitools">Additional and External Delphi Tools</h2>
+
+<p>Besides the IDE, when you install Delphi you get other, external tools. Some of them, such as the Database Desktop, the Package Collection Editor (PCE.exe), and the Image Editor (ImagEdit.exe), are available from Tools menu of the IDE. In addition, the Enterprise edi- tion has a link to the SQL Monitor (SqlMon.exe).</p>
+
+<p>Other tools that are not directly accessible from the IDE include many command-line tools you can find in the bin directory of Delphi. For example, there is a command-line Delphi compiler (DCC.exe), a Borland resource compiler (BRC32.exe and BRCC32.exe), and an executable viewer (TDump.exe).</p>
+
+<p>Finally, some of the sample programs that ship with Delphi are actually useful tools that you can compile and keep at hand. I’ll discuss some of these tools in the book, as needed. Here are a few of the useful and higher-level tools, mostly available in the \Delphi6\bin folder and in the Tools menu:</p>
+
+<p><strong>Web App Debugger</strong> (WebAppDbg.exe) is the debugging Web server introduced in Delphi 6. It is used to keep track of the requests send to your applications and debug them. I’ll dis- cuss this tool in Chapter 21.</p>
+
+<p><strong>XML Mapper</strong> (XmlMapper.exe), again new in Delphi 6, is a tool for creating XML trans- formations to be applied to the format produced by the ClientDataSet component. More on this topic in Chapter 22.</p>
+
+<p><strong>External Translation Manager</strong> (etm60.exe) is the stand-alone version of the Integrated Translation Manager. This external tool can be given to external translators and is available for the first time in Delphi 6.</p>
+
+<p><strong>Borland Registry Cleanup Utility</strong> (D6RegClean.exe) helps you remove all of the Registry entries added by Delphi 6 to a computer.</p>
+
+<p><strong>TeamSource</strong> is an advanced version-control system provided with Delphi, starting with version 5. The tool is very similar to its past incarnation and is installed separately from Delphi.</p>
+
+<p><strong>WinSight</strong> (Ws.exe) is a Windows “message spy” program available in the bin directory.</p>
+
+<p><strong>Database Explorer</strong> can be activated from the Delphi IDE or as a stand-alone tool, using the DBExplor.exe program of the bin directory.</p>
+
+<p><strong>OpenHelp</strong> (oh.exe) is the tool you can use to manage the structure of Delphi’s own Help files, integrating third-party files into the help system.</p>
+
+<p><strong>Convert</strong> (Convert.exe) is a command-line tool you can use to convert DFM files into the equivalent textual description and vice versa.</p>
+
+<p><strong>Turbo Grep</strong> (Grep.exe) is a command-line search utility, much faster than the embedded Find In Files mechanism but not so easy to use.</p>
+
+<p><strong>Turbo Register Server</strong> (TRegSvr.exe) is a tool you can use to register ActiveX libraries and COM servers. The source code of this tool is available under \Demos\ActiveX\ TRegSvr.</p>
+
+<p><strong>Resource Explorer</strong> is a powerful resource viewer (but not a full-blown resource editor) you can find under \Demos\ResXplor.</p>
+
+<p><strong>Resource Workshop</strong> The Delphi 5 CD also includes a separate installation for Resource Workshop. This is an old 16-bit resource editor that can also manage Win32 resource files. It was formerly included in Borland C++ and Pascal compilers for Windows and was much better than the standard Microsoft resource editors then available. Although its user inter- face hasn’t been updated and it doesn’t handle long filenames, this tool can still be very useful for building custom or special resources. It also lets you explore the resources of existing executable files.</p>
+
+<h2 id="thefilesproducedbythesystem">The Files Produced by the System</h2>
+
+<p>Delphi produces various files for each project, and you should know what they are and how they are named. Basically, two elements have an impact on how files are named: the names you give to a project and its units, and the predefined file extensions used by Delphi.</p>
+
+<p>Table 1.1 lists the extensions of the files you’ll find in the directory where a Delphi project resides. The table also shows when or under what circumstances these files are created and their importance for future compilations.</p>
+
+<p><strong>TABLE 1.1:</strong> Delphi Project File Extensions</p>
+
+<p><strong>Extension      File Type and Description</strong>    **Creation Time          Required to Compile?</p>
+
+<p>.BMP, .ICO, .CUR   Bitmap, icon, and cursor files:</p>
+
+<p>standard Windows files used to store bitmapped images.</p>
+
+<p>Development: Image Editor  Usually not, but they might</p>
+
+<p>be needed at run time and for further editing.</p>
+
+<p>.BPG            Borland Project Group: the files used by the new multiple-target Project Manager. It is a sort of makefile.</p>
+
+<p>Development              Required to recompile all the projects of the group at once.</p>
+
+<p>.BPL             Borland Package Library: a DLL including VCL components to be used by the Delphi environment at design time or by applications at run time. (These files used a</p>
+
+<p>.DPL extension in Delphi 3.)</p>
+
+<p>Compilation: Linking       You’ll distribute packages</p>
+
+<p>to other Delphi developers and, optionally, to end- users.</p>
+
+<p>.CAB            The Microsoft Cabinet com- pressed-file format used for Web deployment by Delphi. A CAB file can store multiple com- pressed files.</p>
+
+<p>Compilation              Distributed to users.</p>
+
+<p>.CFG      Configuration file with project options. Similar to the DOF files.</p>
+
+<p>Development Required only if special compiler options have been set.</p>
+
+<p>.DCP            Delphi Component Package: a file with symbol information for the code that was compiled into the package. It doesn’t include compiled code, which is stored in DCU files.</p>
+
+<p>Compilation              Required when you use packages. You’ll distribute it only to other developers along with DPL files.</p>
+
+<p>.DCU            Delphi Compiled Unit: the result of the compilation of a Pascal file.</p>
+
+<p>Compilation             Only if the source code is not available. DCU files for the units you write are an intermediate step, so they make compilation faster.</p>
+
+<p>.DDP The new Delphi Diagram Portfo- lio, used by the Diagram view of the editor (was .DTI in Delphi 5)</p>
+
+<p>Development              No. This file stores “design- time only” information, not required by the resulting program but very impor- tant for the programmer.</p>
+
+<p><strong>TABLE 1.1 continued:</strong> Delphi Project File Extensions</p>
+
+<p><strong>Extension      File Type and Description</strong>    <strong>Creation Time          Required to Compile?</strong></p>
+
+<p>.DFM            Delphi Form File: a binary file with the description of the prop- erties of a form (or a data mod- ule) and of the components it contains.</p>
+
+<p>Development              Yes. Every form is stored in both a PAS and a DFM file.</p>
+
+<p>.~DF      Backup of Delphi Form File (DFM).</p>
+
+<p>Development              No. This file is produced when you save a new ver- sion of the unit related to the form and the form file along with it.</p>
+
+<p>.DFN            Support file for the Integrated Translation Environment (there is one DFN file for each form and each target language).</p>
+
+<p>Development (ITE)         Yes (for ITE). These files contain the translated strings that you edit in the Translation Manager.</p>
+
+<p>.DLL      Dynamic Link Library: another version of an executable file.</p>
+
+<p>Compilation: Linking       See .EXE.</p>
+
+<p>.DOF Delphi Option File: a text file with the current settings for the pro- ject options.</p>
+
+<p>Development              Required only if special compiler options have been set.</p>
+
+<p>.DPK            Delphi Package: the project source code file of a package.</p>
+
+<p>Development              Yes.</p>
+
+<p>.DPR            Delphi Project file. (This file actu- ally contains Pascal source code.)</p>
+
+<p>Development              Yes.</p>
+
+<p>.~DP            Backup of the Delphi Project file (.DPR).</p>
+
+<p>Development              No. This file is generated automatically when you save a new version of a project file.</p>
+
+<p>.DSK            Desktop file: contains informa- tion about the position of the Delphi windows, the files open in the editor, and other Desktop settings.</p>
+
+<p>Development              No. You should actually delete it if you copy the project to a new directory.</p>
+
+<p>.DSM           Delphi Symbol Module: stores all the browser symbol information.</p>
+
+<p>Compilation (but only if the Save Symbols option is set)</p>
+
+<p>No. Object Browser uses this file, instead of the data in memory, when you can- not recompile a project.</p>
+
+<p>.EXE            Executable file: the Windows application you’ve produced.</p>
+
+<p>Compilation: Linking No. This is the file you’ll</p>
+
+<p>distribute. It includes all of the compiled units, forms, and resources.</p>
+
+<p>.HTM            Or .HTML, for Hypertext Markup Language: the file format used for Internet Web pages.</p>
+
+<p>Web deployment of an ActiveForm</p>
+
+<p>No. This is not involved in the project compilation.</p>
+
+<p>.LIC             The license files related to an OCX file.</p>
+
+<p>ActiveX Wizard and other tools</p>
+
+<p>No. It is required to use the control in another develop- ment environment.</p>
+
+<p>.OBJ            Object (compiled) file, typical of the C/C++ world.</p>
+
+<p>Intermediate compilation step, generally not used in Delphi</p>
+
+<p>It might be required to merge Delphi with C++ compiled code in a single project.</p>
+
+<p>OCX      OLE Control Extension: a special version of a DLL, containing ActiveX controls or forms.</p>
+
+<p>Compilation: Linking       See .EXE.</p>
+
+<p>.PAS Pascal file: the source code of a Pascal unit, either a unit related to a form or a stand-alone unit.</p>
+
+<p>Development              Yes.</p>
+
+<p>.~PA            Backup of the Pascal file (.PAS).    Development              No. This file is generated automatically by Delphi when you save a new ver- sion of the source code.</p>
+
+<p>.RES, .RC         Resource file: the binary file asso- ciated with the project and usu- ally containing its icon. You can add other files of this type to a project. When you create custom resource files you might use also the textual format, .RC.</p>
+
+<p>Development Options dialog box. The ITE (Integrated Translation Environment) generates resource files with special comments.</p>
+
+<p>Yes. The main RES file of an application is rebuilt by Del- phi according to the infor- mation in the Application page of the Project Options dialog box.</p>
+
+<p>.RPS             Translation Repository (part of the Integrated Translation Envi- ronment).</p>
+
+<p>Development (ITE)          No. Required to manage the translations.</p>
+
+<p>.TLB Type Library: a file built automati- cally or by the Type Library Editor for OLE server applications.</p>
+
+<p>Development              This is a file other OLE pro- grams might need.</p>
+
+<p>TODO      To-do list file, holding the items related to the entire project.</p>
+
+<p>Development              No. This file hosts notes for the programmers.</p>
+
+<p>.UDL Microsoft Data Link. Development Used by ADO to refer to a data provider. Similar to an alias in the BDE world (see Chapter 12).</p>
+
+<p>Besides the files generated during the development of a project in Delphi, there are many others generated and used by the IDE itself. In Table 1.2, I’ve provided a short list of exten- sions worth knowing about. Most of these files are in proprietary and undocumented for- mats, so there is little you can do with them.</p>
+
+<p><strong>TABLE 1.2:</strong> Selected Delphi IDE Customization File Extensions</p>
+
+<p><strong>Extension File Type</strong></p>
+
+<p>.DCI              Delphi code templates</p>
+
+<p>.DRO              Delphi’s Object Repository (The repository should be modified with the Tools ➢ Repository command.)</p>
+
+<p>.DMT             Delphi menu templates</p>
+
+<p>.DBI               Database Explorer information</p>
+
+<p>.DEM              Delphi edit mask (files with country-specific formats for edit masks)</p>
+
+<p>.DCT              Delphi component templates</p>
+
+<p>.DST              Desktop settings file (one for each desktop setting you’ve defined)</p>
+
+<h4 id="lookingatsourcecodefiles">Looking at Source Code Files</h4>
+
+<p>I’ve just listed some files related to the development of a Delphi application, but I want to spend a little time covering their actual format. The fundamental Delphi files are Pascal source code files, which are plain ASCII text files. The bold, italic, and colored text you see in the editor depends on syntax highlighting, but it isn’t saved with the file. It is worth noting that there is one single file for the whole code of the form, not just small code fragments.</p>
+
+<p>In the listings in this book, I’ve matched the bold syntax highlighting of the editor for key- words and the italic for strings and comments.</p>
+
+<p>For a form, the Pascal file contains the form class declaration and the source code of the event handlers. The values of the properties you set in the Object Inspector are stored in a separate form description file (with a .DFM extension). The only exception is the Name prop- erty, which is used in the form declaration to refer to the components of the form.</p>
+
+<p>The DFM file is a binary and, in Delphi, can be saved either as a plain-text file or in the tradi- tional Windows Resource format. You can set the default format you want to use for new pro- jects in the Preferences page of the Environment Options dialog box, and you can toggle the format of individual forms with the Text DFM command of a form’s shortcut menu. A plain-text editor can read only the text version. However, you can load DFM files of both types in the Delphi editor, which will, if necessary, first convert them into a textual description. The simplest way to open the textual description of a form (whatever the format) is to select the View As Text command on the shortcut menu in the Form Designer. This closes the form, saving it if neces- sary, and opens the DFM file in the editor. You can later go back to the form using the View As Form command on the shortcut menu in the editor window.</p>
+
+<p>You can actually edit the textual description of a form, although this should be done with extreme care. As soon as you save the file, it will be turned back into a binary file. If you’ve made incorrect changes, compilation will stop with an error message and you’ll need to cor- rect the contents of your DFM file before you can reopen the form. For this reason, you shouldn’t try to change the textual description of a form manually until you have good knowledge of Delphi programming.</p>
+
+<p>In the book, I often show you excerpts of DFM files. In most of these excerpts, I only show the most relevant components or properties; generally, I have removed the positional properties, the binary values, and other lines providing little useful information.</p>
+
+<p>In addition to the two files describing the form (PAS and DFM), a third file is vital for rebuilding the application. This is the Delphi project file (DPR), which is another Pascal source code file. This file is built automatically, and you seldom need to change it manually. You can see this file with the View ➢ Project Source menu command.</p>
+
+<p>Some of the other, less relevant files produced by the IDE use the structure of Windows INI files, in which each section is indicated by a name enclosed in square brackets. For exam- ple, this is a fragment of an option file (DOF):</p>
+
+<p>[Compiler] A=1</p>
+
+<p>B=0</p>
+
+<p>ShowHints=1 ShowWarnings=1</p>
+
+<p>[Linker] MinStackSize=16384 MaxStackSize=1048576 ImageBase=4194304</p>
+
+<p>[Parameters] RunParams= HostApplication=</p>
+
+<p>The same structure is used by the Desktop files (DSK), which store the status of the Delphi IDE for the specific project, listing the position of each window. Here is a small excerpt:</p>
+
+<p>[MainWindow] Create=1 Visible=1 State=0 Left=2</p>
+
+<p>Top=0 Width=800 Height=97</p>
+
+<p>A lot of information related to the status of the Delphi environment is saved in the Windows Registry, as well as in DSK and other files. I’ve already indicated a few special undocumented entries of the Registry you can use to activate specific features. You should explore the HKEY<em>CURRENT</em>USER\Software\Borland\Delphi\6.0 section of the Registry to examine all the settings of the Delphi IDE (including all those you can modify with the Project Options and the Environment Options dialog boxes, as well as many others).</p>
+
+<h2 id="theobjectrepository">The Object Repository</h2>
+
+<p>Delphi has menu commands you can use to create a new form, a new application, a new data module, a new component, and so on. These commands are located in the File ➢ New menu and in other pull-down menus. What happens if you simply select File ➢ New ➢ Other?</p>
+
+<p>Delphi opens the Object Repository, which is used to create new elements of any kind: forms, applications, data modules, thread objects, libraries, components, automation objects, and more.</p>
+
+<p>The New dialog box (shown in Figure 1.11) has several pages, hosting all the new elements you can create, existing forms and projects stored in the Repository, Delphi wizards, and the forms of the current project (for visual form inheritance). The pages and the entries in this tabbed dialog box depend on the specific version of Delphi, so I won’t list them here.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image141.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 1 . 1 1 :</strong></p>
+
+<p>The first page of the New dialog box, generally known as the “Object Repository”</p>
+
+<p><strong>T<em>*</strong>IP</em>*     </p>
+
+<p>The Object Repository has a shortcut menu that allows you to sort its items in different ways (by name, by author, by date, or by description) and to show different views (large icons, small icons, lists, and details). The Details view gives you the description, the author, and the date of the tool, information that is particularly important when looking at wizards, projects, or forms that you’ve added to the Repository.</p>
+
+<p>The simplest way to customize the Object Repository is to add new projects, forms, and data modules as templates. You can also add new pages and arrange the items on some of them (not including the New and “current project” pages). Adding a new template to Delphi’s Object Repository is as simple as using an existing template to build an application. When you have a working application you want to use as a starting point for further development of similar programs, you can save the current status to a template, ready to use later on. Simply use the Project ➢ Add To Repository command, and fill in its dialog box.</p>
+
+<p>Just as you can add new project templates to the Object Repository, you can also add new form templates. Simply move to the form that you want to add and select the Add To Reposi- tory command of its shortcut menu. Then indicate the title, description, author, page, and icon in its dialog box.</p>
+
+<p>You might want to keep in mind that as you copy a project or form template to the reposi- tory and then copy it back to another directory, you are simply doing a copy and paste opera- tion. This isn’t much different than copying the files manually.</p>
+
+<p>To further customize the Repository, you can use the Tools ➢ Repository command. This opens the Object Repository dialog box, which you can use to move items to different pages, to add new elements, or to delete existing ones. You can even add new pages, rename or delete them, and change their order. An important element of the Object Repository setup is the use of defaults:</p>
+
+<p>·     Use the New Form check box below the list of objects to designate a form as the one to be used when a new form is created (File ➢ New Form).</p>
+
+<p>·     The Main Form check box indicates which type of form to use when creating the main form of a new application (File ➢ New Application) when no special New Project is selected.</p>
+
+<p>·     The New Project check box, available when you select a project, marks the default pro- ject that Delphi will use when you issue the File ➢ New Application command.</p>
+
+<p>Only one form and only one project in the Object Repository can have each of these three settings marked with a special symbol placed over its icon. If no project is selected as New Project, Delphi creates a default project based on the form marked as Main Form. If no form is marked as the main form, Delphi creates a default project with an empty form.</p>
+
+<p>When you work on the Object Repository, you work with forms and modules saved in the OBJREPOS subdirectory of the Delphi main directory. At the same time, if you use a form or any other object directly without copying it, then you end up having some files of your pro- ject in this directory. It is important to realize how the Repository works, because if you want to modify a project or an object saved in the Repository, the best approach is to operate on the original files, without copying data back and forth to the Repository.</p>
+
+<h2 id="whatsnext">What’s Next?</h2>
+
+<p>This chapter has presented an overview of the new and more advanced features of the Delphi 6 programming environment, including tips and suggestions about some lesser-known features that were already available in previous Delphi versions. I didn’t provide a step-by-step description of the IDE, partly because it is generally simpler to start <em>using</em> Delphi than it is to read about how to use it. Moreover, there is a detailed Help file describing the environment and the development of a new simple project; and you might already have some exposure to one of the past versions of Delphi or a similar development environment.</p>
+
+<p>Now we are ready to spend the next two chapters looking into the Object Pascal language and then proceed by studying the RTL and the class library included in Delphi 6.</p>
