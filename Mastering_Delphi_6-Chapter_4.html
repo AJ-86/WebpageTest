@@ -1,0 +1,713 @@
+<ol>
+<li>sdafds</li>
+
+<li>sdfds</li>
+</ol>
+
+<p><strong>D</strong>elphi uses Object Pascal as its programming language and favors an object-oriented approach, tied with a visual development style. This is where Delphi shines, and we will cover component-based and visual development in this book; however, I want to underline the fact that a lot of ready-to-use features of Delphi come from its run-time library, or RTL for short. This is a large collection of functions you can use to perform simple tasks, as well</p>
+
+<p>as some complex ones, within your Pascal code. (I use “Pascal” here, because the run-time library mainly contains procedures and functions and not classes and objects.)</p>
+
+<p>There is actually a second reason to devote this chapter of the book to the run-time library: Delphi 6 sees a large number of enhancements to this area. There are new groups of func- tions, functions have been moved to new units, and other elements have changed, creating a few incompatibilities with existing code. So even if you’ve used past versions of Delphi and feel confident with the RTL, you should still read at least portions of this chapter.</p>
+
+<h2 id="theunitsofthertl">The Units of the RTL</h2>
+
+<p>As I mentioned above, in Delphi 6 the RTL (run-time library) has a new structure and several new units. The reason for adding new units is that many new functions were added. In most cases, you’ll find the existing functions in the units where they used to be, but the new func- tions will appear in specific units. For example, new functions related to dates are now in the DateUtils unit, but existing date functions have not been moved away from SysUtils in order to avoid incompatibilities with existing code.</p>
+
+<p>The exception to this rule relates to some of the variant support functions, which were moved out of the System unit to avoid unwanted linkage of specific Windows libraries, even in programs that didn’t use those features. These variant functions are now part of the new Variants unit, described later in the chapter.</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* Some of your existing Delphi code might need to use this new Variants unit to recompile. Del- phi 6 is smart enough to acknowledge this and auto-include the Variants unit in projects that use the Variant type, issuing only a warning.</p>
+
+<p>A little bit of fine-tuning has also been applied to reduce the minimum size of an executable file, at times enlarged by the unwanted inclusion of global variables or initialization code.</p>
+
+<p>In the following sections is a list of the RTL units in Delphi 6, including all the units available (with the complete source code) in the Source\Rtl\Sys subfolder of the Delphi directory and some of those available in the new subfolder Source\Rtl\Common. This new directory hosts the source code of units that make up the new RTL package, which comprises both the function- based library and the core classes, discussed in the next chapter.</p>
+
+<p>The VCL50 package has now been split into the VCL and RTL packages, so that nonvisual applications using run-time packages don’t have the overhead of also deploying visual por- tions of the VCL. Also, this change helps with Linux compatibility, as the new package is shared between the VCL and CLX libraries. Notice also that the package names in Delphi 6 don’t have the version number in their name anymore. When they are compiled, though, the BPL does have the version in its file name, as discussed in more detail in Chapter 12.</p>
+
+<p>I’ll give a short overview of the role of each unit and an overview of the groups of functions included. I’ll also devote more space to the new Delphi 6 units. I won’t provide a detailed list of the functions included, because the online help includes similar reference material. How- ever, I’ve tried to pick a few interesting or little-known functions, and I will discuss them shortly.</p>
+
+<h4 id="thesystemandsysinitunits">The System and SysInit Units</h4>
+
+<p>System is the core unit of the RTL and is automatically included in any compilation (consid- ering an automatic and implicit uses statement referring to it). Actually, if you try adding the unit to the uses statement of a program, you’ll get the compile-time error:</p>
+
+<p>[Error] Identifier redeclared: System</p>
+
+<p>The System unit includes, among other things:</p>
+
+<ul>
+<li><p>The TObject class, the base class of any class defined in the Object Pascal language, including all the classes of the VCL. (This class is discussed later in this chapter.)</p></li>
+
+<li><p>The IUnknown and IDispatch interfaces as well as the simple implementation class TInterfacedObject. There are also the new IInterface and IInvokable interfaces. IInterface was added to underscore the point that the interface type in Delphi’s Object Pascal language definition is in no way dependent on the Windows operating system (and never has been). IInvokable was added to support SOAP-based invoca- tion. (Interfaces and related classes were introduced in the last chapter and will be dis- cussed further in multiple sections of the book.)</p></li>
+
+<li><p>Some variant support code, including the variant type constants, the TVarData record type and the new TVariantManager type, a large number of variant conversion routines, and also variant records and dynamic arrays support. This area sees a lot of changes compared to Delphi 5. The basic information on variants is provided in Chapter 10 of <em>Essential Pascal</em> (available on the companion CD), while an introduction to custom vari- ants is available later in this chapter.</p></li>
+
+<li><p>Many base data types, including pointer and array types and the TDateTime type I’ve already described in the last chapter.</p></li>
+
+<li><p>Memory allocation routines, such as GetMem and FreeMem, and the actual memory man- ager, defined by the TMemoryManager record and accessed by the GetMemoryManager and SetMemoryManager functions. For information, the GetHeapStatus function returns a THeapStatus data structure. Two new global variables (AllocMemCount and AllocMemSize) hold the number and total size of allocated memory blocks. There is more on memory and the use of these functions in Chapter 10.</p></li>
+
+<li><p>Package and module support code, including the PackageInfo pointer type, the GetPackageInfoTable global function, and the EnumModules procedure (packages inter- nals are discussed in Chapter 12).</p></li>
+
+<li><p>A rather long list of global variables, including the Windows application instance Main- Instance; IsLibrary, indicating whether the executable file is a library or a stand-alone program; IsConsole, indicating console applications; IsMultiThread, indicating whether there are secondary threads; and the command-line string CmdLine. (The unit includes also the ParamCount and ParamStr for an easy access to command-line parameters.) Some of these variables are specific to the Windows platform.</p></li>
+
+<li><p>Thread-support code, with the BeginThread and EndThread functions; file support records and file-related routines; wide string and OLE string conversion routines; and many other low-level and system routines (including a number of automatic conversion functions).</p></li>
+</ul>
+
+<p>The companion unit of System, called SysInit, includes the system initialization code, with functions you’ll seldom use directly. This is another unit that is always implicitly included, as it is used by the System unit.</p>
+
+<h5 id="newinsystemunit">New in System Unit</h5>
+
+<p>I’ve already described some interesting new features of the System unit in the list above, and most of the changes relate to making the core Delphi RTL more cross-platform portable, replacing Windows-specific features with generic implementations. Along this line, there are new names for interface types, totally revised support for variants, new pointer types, dynamic array support, and functions to customize the management of exception objects.</p>
+
+<p>Another addition for compatibility with Linux relates to line breaks in text files. There is a new DefaultTextLineBreakStyle variable, which can be set to either tlbsLF or tlbsCRLF, and a new sLineBreak string constant, which has the value #13#10 in the Windows version of Delphi and the value #10 in the Linux version. The line break style can also be set on a file-by-file basis with SetTextLineBreakStyle function.</p>
+
+<p>Finally, the System unit now includes the TFileRec and TTextRec structures, which were defined in the SysUtils unit in earlier versions of Delphi.</p>
+
+<h4 id="thesysutilsandsysconstunits">The SysUtils and SysConst Units</h4>
+
+<p>The SysConst unit defines a few constant strings used by the other RTL units for displaying messages. These strings are declared with the resourcestring keyword and saved in the pro- gram resources. As other resources, they can be translated by means of the Integrated Trans- lation Manager or the External Translation Manager.</p>
+
+<p>The SysUtils unit is a collection of system utility functions of various types. Different from other RTL units, it is in large part an operating system–dependent unit. The SysUtils unit has no specific focus, but it includes a bit of everything, from string management to locale and multibyte-characters support, from the Exception class and several other derived excep- tion classes to a plethora of string-formatting constants and routines.</p>
+
+<p>Some of the features of SysUtils are used every day by every programmer as the IntToStr or Format string-formatting functions; other features are lesser known, as they are the Windows version information global variables. These indicate the Windows platform (Window 9<em>x</em> or NT/2000), the operating system version and build number, and the eventual service pack installed on NT. They can be used as in the following code, extracted from the WinVersion example on the companion CD:</p>
+
+<p><strong>case</strong> Win32Platform <strong>of</strong></p>
+
+<p>VER<em>PLATFORM</em>WIN32<em>WINDOWS: ShowMessage (*‘Windows 9x’*); VER</em>PLATFORM<em>WIN32</em>NT:    ShowMessage (<em>‘Windows NT’</em>);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>ShowMessage (<em>‘Running on Windows: ‘</em> + IntToStr (Win32MajorVersion) + <em>‘.’</em> + IntToStr (Win32MinorVersion) + <em>‘ (Build ‘</em> + IntToStr (Win32BuildNumber) + <em>‘) ‘</em> + #10#13 + <em>‘Update: ‘</em> + Win32CSDVersion);</p>
+
+<p>The second code fragment produces a message like the one in Figure 4.1, depending, of course, on the operating-system version you have installed.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image220.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 4 . 1 :</strong></p>
+
+<p>The version information displayed by the WinVer- sion example</p>
+
+<p>Another little-known feature, but one with a rather long name, is a class that supports multithreading: TMultiReadExclusiveWriteSynchronizer. This class allows you to work with resources that can be used by multiple threads at the same time for reading (multiread) but must be used by one single thread when writing (exclusive-write). This means that the writ- ing cannot start until all the reading threads have terminated.</p>
+
+<p>The multi-read synchronizer is unique in that it supports recursive locks and promotion of read locks to write locks. The main purpose of the class is to allow multiple threads easy, fast access to read from a shared resource, but still allow one thread to gain exclusive control of the resource for relatively infrequent updates. There are other synchronization classes in Delphi, declared in the SyncObjs unit and closely mapped to operating-system synchronization objects (such as events and critical sections in Windows).</p>
+
+<h5 id="newsysutilsfunctions">New SysUtils Functions</h5>
+
+<p>Delphi 6 has some new functions within the SysUtils unit. One of the new areas relates to Boolean to string conversion. The BoolToStr function generally returns ‘-1’ and ‘0’ for true and false values. If the second optional parameter is specified, the function returns the first string in the TrueBoolStrs and FalseBoolStrs arrays (by default ‘TRUE’ and ‘FALSE’):</p>
+
+<p>BoolToStr (True) <em>// returns ‘-1’</em></p>
+
+<p>BoolToStr (False, True) <em>// returns ‘FALSE’ by default</em></p>
+
+<p>The reverse function is StrToBool, which can convert a string containing either one of the values of two Boolean arrays mentioned above or a numeric value. In the latter case, the result will be true unless the numeric value is zero. You can see a simple demo of the use of the Boolean conversion functions in the StrDemo example, later in this chapter.</p>
+
+<p>Other new functions of SysUtils relate to floating-point conversions to currency and date time types: FloatToCurr and FloatToDateTime can be used to avoid an explicit type cast. The TryStrToFloat and TryStrToCurr functions try to convert a string into a floating point or currency value and will return False in case of error instead of generating an exception (as the classic StrToFloat and StrToCurr functions do).</p>
+
+<p>There is an AnsiDequotedStr function, which removes quotes from a string, matching the AnsiQuoteStr function added in Delphi 5. Speaking of strings, Delphi 6 has much-improved support for wide strings, with a series of new routines, including WideUpperCase, WideLowerCase, WideCompareStr, WideSameStr, WideCompareText, WideSameText, and WideFormat. All of these functions work like their AnsiString counterparts.</p>
+
+<p>Three functions (TryStrToDate, TryEncodeDate, and TryEncodeTime) try to convert a string to a date or to encode a date or time, without raising an exception, similarly to the Try functions previously mentioned. In addition, the DecodeDateFully function returns more detailed information, such as the day of the week, and the CurrentYear function returns the year of today’s date.</p>
+
+<p>There is a portable, friendly, overloaded version of the GetEnvironmentVariable function. This new version uses string parameters instead of PChar parameters and is definitely easier to use:</p>
+
+<p><strong>function</strong> GetEnvironmentVariable(Name: string): string;</p>
+
+<p>Other new functions relate to interface support. Two new overloaded versions of the little- known Support function allow you to check whether an object or a class supports a given interface. The function corresponds to the behavior of the is operator for classes and is mapped to the QueryInterface method. Here’s an example in the code of the IntfDemo pro- gram from Chapter 3:</p>
+
+<p><strong>var</strong></p>
+
+<p>W1: IWalker; J1: IJumper;</p>
+
+<p><strong>begin</strong></p>
+
+<p>W1 := TAthlete.Create;</p>
+
+<p><em>// more code...</em></p>
+
+<p><strong>if</strong> Supports (w1, IJumper) <strong>then begin</strong></p>
+
+<p>J1 := W1 <strong>as</strong> IJumper; Log (J1.Walk);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>There are also an IsEqualGUID function and two functions for converting strings to GUIDs and vice versa. The function CreateGUID has been moved to SysUtils, as well, to make it also available on Linux (with a custom implementation, of course).</p>
+
+<p>Finally, Delphi 6 has some more Linux-compatibility functions. The AdjustLineBreaks function can now do different types of <em>adjustments</em> to carriage-return and line-feed sequences, along with the introduction of new global variables for text files in the System unit, as described earlier. The FileCreate function has an overloaded version in which you can specify file-access rights <em>the Unix way</em>. The ExpandFileName function can locate files (on case-sensitive file systems) even when their cases don’t exactly correspond. The functions related to path delimiters (back- slash or slash) have been made more generic and renamed accordingly. (For example, the IncludeTralingBackslash function is now better known as IncludingTrailingPathDelimiter.)</p>
+
+<h4 id="themathunit">The Math Unit</h4>
+
+<p>The Math unit hosts a collection of mathematical functions: about forty trigonometric func- tions, logarithmic and exponential functions, rounding functions, polynomial evaluations, almost thirty statistical functions, and a dozen financial functions.</p>
+
+<p>Describing all of the functions of this unit would be rather tedious, although some readers are probably very interested in the mathematical capabilities of Delphi. Here are some of the newer math functions.</p>
+
+<h5 id="newmathfunctions">New Math Functions</h5>
+
+<p>Delphi 6 adds to the Math unit quite a number of new features. There is support for infinite constants (Infinity and NegInfinity) and related comparison functions (IsInfinite and IsNan). There are new trigonometric functions for cosecants and cotangents and new angle- conversion functions.</p>
+
+<p>A handy feature is the availability of an overloaded IfThen function, which returns one of two possible values depending on a Boolean expression. (A similar function is now available also for strings.) You can use it, for example, to compute the minimum of two values:</p>
+
+<p>nMin := IfThen (nA &lt; nB, na, nB);</p>
+
+<p>The IfThen function is similar to the ?: operator of the C/C++ language, which I find very handy because you can replace a complete if/then/else statement with a much shorter expression, writing less code and often declaring fewer temporary variables.</p>
+
+<p>The RandomRange and RandomFrom can be used instead of the traditional Random function to have more control on the random values produced by the RTL. The first function returns a number within two extremes you specify, while the second selects a random value from an array of possible numbers you pass to it as a parameter.</p>
+
+<p>The InRange Boolean function can be used to check whether a number is within two other values. The EnsureRange function, instead, forces the value to be within the specified range.</p>
+
+<p>The return value is the number itself or the lower limit or upper limit, in the event the number is out of range. Here is an example:</p>
+
+<p><em>// do something only if value is within min and max</em></p>
+
+<p><strong>if</strong> InRange (value, min, max) <strong>then</strong></p>
+
+<p>...</p>
+
+<p><em>// make sure the value is between min and max</em></p>
+
+<p>value := EnsureRange (value, min, max);</p>
+
+<p>...</p>
+
+<p>Another set of very useful functions relates to comparisons. Floating-point numbers are fundamentally inexact; a floating-point number is an approximation of a theoretical real value. When you do mathematical operations on floating-point numbers, the inexactness of the original values accumulates in the results. Multiplying and dividing by the same number might not return exactly the original number but one that is very close to it. The SameValue function allows you to check whether two values are close enough in value to be considered equal. You can specify how close the two numbers should be or let Delphi compute a reason- able error range for the representation you are using. (This is why the function is overloaded.) Similarly, the IsZero function compares a number to zero, with the same “fuzzy logic.”</p>
+
+<p>The CompareValue function uses the same rule for floating-point numbers but is available also for integers; it returns one of the three constants LessThanValue, EqualsValue, and GreaterThanValue (corresponding to –1, 0, and 1). Similarly, the new Sign function returns</p>
+
+<p>–1, 0, and 1 to indicate a negative value, zero, or a positive value.</p>
+
+<p>The DivMod function is equivalent to both div and mod operations, returning the result of the integer division and the remainder (or modulus) at once. The RoundTo function allows you to specify the rounding digit—allowing, for example, rounding to the nearest thousand or to two decimals:</p>
+
+<p>RoundTo (123827, 3);  <em>// result is 124,000</em></p>
+
+<p>RoundTo (12.3827, -2); <em>// result is 12.38</em></p>
+
+<p><strong>W<em>*</strong>ARNING</em>* Notice that the RoundTo function uses a positive number to indicate the power of ten to round to (for example, 2 for hundreds) or a negative number for the number of decimal places. This is exactly the opposite of the Round function used by spreadsheets such as Excel.</p>
+
+<p>There are also some changes to the standard rounding operations provided by the Round function: You can now control how the FPU (the floating-point unit of the CPU) does the rounding by calling the SetRoundMode function. There are also functions to control the FPU precision mode and its exceptions.</p>
+
+<h4 id="thenewconvutilsandstdconvsunits">The New ConvUtils and StdConvs Units</h4>
+
+<p>The new ConvUtils unit contains the core of the conversion engine. It uses the conversion constants defined by a second unit, StdConvs. I’ll cover these two units later in this chapter, showing you also how to extend them with new measurement units.</p>
+
+<h4 id="thenewdateutilsunit">The New DateUtils Unit</h4>
+
+<p>The DateUtils unit is a new collection of date and time-related functions. It includes new functions for picking values from a TDateTime variable or counting values from a given interval, such as</p>
+
+<p><em>// pick value</em></p>
+
+<p><strong>function</strong> DayOf(<strong>const</strong> AValue: TDateTime): Word;</p>
+
+<p><strong>function</strong> HourOf(<strong>const</strong> AValue: TDateTime): Word;</p>
+
+<p><em>// value in range</em></p>
+
+<p><strong>function</strong> WeekOfYear(<strong>const</strong> AValue: TDateTime): Integer; <strong>function</strong> HourOfWeek(<strong>const</strong> AValue: TDateTime): Integer; <strong>function</strong> SecondOfHour(<strong>const</strong> AValue: TDateTime): Integer;</p>
+
+<p>Some of these functions are actually quite odd, such as MilliSecondOfMonth or SecondOfWeek, but Borland developers have decided to provide a complete set of functions, no matter how impractical they sound. I actually used some of these functions in Chapter 2, to build the TDate class.</p>
+
+<p>There are functions for computing the initial or final value of a given time interval (day, week, month, year) including the current date, and for range checking and querying; for example:</p>
+
+<p><strong>function</strong> DaysBetween(<strong>const</strong> ANow, AThen: TDateTime): Integer;</p>
+
+<p><strong>function</strong> WithinPastDays(<strong>const</strong> ANow, AThen: TDateTime;</p>
+
+<p><strong>const</strong> ADays: Integer): Boolean;</p>
+
+<p>Other functions cover incrementing and decrementing by each of the possible time inter- vals, encoding and “recoding” (replacing one element of the TDateTime value, such as the day, with a new one), and doing “fuzzy” comparisons (approximate comparisons where a differ- ence of a millisecond will still make two dates equal). Overall, DateUtils is quite interesting and not terribly difficult to use.</p>
+
+<h4 id="thenewstrutilsunit">The New StrUtils Unit</h4>
+
+<p>The StrUtils unit is a new unit with some new string-related functions. One of the key features of this unit is the availability of many new string comparison functions. There are functions based on a “soundex” algorithm (AnsiResembleText), some providing lookup in arrays of strings (AnsiMatchText and AnsiIndexText), sub-string location, and replacement (including AnsiContainsText and AnsiReplaceText).</p>
+
+<p><em>Soundex</em> is an algorithm to compare names based on how they sound rather then how they are spelled. The algorithm computes a number for each word sound, so that compar- ing two such numbers you can determine whether two names sound similar. The system was first applied 1880 by the U.S. Bureau of the Census, patented in 1918, and is now in the public domain. The soundex code is an indexing system that translates names into a four-character code consisting of one letter and three numbers. More information is at <a href="http://www.nara.gov/genealogy/coding.html">www.nara.gov/genealogy/coding.html.</a></p>
+
+<p>Beside comparisons, other functions provide a two-way test (the nice IfThen function, similar to the one we’ve already seen for numbers), duplicate and reverse strings, and replace sub-strings. Most of these string functions were added as a convenience to Visual Basic programmers migrating to Delphi.</p>
+
+<p>I’ve used some of these functions in the StrDemo example on the companion CD, which uses also some of the new Boolean-to-string conversions defined within the SysUtils unit. The program is actually a little more than a test for a few of these functions. For example, it uses the “soundex” comparison between the strings entered in two edit boxes, converting the resulting Boolean into a string and showing it:</p>
+
+<p>ShowMessage (BoolToStr (AnsiResemblesText (EditResemble1.Text, EditResemble2.Text), True));</p>
+
+<p>The program also showcases the AnsiMatchText and AnsiIndexText functions, after filling a dynamic array of strings (called strArray) with the values of the strings inside a list box. I could have used the simpler IndexOf method of the TStrings class, but this would have defeated the purpose of the example. The two list comparisons are done as follows:</p>
+
+<p><strong>procedure</strong> TForm1.ButtonMatchesClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>ShowMessage (BoolToStr (AnsiMatchText(EditMatch.Text, strArray), True));</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TForm1.ButtonIndexClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>nMatch: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>nMatch := AnsiIndexText(EditMatch.Text, strArray);</p>
+
+<p>ShowMessage (IfThen (nMatch >= 0, <em>‘Matches the string number ‘</em> + IntToStr (nMatch), <em>‘No match’</em>));</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Notice the use of the IfThen function in the last few lines of code, with two alternative out- put strings, depending on the result of the initial test (nMatch &lt;= 0).</p>
+
+<p>Three more buttons do simple calls to three other new functions, with the following lines of code (one for each):</p>
+
+<p><em>// duplicate (3 times) a string</em></p>
+
+<p>ShowMessage (DupeString (EditSample.Text, 3));</p>
+
+<p><em>// reverse the string</em></p>
+
+<p>ShowMessage (ReverseString (EditSample.Text));</p>
+
+<p><em>// choose a random string</em></p>
+
+<p>ShowMessage (RandomFrom (strArray));</p>
+
+<h4 id="thenewtypesunit">The New Types Unit</h4>
+
+<p>The Types unit is a new Pascal file holding data types common to multiple operating sys- tems. In past versions of Delphi, the same types were defined by the Windows unit; now they’ve been moved to this common unit, shared by Delphi and Kylix. The types defined here are simple ones and include, among others, the TPoint, TRect, and TSmallPoint record structures plus their related pointer types.</p>
+
+<h4 id="thenewvariantsandvarutilsunits">The New Variants and VarUtils Units</h4>
+
+<p>Variants and VarUtils are two new variant-related units. The Variants unit contains generic code for variants. As mentioned earlier, some of the routines in this unit have been moved here from the System unit. Functions include generic variant support, variant arrays, variant copy- ing, and dynamic array to variant array conversions. There is also the TCustomVariantType class, which defines customizable variant data types.</p>
+
+<p>The Variants unit is totally platform independent and uses the VarUtils unit, which con- tains OS-dependent code. In Delphi, this unit uses the system APIs to manipulate variant data, while in Kylix it uses some custom code provided by the RTL library.</p>
+
+<h5 id="customvariantsandcomplexnumbers">Custom Variants and Complex Numbers</h5>
+
+<p>The possibility to extend the type system with custom variants is brand new in Delphi 6. It allows you to define a new data type that, contrary to a class, overloads standard arithmetic operators.</p>
+
+<p>In fact, a variant is a type holding both type specification and the actual value. A variant can contain a string, another can contain a number. The system defines automatic conversions among variant types, allowing you to mix them inside operations (including custom variants). This flexibility comes at a high cost: operations on variants are much slower than on native types, and variants use extra memory.</p>
+
+<p>As an example of a custom variant type, Delphi 6 ships with an interesting definition for complex numbers, found in the VarCmplx unit (available in source-code format in the Rtl\Common folder). You can create complex variants by using one of the overloaded VarComplex- Create functions and use them in any expression, as the following code fragment demonstrates:</p>
+
+<p><strong>var</strong></p>
+
+<p>v1, v2: Variant;</p>
+
+<p><strong>begin</strong></p>
+
+<p>v1 := VarComplexCreate (10, 12);</p>
+
+<p>v2 := VarComplexCreate (10, 1); ShowMessage (v1 + v2 + 5);</p>
+
+<p>The complex numbers are actually defined using classes, but they are surfaced as variants by inheriting a new class from the TCustomVariantType class (defined in the Variants unit), overriding a few virtual abstract functions, and creating a global object that takes care of the registration within the system.</p>
+
+<p>Beside these internal definitions, the unit includes a long list of routines for operating on variant, including mathematical and trigonometric operations. I’ll leave them to your study, as not all readers may be interested in complex numbers for their programs.</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* Building a custom variant is certainly not an easy task, and I can hardly find reasons for using them instead of objects and classes. In fact, with a custom variant you gain the advantage of using operator overloading on your own data structures, but you lose compile-time checking, make the code much slower, miss several OOP features, and have to write a lot of rather com- plex code.</p>
+
+<h4 id="thedelphimmandsharememunits">The DelphiMM and ShareMem Units</h4>
+
+<p>The DelphiMM and ShareMem units relate to memory management. The actual Delphi memory manager is declared in the System unit. The DelphiMM unit defines an alternative memory manager library to be used when passing strings from an executable to a DLL (a Windows dynamic linking library), both built with Delphi.</p>
+
+<p>The interface to this memory manager is defined in the ShareMem unit. This is the unit you must include (compulsory as first unit) in the projects of both your executable and library (or libraries). Then, you’ll also need to distribute and install the Borlndmm.dll library file along with your program.</p>
+
+<h4 id="comrelatedunits">COM-Related Units</h4>
+
+<p>ComConts, ComObj, and ComServ provide low-level COM support. As these units are not really part of the RTL, from my point of view, I won’t discuss them here in any detail. You can refer to Chapter 20 for all the related information. In any case, these units have not changed a lot since the last version of Delphi.</p>
+
+<h2 id="convertingdata">Converting Data</h2>
+
+<p>Delphi 6 includes a new conversion engine, defined in the ConvUtils unit. The engine by itself doesn’t include any definition of actual measurement units; instead, it has a series of core functions for end users.</p>
+
+<p>The key function is the actual conversion call, the Convert function. You simply provide the amount, the units it is expressed in, and the units you want it converted into. The follow- ing would convert a temperature of 31 degrees Celsius to Fahrenheit:</p>
+
+<p>Convert (31, tuCelsius, tuFahrenheit)</p>
+
+<p>An overloaded version of the Convert function allows converting values that have two units, such as speed (which has both a length and a time unit). For example, you can convert miles per hours to meters per second with this call:</p>
+
+<p>Convert (20, duMiles, tuHours, duMeters, tuSeconds)</p>
+
+<p>Other functions in the unit allow you to convert the result of an addition or a difference, check if conversions are applicable, and even list the available conversion families and units.</p>
+
+<p>A predefined set of measurement units is provided in the StdConvs unit. This unit has con- version families and an impressive number of actual values, as in the following reduced excerpt:</p>
+
+<p><em>// Distance Conversion Units</em></p>
+
+<p><em>// basic unit of measurement is meters</em></p>
+
+<p>cbDistance: TConvFamily;</p>
+
+<p>duAngstroms: TConvType; duMicrons: TConvType; duMillimeters: TConvType; duMeters: TConvType; duKilometers: TConvType; duInches: TConvType; duMiles: TConvType; duLightYears: TConvType; duFurlongs: TConvType; duHands: TConvType; duPicas: TConvType;</p>
+
+<p>This family and the various units are registered in the conversion engine in the initializa- tion section of the unit, providing the conversion ratios (saved in a series of constants, as MetersPerInch in the code below):</p>
+
+<p>cbDistance := RegisterConversionFamily(<em>‘Distance’</em>);</p>
+
+<p>duAngstroms := RegisterConversionType(cbDistance, <em>‘Angstroms’</em>, 1E-10); duMillimeters := RegisterConversionType(cbDistance, <em>‘Millimeters’</em>, 0.001); duInches := RegisterConversionType(cbDistance, <em>‘Inches</em>’, MetersPerInch);</p>
+
+<p>To test the conversion engine, I built a generic example (ConvDemo on the companion CD) that allows you to work with the entire set of available conversions. The program fills a combo box with the available conversion families and a list box with the available units of the active family. This is the code:</p>
+
+<p><strong>procedure</strong> TForm1.FormCreate(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>i: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>GetConvFamilies (aFamilies);</p>
+
+<p><strong>for</strong> i := Low(aFamilies) <strong>to</strong> High(aFamilies) <strong>do</strong></p>
+
+<p>ComboFamilies.Items.Add (ConvFamilyToDescription (aFamilies[i]));</p>
+
+<p><em>// get the first and fire event</em> ComboFamilies.ItemIndex := 0; ChangeFamily (<strong>self</strong>);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TForm1.ChangeFamily(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>aTypes: TConvTypeArray; i: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>ListTypes.Clear;</p>
+
+<p>CurrFamily := aFamilies [ComboFamilies.ItemIndex]; GetConvTypes (CurrFamily, aTypes);</p>
+
+<p><strong>for</strong> i := Low(aTypes) <strong>to</strong> High(aTypes) <strong>do</strong></p>
+
+<p>ListTypes.Items.Add (ConvTypeToDescription (aTypes[i]));</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The aFamilies and CurrFamily variables are declared in the private section of the form as follows:</p>
+
+<p>aFamilies: TConvFamilyArray; CurrFamily: TConvFamily;</p>
+
+<p>At this point, a user can enter two measurement units and an amount in the corresponding edit boxes of the form, as you can see in Figure 4.2. To make the operation faster, it is actu- ally possible to select a value in the list and drag it to one of the two Type edit boxes. The dragging support is described in the sidebar “Simple Dragging in Delphi.”</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image222.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 4 . 2 :</strong></p>
+
+<p>The ConvDemo example at run time</p>
+
+<h5 id="simpledraggingindelphi">Simple Dragging in Delphi</h5>
+
+<p>The ConvDemo example I’ve built to show how to use the new conversion engine of Delphi 6 uses an interesting technique: dragging. In fact, you can move the mouse over the list box, select an item, and then keep the left mouse button pressed and drag the item over one of the edit boxes in the center of the form.</p>
+
+<p>To accomplish this, I had to set the DragMode property of the list box (the source component) to dmAutomatic and implement the OnDragOver and OnDragDrop events of the target edit boxes (the two edit boxes are connected to the same event handlers, sharing the same code). In the first method, the program indicates that the edit boxes always accept the dragging oper- ation, regardless of the source. In the second method, the program copies the text selected in the list box (the Source control of the dragging operation) to the edit box that fired the event (the Sender object). Here is the code for the two methods:</p>
+
+<p><strong>procedure</strong> TForm1.EditTypeDragOver(Sender, Source: TObject; X, Y: Integer; State: TDragState; <strong>var</strong> Accept: Boolean);</p>
+
+<p><strong>begin</strong></p>
+
+<p>Accept := True;</p>
+
+<p><strong>end;</strong></p>
+
+<p><strong>procedure</strong> TForm1.EditTypeDragDrop(Sender, Source: TObject; X, Y: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>(Sender <strong>as</strong> TEdit).Text := (Source <strong>as</strong> TListBox).Items [(Source <strong>as</strong> TListBox).ItemIndex];</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The units must match those available in the current family. In case of error, the text of the Type edit boxes is shown in red. This is the effect of the first part of the DoConvert method of the form, which is activated as soon as the value of one of the edit boxes for the units or the amount changes. After checking the types in the edit boxes, the DoConvert method does the actual conversion, displaying the result in the fourth, grayed edit box. In case of errors, you’ll get a proper message in the same box. Here is the code:</p>
+
+<p><strong>procedure</strong> TForm1.DoConvert(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>BaseType, DestType: TConvType;</p>
+
+<p><strong>begin</strong></p>
+
+<p><em>// get and check base type</em></p>
+
+<p><strong>if not</strong> DescriptionToConvType(CurrFamily, EditType.Text, BaseType) <strong>then</strong></p>
+
+<p>EditType.Font.Color := clRed</p>
+
+<p><strong>else</strong></p>
+
+<p>EditType.Font.Color := clBlack;</p>
+
+<p><em>// get and check destination type</em></p>
+
+<p><strong>if not</strong> DescriptionToConvType(CurrFamily, EditDestination.Text, DestType) <strong>then</strong></p>
+
+<p>EditDestination.Font.Color := clRed</p>
+
+<p><strong>else</strong></p>
+
+<p>EditDestination.Font.Color := clBlack;</p>
+
+<p><strong>if</strong> (DestType = 0) <strong>or</strong> (BaseType = 0) <strong>then</strong></p>
+
+<p>EditConverted.Text := <em>‘Invalid type’</em></p>
+
+<p><strong>else</strong></p>
+
+<p>EditConverted.Text := FloatToStr (Convert ( StrToFloat (EditAmount.Text), BaseType, DestType));</p>
+
+<p><strong>end</strong>;</p>
+
+<p>If all this is not interesting enough for you, consider that the conversion types provided serve only as a demo: You can fully customize the engine, by providing the measurement units you are interested in, as described in the next section.</p>
+
+<h4 id="whataboutcurrencyconversions">What About Currency Conversions?</h4>
+
+<p>Converting currencies is not exactly the same as converting measurement units, as currency rates change at very high speed. In theory, you can register a conversion rate with Delphi’s conversion engine. From time to time, you check the new rate exchange, unregister the existing conversion, and register a new one. However, keeping up with the actual rate means changing the conversion so often that the operation might not make a lot of sense. Also, you’ll have to triangulate conversions: you have to define a base unit (probably the U.S. dollar if you live in America) and convert to and from this currency even for converting between two different ones.</p>
+
+<p>What’s more interesting is to use the engine for converting member currencies of the euro, for two reasons. First, conversion rates are fixed (until the single euro currency actually takes over). Second, the conversion among euro currencies is legally done by converting a currency to euros first and then from the euro amount to the other currency, the exact behavior of Delphi’s conversion engine. There is only a small problem, as you should apply a rounding algorithm at every step of the conversion. I’ll consider this problem after I’ve provided the base code for integrating euro currencies with Delphi 6 conversion engine.</p>
+
+<p>The ConvertIt demo of Delphi 6 provides support for euro conversions, using a slightly differ- ent rounding approach (which might be more correct or not, I’m not really sure). I’ve decided to keep this example anyway, as it is instructive in showing how to create a new measurement system (and I lacked another example as good).</p>
+
+<p>The example, called EuroConv, is actually meant to teach how to register any new mea- surement unit with the engine. Following the template provided by the StdConvs unit, I’ve created a new unit (called EuroConvConst) and in the interface portion I’ve declared vari- ables for the family and the specific units, as follows:</p>
+
+<p><strong>interface</strong></p>
+
+<p><strong>var</strong></p>
+
+<p><em>// Euro Currency Conversion Units</em></p>
+
+<p>cbEuroCurrency: TConvFamily;</p>
+
+<p>cuEUR: TConvType;</p>
+
+<p>cuDEM: TConvType; <em>// Germany</em> cuESP: TConvType; <em>// Spain</em> cuFRF: TConvType; <em>// France</em> cuIEP: TConvType; <em>// Ireland</em> cuITL: TConvType; <em>// Italy</em></p>
+
+<p><em>// and so on...</em></p>
+
+<p>In the implementation portion of the unit, I’ve defined constants for the various official conversion rates:</p>
+
+<p><strong>implementation</strong></p>
+
+<p><strong>const</strong></p>
+
+<p>DEMPerEuros = 1.95583;</p>
+
+<p>ESPPerEuros = 166.386;</p>
+
+<p>FRFPerEuros = 6.55957;</p>
+
+<p>IEPPerEuros = 0.787564;</p>
+
+<p>ITLPerEuros = 1936.27;</p>
+
+<p><em>// and so on...</em></p>
+
+<p>Finally, in the unit initialization code I’ve registered the family and the various currencies, each with its own conversion rate and a readable name:</p>
+
+<p><strong>initialization</strong></p>
+
+<p><em>// Euro Currency’s family type</em></p>
+
+<p>cbEuroCurrency := RegisterConversionFamily(<em>‘EuroCurrency’</em>);</p>
+
+<p>cuEUR := RegisterConversionType( cbEuroCurrency, <em>‘EUR’</em>, 1);</p>
+
+<p>cuDEM := RegisterConversionType( cbEuroCurrency, <em>‘DEM’</em>, 1 / DEMPerEuros);</p>
+
+<p>cuESP := RegisterConversionType( cbEuroCurrency, <em>‘ESP’</em>, 1 / ESPPerEuros);</p>
+
+<p>cuFRF := RegisterConversionType( cbEuroCurrency, <em>‘FRF’</em>, 1 / FRFPerEuros);</p>
+
+<p>cuIEP := RegisterConversionType( cbEuroCurrency, <em>‘IEP’</em>, 1 / IEPPerEuros);</p>
+
+<p>cuITL := RegisterConversionType( cbEuroCurrency, <em>‘ITL’</em>, 1 / ITLPerEuros);</p>
+
+<p>The engine uses as a conversion factor the amount of the base unit to obtain the secondary ones, with a constant like MetersPerInch, for example. The standard rate of euro currencies is defined in the opposite way. For this reason, I’ve decided to keep the conversion constants with the official values (as DEMPerEuros above) and pass them to the engine as fractions (1/DEMPerEuros).</p>
+
+<p>Having registered this unit, we can now convert 120 German marks to Italian liras by writing:</p>
+
+<p>Convert (120, cuDEM, cuITL)</p>
+
+<p>The demo program actually does a little more, providing two list boxes with the available currencies, extracted as in the previous example, and edit boxes for the input value and final result. You can see the form at run time in Figure 4.3.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image224.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 4 . 3 :</strong></p>
+
+<p>The output of the EuroConv unit, showing the use of Delphi’s conversion engine with a custom measure- ment unit</p>
+
+<p>The program works nicely but is not perfect, as the proper rounding is not applied. In fact, you should round not only the final result of the conversion but also the intermediate value. Using the conversion engine to accomplish this directly is not easy. The engine allows you to provide either a custom conversion function or a conversion rate. But writing identical con- version functions for the all the various currencies seems a bad idea, so I’ve decided to go a different path. (You can see examples of custom conversion functions in the StdConvs unit, in the portion related to temperatures.)</p>
+
+<p>In the EuroConv example, I’ve added to the unit with the conversion rates a custom func- tion, called EuroConv, that does the proper conversion. Simply calling this function instead of the standard Convert function does the trick (and I really see no drawback to this approach, because in programs like this, you’ll hardly mix currencies with meters or temperatures). As an alternative, I could inherit a new class from TConvTypeFactor, providing a new version of the FromCommon and ToCommon methods, or I could have called the overloaded versions of the RegisterConversionType that accepts these two functions as parameters. None of these tech- niques, however, would have allowed me to handle special cases, such as the conversion of a currency to itself.</p>
+
+<p>This is the code of the EuroConv function, which uses the internal EuroRound function for rounding to the number of digits specified in the Decimals parameter (which must be between 3 and 6, according with the official rules):</p>
+
+<p><strong>type</strong></p>
+
+<p>TEuroDecimals = 3..6;</p>
+
+<p><strong>function</strong> EuroConvert (<strong>const</strong> AValue: Double;</p>
+
+<p><strong>const</strong> AFrom, ATo: TConvType;</p>
+
+<p><strong>const</strong> Decimals: TEuroDecimals = 3): Double;</p>
+
+<p><strong>function</strong> EuroRound (<strong>const</strong> AValue: Double): Double;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Result := AValue * Power (10, Decimals); Result := Round (Result);</p>
+
+<p>Result := Result / Power (10, Decimals);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>begin</strong></p>
+
+<p><em>// check special case: no conversion</em></p>
+
+<p><strong>if</strong> AFrom = ATo <strong>then</strong></p>
+
+<p>Result := AValue</p>
+
+<p><strong>else begin</strong></p>
+
+<p><em>// convert to Euro, then round</em></p>
+
+<p>Result := ConvertFrom (AFrom, AValue); Result := EuroRound (Result)</p>
+
+<p><em>// convert to currency then round again</em> Result := ConvertTo (Result, ATo); Result := EuroRound (Result);</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p>Of course, you might want to extend the example by providing conversion to other non- euro currencies, eventually picking the values automatically from a Web site. I’ll leave this as a rather complex exercise.</p>
+
+<p><strong>The</strong> <strong>*TObject*</strong> <strong>Class</strong></p>
+
+<p>As mentioned earlier, a key element of the System unit is the definition of the TObject class, the <em>mother of all Delphi classes</em>. Every class in the system is a subclass of the TObject class, either directly (for example, if you indicate no base class) or indirectly. The whole hierarchy of the classes of an Object Pascal program has a single root. This allows you to use the TObject data type as a replacement for the data type of any class type in the system.</p>
+
+<p>For example, event handlers of components usually have a Sender parameter of type TObject. This simply means that the Sender object can be of any class, since every class is ultimately derived from TObject. The typical drawback of such an approach is that to work on the object, you need to know its data type. In fact, when you have a variable or a parameter of the TObject type, you can apply to it only the methods and properties defined by the TObject class itself. If this variable or parameter happens to refer to an object of the TButton type, for example, you cannot directly access its Caption property. The solution to this problem lies in the use of the safe down-casting or run-time type information (RTTI) operators (is and as) discussed in Chapter 3.</p>
+
+<p>There is another approach. For any object, you can call the methods defined in the TObject class itself. For example, the ClassName method returns a string with the name of the class. Because it is a class method (see Chapter 2 for details), you can actually apply it both to an object and to a class. Suppose you have defined a TButton class and a Button1 object of that class. Then the following statements have the same effect:</p>
+
+<p>Text := Button1.ClassName; Text := TButton.ClassName;</p>
+
+<p>There are occasions when you need to use the name of a class, but it can also be useful to retrieve a class reference to the class itself or to its base class. The class reference, in fact, allows you to operate on the class at run time (as we’ve seen in the preceding chapter), while the class name is just a string. We can get these class references with the ClassType and ClassParent methods. The first returns a class reference to the class of the object, the second</p>
+
+<p>to its base class. Once you have a class reference, you can apply to it any class methods of</p>
+
+<p>TObject—for example, to call the ClassName method.</p>
+
+<p>Another method that might be useful is InstanceSize, which returns the run-time size of an object. Although you might think that the SizeOf global function provides this information, that function actually returns the size of an object reference—a pointer, which is invariably four bytes—instead of the size of the object itself.</p>
+
+<p>In Listing 4.1, you can find the complete definition of the TObject class, extracted from the System unit. Beside the methods I’ve already mentioned, notice InheritsFrom, which provides a test very similar to the is operator but that can be applied also to classes and class references (while the first argument of is must be an object).</p>
+
+<p><strong>The definition of the</strong> <strong>*TObject*</strong> <strong>class (in the System RTL unit)</strong></p>
+
+<p><strong>type</strong></p>
+
+<p>TObject = <strong>class constructor</strong> Create; <strong>procedure</strong> Free;</p>
+
+<p><strong>class function</strong> InitInstance(Instance: Pointer): TObject;</p>
+
+<p><strong>procedure</strong> CleanupInstance;</p>
+
+<p><strong>function</strong> ClassType: TClass;</p>
+
+<p><strong>class function</strong> ClassName: ShortString;</p>
+
+<p><strong>class function</strong> ClassNameIs(</p>
+
+<p><strong>const</strong> Name: string): Boolean; <strong>class function</strong> ClassParent: TClass; <strong>class function</strong> ClassInfo: Pointer; <strong>class function</strong> InstanceSize: Longint;</p>
+
+<p><strong>class function</strong> InheritsFrom(AClass: TClass): Boolean;</p>
+
+<p><strong>class function</strong> MethodAddress(<strong>const</strong> Name: ShortString): Pointer; <strong>class function</strong> MethodName(Address: Pointer): ShortString; <strong>function</strong> FieldAddress(<strong>const</strong> Name: ShortString): Pointer; <strong>function</strong> GetInterface(<strong>const</strong> IID: TGUID;<strong>out</strong> Obj): Boolean;</p>
+
+<p><strong>class function</strong> GetInterfaceEntry(</p>
+
+<p><strong>const</strong> IID: TGUID): PInterfaceEntry;</p>
+
+<p><strong>class function</strong> GetInterfaceTable: PInterfaceTable;</p>
+
+<p><strong>function</strong> SafeCallException(ExceptObject: TObject; ExceptAddr: Pointer): HResult; <strong>virtual</strong>;</p>
+
+<p><strong>procedure</strong> AfterConstruction; <strong>virtual</strong>; <strong>procedure</strong> BeforeDestruction; <strong>virtual</strong>; <strong>procedure</strong> Dispatch(<strong>var</strong> Message); <strong>virtual</strong>; <strong>procedure</strong> DefaultHandler(<strong>var</strong> Message); <strong>virtual</strong>; <strong>class function</strong> NewInstance: TObject; <strong>virtual</strong>; <strong>procedure</strong> FreeInstance; <strong>virtual</strong>;</p>
+
+<p><strong>destructor</strong> Destroy; <strong>virtual</strong>; <strong>end</strong>;</p>
+
+<p>The ClassInfo method returns a pointer to the internal run-time type information (RTTI) of the class, introduced in the next chapter.</p>
+
+<p>These methods of TObject are available for objects of every class, since TObject is the common ancestor class of every class. Here is how we can use these methods to access class information:</p>
+
+<p><strong>procedure</strong> TSenderForm.ShowSender(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>Memo1.Lines.Add (<em>‘Class Name: ‘</em> + Sender.ClassName);</p>
+
+<p><strong>if</strong> Sender.ClassParent &lt;> <strong>nil then</strong></p>
+
+<p>Memo1.Lines.Add (<em>‘Parent Class: ‘</em> + Sender.ClassParent.ClassName);</p>
+
+<p>Memo1.Lines.Add (<em>‘Instance Size: ‘</em> + IntToStr (Sender.InstanceSize));</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The code checks to see whether the ClassParent is nil in case you are actually using an instance of the TObject type, which has no base type. This ShowSender method is part of the IfSender example on the companion CD. The method is connected with the OnClick event of several controls: three buttons, a check box, and an edit box. When you click each control, the ShowSender method is invoked with the corresponding control as sender (more on events in the next chapter). One of the buttons is actually a Bitmap button, an object of a TButton subclass. You can see an example of the output of this program at run time in Figure 4.4.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image228.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 4 . 4 :</strong></p>
+
+<p>The output of the IfSender example</p>
+
+<p>You can use other methods to perform tests. For example, you can check whether the</p>
+
+<p>Sender object is of a specific type with the following code:</p>
+
+<p><strong>if</strong> Sender.ClassType = TButton <strong>then</strong> ...</p>
+
+<p>You can also check whether the Sender parameter corresponds to a given object, with this test:</p>
+
+<p><strong>if</strong> Sender = Button1 <strong>then</strong>...</p>
+
+<p>Instead of checking for a particular class or object, you’ll generally need to test the type compatibility of an object with a given class; that is, you’ll need to check whether the class of the object is a given class <em>or</em> one of its subclasses. This lets you know whether you can operate on the object with the methods defined for the class. This test can be accomplished using the InheritsFrom method, which is also called when you use the is operator. The following two tests are equivalent:</p>
+
+<p><strong>if</strong> Sender.InheritsFrom (TButton) <strong>then</strong> ...</p>
+
+<p><strong>if</strong> Sender <strong>is</strong> TButton <strong>then</strong> ...</p>
+
+<h4 id="showingclassinformation">Showing Class Information</h4>
+
+<p>I’ve extended the IfSender example to show a complete list of base classes of a given object or class. Once you have a class reference, in fact, you can add all of its base classes to the List- Parent list box with the following code:</p>
+
+<p><strong>with</strong> ListParent.Items <strong>do begin</strong></p>
+
+<p>Clear;</p>
+
+<p><strong>while</strong> MyClass.ClassParent &lt;> nil <strong>do begin</strong></p>
+
+<p>MyClass := MyClass.ClassParent; Add (MyClass.ClassName);</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p>You’ll notice that we use a class reference at the heart of the while loop, which tests for the absence of a parent class (so that the current class is TObject). Alternatively, we could have written the while statement in either of the following ways:</p>
+
+<p><strong>while not</strong> MyClass.ClassNameIs (<em>‘TObject’</em>) <strong>do</strong>... <strong>while</strong> MyClass &lt;> TObject <strong>do</strong>...</p>
+
+<p>The code in the with statement referring to the ListParent list box is part of the ClassInfo example (see the companion CD), which displays the list of parent classes and some other information about a few components of the VCL, basically those on the Standard page of the Component Palette. These components are manually added to a dynamic array holding classes and declared as</p>
+
+<p><strong>private</strong></p>
+
+<p>ClassArray: <strong>array of</strong> TClass;</p>
+
+<p>When the program starts, the array is used to show all the class names in a list box. Select- ing an item from the list box triggers the visual presentation of its details and its base classes, as you can see in the output of the program, in Figure 4.5.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image230.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 4 . 5 :</strong></p>
+
+<p>The output of the ClassInfo example</p>
+
+<p>As a further extension to this example, it is possible to create a tree with all of the base classes of the various components in a hierarchy. To do that, I’ve created the VclHierarchy program, which you can find on my Web site, <a href="http://www.marcocantu.com/">www.marcocantu.com, </a>in the CanTools section.</p>
+
+<h2 id="whatsnext">What’s Next?</h2>
+
+<p>In this chapter I’ve focused my attention on new features of the Delphi 6 function-based run- time library. I have provided only a summary of the entire RTL, not a complete overview, as this would have taken too much space. You can find more examples of the basic RTL func- tions of Delphi in my free electronic book <em>Essential Pascal</em>, which is featured on the compan- ion CD.</p>
+
+<p>In the next chapter, we’ll start moving from the function-based RTL to the class-based RTL, which is the core of Delphi’s class library. I won’t debate whether the core classes com- mon to the VCL and CLX, such as TObject, actually belong to the RTL or the class library. I’ve covered everything defined in System, SysUtils, and other units hosting functions and procedures in this chapter, while the next chapter focuses on the Classes unit and other core units defining classes.</p>
+
+<p>Along with the preceding two chapters on the Object Pascal language, this will provide a foundation for discussing visual- and database-oriented classes, or components, if you prefer. Looking to the various library units, we’ll find many more global functions, which don’t belong to the core RTL but are still quite useful!</p>

@@ -1,0 +1,1251 @@
+<p><strong>W</strong>e saw in the preceding chapter that Delphi includes a large number of functions and procedures, but the real power of Delphi’s visual programming lies in the huge class library it comes with. Delphi’s standard class library contains hundreds of classes, with thousands of methods, and it is so large that I certainly cannot provide a detailed reference in this book.</p>
+
+<p>What I’ll do, instead, is explore various areas of this library starting with this chapter and continuing through the following ones.</p>
+
+<p>This first chapter is devoted to the core classes of the library as well as to some standard programming techniques, such as the definition of events. We’ll explore some commonly used classes, such as lists, string lists, collections, and streams. We’ll devote most of our time to exploring the content of the Classes unit, but we’ll devote time also to other core units of the library.</p>
+
+<p>Delphi classes can be used either entirely in code or within the visual form designer. Some of them are component classes, which show up in the Component Palette, while others are more general-purpose. The terms <em>class</em> and <em>component</em> can be used almost as synonyms in Delphi. Components are the central elements of Delphi applications. When you write a pro- gram, you basically choose a number of components and define their interactions. That’s all there is to Delphi visual programming.</p>
+
+<p>Before reading this chapter, you need to have a good understanding of the Object Pascal programming language, including inheritance, properties, virtual methods, class references, and so on, as discussed in Chapters 2 and 3 of this book.</p>
+
+<h2 id="thertlpackagevclandclx">The RTL Package, VCL, and CLX</h2>
+
+<p>Until version 5, Delphi’s class library was known as VCL, which stands for Visual Components Library. Kylix, the Delphi version for Linux, introduced a new component library, called CLX (pronounced “clicks” and standing for Component Library for X-Platform or Cross Platform). Delphi 6 includes both the VCL and CLX libraries. For visual components, the two class libraries are alternative one to the other. However, the core classes and the database and Inter- net portions of the two libraries are basically shared.</p>
+
+<p>VCL was considered as a single large library, although programmers used to refer to differ- ent parts of it (components, controls, nonvisual components, data sets, data-aware controls, Internet components, and so on). CLX introduces a distinction in four parts: BaseCLX, VisualCLX, DataCLX, and NetCLX. Only in VisualCLX does the library use a totally differ- ent approach between the two platforms, with the rest of the code being inherently portable to Linux. In the following section, I discuss the sections of these two libraries, while the rest of the chapter focuses on the common core classes.</p>
+
+<p>In Delphi 6, this distinction is underlined by the fact that the core non-visual components and classes of the library are part of the new RTL package, which is used by both VCL and CLX. Moreover, using this package in non-visual applications (for example, Web server pro- grams) allows you to reduce the size of the files to deploy and load in memory considerably.</p>
+
+<h4 id="traditionalsectionsofvcl">Traditional Sections of VCL</h4>
+
+<p>Delphi programmers use to refer to different sections of VCL with names Borland originally suggested in its documentation, and names that became common afterwards for different groups of components. Technically, components are subclasses of the TComponent class, which is one of the root classes of the hierarchy, as you can see in Figure 5.1. Actually the TComponent class inherits from the TPersistent class; the role of these two classes will be explained in the next section.</p>
+
+<p><strong>F I G U R E 5 . 1 :</strong></p>
+
+<p>A graphical representation of the main groups of com- ponents of VCL</p>
+
+<p>Besides components, the library includes classes that inherit directly from TObject and from TPersistent. These classes are collectively known as <em>Objects</em> in portions of the documen- tation, a rather confusing name for me. These noncomponent classes are often used for val- ues of properties or as utility classes used in code; not inheriting from TComponent, these classes cannot be used directly in visual programming.</p>
+
+<p>To be more precise, noncomponent classes cannot be made available in the Component Palette and cannot be dropped directly into a form, but they can be visually managed with the Object Inspector, as subproperties of other properties or items of collections of various types. So even noncomponent classes are often easily used when interacting with the Form Designer.</p>
+
+<p>The component classes can be further divided into two main groups: controls and nonvi- sual components. Controls groups all the classes that descend from TControl.</p>
+
+<p><strong>Controls</strong> have a position and a size on the screen and show up in the form at design time in the same position they’ll have at run time. Controls have two different subspecifications, window-based or graphical, but I’ll discuss them in more detail in the next chapter.</p>
+
+<p><strong>Nonvisual components</strong> are all the components that are not controls—all the classes that descend from TComponent but not from TControl. At design time, a nonvisual component appears on the form as an icon (optionally with a caption below it). At run time, some of these components may be visible (for example, the standard dialog boxes), and others are always invisible (for example, the database table component).</p>
+
+<p>You can simply move the mouse cursor over a control or component in the Form Designer to see a Tooltip with its name and class type (and, in Delphi 6, some extended information). You can also use an environment option, Show Component Captions, to see the name of a nonvi- sual component right under its icon.</p>
+
+<h4 id="thestructureofclx">The Structure of CLX</h4>
+
+<p>This is the traditional subdivision of VCL, which is very common for Delphi programmers. Even with the introduction of CLX and some new naming schemes, the traditional names will probably survive and merge into Delphi programmers’ jargon.</p>
+
+<p>Borland now refers to different portions of the CLX library using one terminology under Linux and a slightly different (and less clear) naming structure in Delphi. This is the subdivi- sion of the Linux-compatible library:</p>
+
+<p><strong>BaseCLX</strong> forms the core of the class library, the topmost classes (such as TComponent), and several general utility classes (including lists, containers, collections, and streams). Com- pared to the corresponding classes of VCL, BaseCLX is largely unchanged and is highly portable between the Windows and Linux platforms. This chapter is largely devoted to exploring BaseCLX and the common VCL core classes.</p>
+
+<p><strong>VisualCLX</strong> is the collection of visual components, generally indicated as controls. This is the portion of the library that is more tightly related to the operating system: VisualCLX is implemented on top of the Qt library, available both on Windows and on Linux. Using VisualCLX allows for full portability of the visual portion of your application between Delphi on Windows and Kylix on Linux. However, most of the VisualCLX components have corresponding VCL controls, so that you can also easily move your code from one library to the other. I’ll discuss VisualCLX and the controls of VCL in the next chapter.</p>
+
+<p><strong>DataCLX</strong> comprises all the database-related components of the library. Actually, DataCLX is the front end of the new dbExpress database engine included in Delphi 6 and Kylix. Delphi includes also the traditional BDE front end, dbGo, and InterBase Express (IBX). If we can consider all these components as part of DataCLX, only the dbExpress front end and IBX are portable between Windows and Linux. DataCLX includes also the ClientDataSet com- ponent, now indicated as MyBase, and other related classes. Delphi’s data access components are discussed in Part III of the book.</p>
+
+<p><strong>NetCLX</strong> includes the Internet-related components, from the WebBroker framework, to the HTML producer components, from Indy (Internet Direct) to Internet Express, from the new Site Express to XML support. This part of the library is, again, highly portable between Windows and Linux. Internet support is discussed in the last part of the book.</p>
+
+<h4 id="vclspecificsectionsofthelibrary">VCL-Specific Sections of the Library</h4>
+
+<p>The preceding areas of the library are available, with the differences I’ve mentioned, on both Delphi and Kylix. In Delphi 6, however, there are other sections of VCL, which for one reason or another are specific to Windows only:</p>
+
+<ul>
+<li><p>The Delphi ActiveX (DAX) framework provides support for COM, OLE Automation, ActiveX, and other COM-related technologies. See Chapter 16 for more information on this area of Delphi.</p></li>
+
+<li><p>The Decision Cube components provide OLAP support but have ties with the BDE and haven’t been updated recently. Decision Cube is not discussed in the book.</p></li>
+</ul>
+
+<p>Finally, the default Delphi 6 installation includes some third-party components, such as TeeChart for business graphics and QuickReport for reporting. These components will be mentioned in the book but are not discussed in detail.</p>
+
+<p><strong>The</strong> <strong>*TPersistent*</strong> <strong>Class</strong></p>
+
+<p>The first core class of the Delphi library we’ll look at is the TPersistent class, which is quite a strange one: it has very little code and almost no direct use, but it provides a foundation for the entire idea of visual programming. You can see the definition of the class in Listing 5.1.</p>
+
+<p><em>{$M+}</em></p>
+
+<h6 id="thedefinitionofthetpersistentclassfromtheclassesunit">The definition of the <em>TPersistent</em> class, from the Classes unit</h6>
+
+<p>TPersistent = <strong>class</strong>(TObject) <strong>private</strong></p>
+
+<p><strong>procedure</strong> AssignError(Source: TPersistent);</p>
+
+<p><strong>protected</strong></p>
+
+<p><strong>procedure</strong> AssignTo(Dest: TPersistent); <strong>virtual</strong>; <strong>procedure</strong> DefineProperties(Filer: TFiler); <strong>virtual</strong>; <strong>function</strong> GetOwner: TPersistent; <strong>dynamic</strong>;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>destructor</strong> Destroy; <strong>override</strong>;</p>
+
+<p><strong>procedure</strong> Assign(Source: TPersistent); <strong>virtual</strong>; <strong>function</strong> GetNamePath: string; <strong>dynamic</strong>;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>As the name implies, this class handles persistency—that is, saving the value of an object to a file to be used later to re-create the object in the same state and with the same data. Persis- tency is a key element of visual programming. In fact (as we saw in Chapter 1) at design time in Delphi you manipulate actual objects, which are saved to DFM files and re-created at run time when the specific component container—form or data module—is created.</p>
+
+<p>The streaming support, though, is not embedded in the TPersistent class but is provided by other classes, which target TPersistent and its descendants. In other words, you can “per- sist” with Delphi default streaming-only objects of classes inheriting from TPersistent. One of the reasons for this behavior lies in the fact that the class is compiled with a special option turned on, {$M+}. This flag activates the generation of extended RTTI information for the published portion of the class.</p>
+
+<p>Delphi’s streaming system, in fact, doesn’t try to save the in-memory data of an object, which would be complex because of the many pointers to other memory locations, totally meaningless when the object would be reloaded. Instead, Delphi saves objects by listing the value of all of properties marked with a special keyword, published. When a property refers to another object, Delphi saves the name of the object or the entire object (with the same mechanism) depending on its type and relationship with the main object.</p>
+
+<p>Of the methods of the TPersistent class, the only one you’ll generally use is the Assign procedure, which can be used for copying the actual value of an object. In the library, this method is implemented by many noncomponent classes but by very few components. Actu- ally, most subclasses reimplement the virtual protected AssignTo method, called by the default implementation of Assign.</p>
+
+<p>Other methods include DefineProperties, used for customizing the streaming system and adding extra information (pseudo-properties), and the GetOwner and GetNamePath methods used by collections and other special classes to identify themselves to the Object Inspector.</p>
+
+<p><strong>The</strong> <strong>*published*</strong> <strong>Keyword</strong></p>
+
+<p>Along with the public, protected, and private access directives, you can use a fourth one, called published. For any published field, property, or method, the compiler generates extended RTTI information, so that Delphi’s run time environment or a program can query a class for its published interface. For example, every Delphi component has a published inter- face that is used by the IDE, in particular the Object Inspector. A regular use of published fields is important when you write components. Usually, the published part of a component contains no fields or methods but properties and events.</p>
+
+<p>When Delphi generates a form or data module, it places the definitions of its components and methods (the event handlers) in the first portion of its definition, before the public and private keywords. These fields and methods of the initial portion of the class are published. The default is published when no special keyword is added before an element of a compo- nent class.</p>
+
+<p>To be more precise, published is the default keyword only if the class was compiled with the $M+ compiler directive or is descended from a class compiled with $M+. As this directive is used in the TPersistent class, most classes of VCL and all of the component classes default to published. However, noncomponent classes in Delphi (such as TStream and TList) are compiled with $M- and default to public visibility.</p>
+
+<p>The methods assigned to any event should be published methods, and the fields corre- sponding to your components in the form should be published to be automatically con- nected with the objects described in the DFM file and created along with the form. (We’ll see later in this chapter the details of this situation and the problems it generates.)</p>
+
+<p>the proper method pointer type. This is a code fragment highlighting the key points of this technique:</p>
+
+<p><strong>var</strong></p>
+
+<p>Method: TMethod; Evt: TNotifyEvent;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Method.Code := MethodAddress (<em>‘Button1Click’</em>); Method.Data := <strong>Self</strong>;</p>
+
+<p>Evt := TNotifyEvent(Method);</p>
+
+<p>Evt (Sender); <em>// call the method</em></p>
+
+<p><strong>end</strong>;</p>
+
+<p>Delphi uses similar code to assign an event handler when it loads a DFM file, as these files store the name of the methods used to handle the events, while the components actually store the method pointer. The second method, MethodName, does the opposite transformation, return- ing the name of the method at a given memory address. This can be used to obtain the name of an event handler, given its value, something Delphi does when streaming a component into a DFM file.</p>
+
+<p>Finally, the FieldAddress method of TObject returns the memory location of a published field, given its name. This is used by Delphi to connect components created from the DFM files with the fields of their owner (for example, a form) having the same name.</p>
+
+<p>Notice that these three methods are seldom used in “normal” programs but play a key role to make Delphi work as it actually does and are strictly related to the streaming system. You’ll need to use these methods only when writing extremely dynamic programs or special-purpose wizards or other Delphi extensions.</p>
+
+<h4 id="accessingpropertiesbyname">Accessing Properties by Name</h4>
+
+<p>The Object Inspector displays a list of an object’s published properties, even for components you’ve written. To do this, it relies on the RTTI information generated for published proper- ties. Using some advanced techniques, an application can retrieve a list of the published properties of an object and use them.</p>
+
+<p>Although this capability is not very well known, in Delphi it is possible to access properties by name simply by using the string with the name of the property and then retrieving its value. Access to the RTTI information of properties is provided through a group of undocu- mented subroutines, part of the TypInfo unit.</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* These subroutines have always been undocumented in past versions of Delphi, so that Borland remained free to change them. However, from Delphi 1 to Delphi 5, changes were actually very limited and related only to the data structures declared in TypInfo, not the functions pro- vided by the unit. In Delphi 5 Borland actually added many more goodies, and a few “helper” routines, that are officially promoted (even if still not fully documented in the help file but only with comments provided in the unit).</p>
+
+<p>Rather than explore the entire TypInfo unit here, we will look at only the minimal code required to access properties by name. Prior to Delphi 5 it was necessary to use the GetPropInfo function to retrieve a pointer to some internal property information and then apply one of the access functions, such as GetStrProp, to this pointer. You also had to check for the existence and the type of the property.</p>
+
+<p>Delphi 5 introduced a new set of TypInfo routines, including the handy GetPropValue, which returns a variant with the value of the property or varNULL if the property doesn’t exist. You simply pass to this function the object and a string with the property name. A further optional parameter allows you to choose the format for returning values of properties of the set type.</p>
+
+<p>For example, we can call</p>
+
+<p>ShowMessage (GetPropValue (Button1, <em>‘Caption’</em>));</p>
+
+<p>This call has the same effect as calling ShowMessage, passing as parameter Button1.Caption. The only real difference is that this version of the code is much slower, since the compiler generally resolves normal access to properties in a more efficient way. The advantage of the run-time access is that you can make it very flexible, as in the following RunProp example (also available on the companion CD).</p>
+
+<p>This program displays in a list box the value of a property of any type for each component of a form. The name of the property we are looking for is provided in an edit box. This makes the program very flexible. Besides the edit box and the list box, the form has a button to gen- erate the output and some other components added only to test their properties. When you click the button, the following code is executed:</p>
+
+<p><strong>uses</strong></p>
+
+<p>TypInfo;</p>
+
+<p><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>I: Integer; Value: Variant;</p>
+
+<p><strong>begin</strong></p>
+
+<p>ListBox1.Clear;</p>
+
+<p><strong>for</strong> I := 0 <strong>to</strong> ComponentCount -1 <strong>do begin</strong></p>
+
+<p>Value := GetPropValue (Components[I], Edit1.Text);</p>
+
+<p><strong>if</strong> Value &lt;> varNULL <strong>then</strong></p>
+
+<p>ListBox1.Items.Add (Components[I].Name + <em>‘.’</em> + Edit1.Text + <em>‘ = ‘</em> + string (Value))</p>
+
+<p><strong>else</strong></p>
+
+<p>ListBox1.Items.Add (<em>‘No ‘</em> + Components[I].Name + <em>‘.’</em> + Edit1.Text);</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p>You can see the effect of pressing the Fill List button while using the default <em>Caption</em> value in the edit box in Figure 5.2. You can try with any other property name. Numbers will be con- verted to strings by the variant conversion. Objects (such as the value of the Font property) will be displayed as memory addresses.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image240.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 5 . 2 :</strong></p>
+
+<p>The output of the RunProp example, which accesses properties by name at run time</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* Do not use regularly the TypInfo unit instead of polymorphism and other property-access tech- niques. Use base-class property access first, or use the safe as typecast when required, and reserve RTTI access to properties as a very last resort. Using TypInfo techniques makes your code slower, more complex, and more prone to human error; in fact, it skips the compile-time type-checking.</p>
+
+<p><strong>The</strong> <strong>*TComponent*</strong> <strong>Class</strong></p>
+
+<p>If the TPersistent class is really more important than it seems at first sight, the key class at the heart of Delphi’s component-based class library is TComponent, which inherits from</p>
+
+<p>TPersistent (and from TObject). The TComponent class defines many core elements of com- ponents, but it is not as complex as you might think, as the base classes and the language already provide most of what’s actually needed.</p>
+
+<p>I won’t explore all of the details of the TComponent class, some of which are more important for component designers than they are for component users. I’ll just discuss ownership (which accounts for some public properties of the class) and the two published properties of the class, Name and Tag.</p>
+
+<h4 id="ownership">Ownership</h4>
+
+<p>One of the core features of the TComponent class is the definition of ownership. When a com- ponent is created, it can be assigned an owner component, which will be responsible for destroy- ing it. So every component can have an owner and can also be the owner of other components. Several public methods and properties of the class are actually devoted to handling the <em>two sides</em> of ownership. Here is a list, extracted from the class declaration (in the Classes unit of VCL):</p>
+
+<p><strong>type</strong></p>
+
+<p>TComponent = <strong>class</strong>(TPersistent, IInterface, IInterfaceComponentReference)</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create(AOwner: TComponent); <strong>virtual</strong>; <strong>procedure</strong> DestroyComponents;</p>
+
+<p><strong>function</strong> FindComponent(<strong>const</strong> AName: string): TComponent; <strong>procedure</strong> InsertComponent(AComponent: TComponent); <strong>procedure</strong> RemoveComponent(AComponent: TComponent);</p>
+
+<p><strong>property</strong> Components[Index: Integer]: TComponent <strong>read</strong> GetComponent;</p>
+
+<p><strong>property</strong> ComponentCount: Integer <strong>read</strong> GetComponentCount;</p>
+
+<p><strong>property</strong> ComponentIndex: Integer</p>
+
+<p><strong>read</strong> GetComponentIndex <strong>write</strong> SetComponentIndex;</p>
+
+<p><strong>property</strong> Owner: TComponent <strong>read</strong> FOwner;</p>
+
+<p>If you create a component giving it an owner, this will be added to the list of components (InsertComponent), which is accessible using the Components array property. The specific component has an Owner and knows its position in the owner components list, with the ComponentIndex property. Finally, the destructor of the owner will take care of the destruc- tion of the object it owns, calling DestroyComponents. There are a few more protected meth- ods involved, but this should give you the overall picture.</p>
+
+<p>What is important to emphasize is that component ownership can solve a large part of the memory management problems of your applications, if used properly. If you always create components with an owner—the default operation if you use the visual designers of the IDE—you only need to remember to destroy these component containers when they are not needed anymore, and you can forget about the components they contain. For example, you delete a form to destroy all of the components it contains at once, which is a large simplifica- tion compared to having to remember to free each and every object individually.</p>
+
+<h5 id="thecomponentsarray">The Components Array</h5>
+
+<p>The Components property can also be used to access one component owned by another—let’s say, a form. This can be very handy (compared to using directly a specific component) for writing generic code, acting on all or many components at a time. For example, you can use the following code to add to a list box the names of all the components of a form (this code is actually part of the ChangeOwner example, presented in the next section):</p>
+
+<p><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>I: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>ListBox1.Items.Clear;</p>
+
+<p><strong>for</strong> I := 0 <strong>to</strong> ComponentCount - 1 <strong>do</strong></p>
+
+<p>ListBox1.Items.Add (Components [I].Name);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This code uses the ComponentCount property, which holds the total number of components owned by the current form, and the Components property, which is actually the list of the owned components. When you access a value from this list you get a value of the TComponent type. For this reason you can directly use only the properties common to all components, such as the Name property. To use properties specific to particular components, you have to use the proper type-downcast (as).</p>
+
+<p>In Delphi, some components are also component containers: the GroupBox, Panel, PageCon- trol, and, of course, Form components. When you use these controls, you can add other com- ponents inside them. In this case, the container is the parent of the components (as indicated by the Parent property), while the form is their owner (as indicated by the Owner property). You can use the Controls property of a form or group box to navigate the child controls, and you can use the Components property of the form to navigate all the owned components, regardless of their parent.</p>
+
+<p>Using the Components property, we can always access each component of a form. If you need access to a specific component, however, instead of comparing each name with the name of the component you are looking for, you can let Delphi do this work, by using the FindComponent method of the form. This method simply scans the Components array looking for a name match. More information about the role of the Name property for a component is in a later section.</p>
+
+<h5 id="changingtheowner">Changing the Owner</h5>
+
+<p>We have seen that almost every component has an owner. When a component is created at design time (or from the resulting DFM file), its owner will invariably be its form. When you create a component at run time, the owner is passed as a parameter to the Create constructor.</p>
+
+<p>Owner is a read-only property, so you cannot change it. The owner is set at creation time and should generally not change during the lifetime of a component. To understand why you should not change the owner of a component at design time nor freely change its name, read the following discussion. Be warned, that the topic covered is not simple, so if you’re only starting with Delphi, you might want to come back to this section at a later time.</p>
+
+<p>To change the owner of a component, you can call the InsertComponent and RemoveComponent methods of the owner itself, passing the current component as parameter. Using these meth- ods you can change a component’s owner. However, you cannot apply them directly in an event handler of a form, as we attempt to do here:</p>
+
+<p><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>RemoveComponent (Button1); Form2.InsertComponent (Button1);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This code produces a memory access violation, because when you call RemoveComponent, Delphi disconnects the component from the form field (Button1), setting it to nil. The solu- tion is to write a procedure like this:</p>
+
+<p><strong>procedure</strong> ChangeOwner (Component, NewOwner: TComponent);</p>
+
+<p><strong>begin</strong></p>
+
+<p>Component.Owner.RemoveComponent (Component); NewOwner.InsertComponent (Component);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This method (extracted from the ChangeOwner example) changes the owner of the com- ponent. It is called along with the simpler code used to change the parent component; the two commands combined move the button <em>completely</em> to another form, changing its owner:</p>
+
+<p><strong>procedure</strong> TForm1.ButtonChangeClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>if</strong> Assigned (Button1) <strong>then begin</strong></p>
+
+<p><em>// change parent</em></p>
+
+<p>Button1.Parent := Form2;</p>
+
+<p><em>// change owner</em></p>
+
+<p>ChangeOwner (Button1, Form2);</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p>The method checks whether the Button1 field still refers to the control, because while moving the component, Delphi will set Button1 to nil. You can see the effect of this code in Figure 5.3.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image242.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 5 . 3 :</strong></p>
+
+<p>In the ChangeOwner example, clicking the Change button moves the Button1 component to the second form.</p>
+
+<p>To demonstrate that the Owner of the Button1 component actually changes, I’ve added another feature to both forms. The List button fills the list box with the names of the com- ponents each form owns, using the procedure shown in the previous section. Click the two List buttons before and after moving the component, and you’ll see what happens behind the scenes. As a final feature, the Button1 component has a simple handler for its OnClick event, to display the caption of the owner form:</p>
+
+<p><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>ShowMessage (<em>‘My owner is ‘</em> + ((Sender <strong>as</strong> TButton).Owner <strong>as</strong> TForm).Caption);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>The</strong> <strong>*Name*</strong> <strong>Property</strong></p>
+
+<p>Every component in Delphi should have a name. The name must be unique within the owner component, which is generally the form into which you place the component. This means that an application can have two different forms, each with a component with the same name, although you might want to avoid this practice to prevent confusion. It is gener- ally better to keep component names unique throughout an application.</p>
+
+<p>Setting a proper value for the Name property is very important: If it’s too long, you’ll need to type a lot of code to use the object; if it’s too short, you may confuse different objects. </p>
+
+<p>Usually the name of a component has a prefix with the component type; this makes the code more readable and allows Delphi to group components in the combo box of the Object Inspector, where they are sorted by name. There are three important elements related to the Name property of the components:</p>
+
+<ul>
+<li><p>First, the value of the Name property is used to define the name of the object in the dec- laration of the form class. This is the name you’re generally going to use in the code to refer to the object. For this reason, the value of the name property must be a legal Pas- cal identifier (it has to be without spaces and must start with a letter, not a number).</p></li>
+
+<li><p>Second, if you set the Name property of a control before changing its Caption or Text property, the new name is often copied to the caption. That is, if the name and the cap- tion are identical, then changing the name will also change the caption.</p></li>
+
+<li><p>Third, Delphi uses the name of the component to create the default name of the meth- ods related to its events. If you have a Button1 component, its default OnClick event handler will be called Button1Click, unless you specify a different name. If you later change the name of the component, Delphi will modify the names of the related meth- ods accordingly. For example, if you change the name of the button to MyButton, the Button1Click method automatically becomes MyButtonClick.</p></li>
+</ul>
+
+<p>As mentioned earlier, if you have a string with the name of a component, you can get its instance by calling the FindComponent of its owner, which returns nil in case the component is not found. For example, you can write</p>
+
+<p><strong>var</strong></p>
+
+<p>Comp: TComponent;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Comp := FindComponent (<em>‘Button1’</em>);</p>
+
+<p><strong>if</strong> Assigned (Comp) <strong>then with</strong> Comp <strong>as</strong> TButton <strong>do</strong></p>
+
+<p><em>// some code...</em></p>
+
+<p>Delphi includes also a FindGlobalComponent function, which finds a top-level component, basi- cally a form or data module, that has a given name. To be precise, the FindGlobalComponent function calls one or more installed functions, so in theory you can modify the way the func- tion works. However, as FindGlobalComponent is used by the streaming system, I strongly recommend against installing your own replacement functions. If you want to have a cus- tomized way to search for components on other containers, simply write a new function with a custom name.</p>
+
+<h4 id="removingformfields">Removing Form Fields</h4>
+
+<p>Every time you add a component to a form, Delphi adds an entry for it, along with some of its properties, to the DFM file. To the Pascal file, Delphi adds the corresponding field in the form class declaration. When the form is created, Delphi loads the DFM file and uses it to</p>
+
+<p>re-create all the components and set their properties back. Then it hooks the new object with the form field corresponding to its Name property.</p>
+
+<p>For this reason, it is certainly possible to have a component without a name. If your appli- cation will not manipulate the component or modify it at run time, you can remove the com- ponent name from the Object Inspector. Examples are a static label with fixed text, or a menu item, or even more obviously, menu item separators. By blanking out the name, you’ll remove the corresponding element from the form class declaration. This reduces the size of the form object (by only four bytes, the size of the object reference) and it reduces the DFM file by not including a useless string (the component name). Reducing the DFM also implies reducing the final EXE file size, even if only slightly.</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* If you blank out component names, just make sure to leave at least one named component of each class used on the form so that the smart linker will link in the required code for the class. If, as an example, you remove from a form all the fields referring to TLabel components, the Delphi linker will remove the implementation of the TLabel class from the executable file. The effect is that when the system loads the form at run time, it is unable to create an object of an unknown class and issues an error indicating that the class is not available.</p>
+
+<p>You can also keep the component name and manually remove the corresponding field of the form class. Even if the component has no corresponding form field, it is created any- way, although using it (through the FindComponent method, for example) will be a little more difficult.</p>
+
+<h4 id="hidingformfields">Hiding Form Fields</h4>
+
+<p>Many OOP purists complain that Delphi doesn’t really follow the encapsulation rules, because all of the components of a form are mapped to public fields and can be accessed from other forms and units. Fields for components, in fact, are listed in the first unnamed section of a class declaration, which has a default visibility of published. However, Delphi does that only as a default to help beginners learn to use the Delphi visual development environment quickly. A programmer can follow a different approach and use properties and methods to operate on forms. The risk, however, is that another programmer of the same team might inadvertently bypass this approach, directly accessing the components if they are left in the published sec- tion. The solution, which many programmers don’t know about, is to move the components to the private portion of the class declaration.</p>
+
+<p>As an example, I’ve taken a very simple form with an edit box, a button, and a list box. When the edit box contains text and the user presses the button, the text is added to the list box.</p>
+
+<p>When the edit box is empty, the button is disabled. This is the simple code of the HideComp example:</p>
+
+<p><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>ListBox1.Items.Add (Edit1.Text);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TForm1.Edit1Change(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>Button1.Enabled := Length (Edit1.Text) &lt;> 0;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>I’ve listed these methods only to show you that in the code of a form we usually refer to the available components, defining their interactions. For this reason it seems impossible to get rid of the fields corresponding to the component. However, what we can do is hide them, moving them from the default published section to the private section of the form class declaration:</p>
+
+<p>TForm1 = <strong>class</strong>(TForm)</p>
+
+<p><strong>procedure</strong> Button1Click(Sender: TObject); <strong>procedure</strong> Edit1Change(Sender: TObject); <strong>procedure</strong> FormCreate(Sender: TObject);</p>
+
+<p><strong>private</strong></p>
+
+<p>Button1: TButton; Edit1: TEdit; ListBox1: TListBox;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Now if you run the program you’ll get in trouble: The form will load fine, but because the private fields are not initialized, the events above will use nil object references. Delphi usu- ally initializes the published fields of the form using the components created from the DFM file. What if we do it ourselves, with the following code?</p>
+
+<p><strong>procedure</strong> TForm1.FormCreate(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>Button1 := FindComponent (<em>‘Button1’</em>) <strong>as</strong> TButton; Edit1 := FindComponent (<em>‘Edit1’</em>) <strong>as</strong> TEdit; ListBox1 := FindComponent (<em>‘ListBox1’</em>) <strong>as</strong> TListBox;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>It will <em>almost</em> work, but it generates a system error, similar to the one we discussed in the previous section. This time, the private declarations will cause the linker to link in the imple- mentations of those classes, but the problem is that the streaming system needs to know the names of the classes in order to locate the class reference needed to construct the compo- nents while loading the DFM file.</p>
+
+<p>The final touch we need is some registration code to tell Delphi at run time about the exis- tence of the component classes we want to use. We should do this before the form is created, so I generally place this code in the initialization section of the unit:</p>
+
+<p><strong>initialization</strong></p>
+
+<p>RegisterClasses ([TButton, TEdit, TListBox]);</p>
+
+<p>Now the question is, is this really worth the effort? What we obtain is a higher degree of encapsulation, protecting the components of a form from other forms (and other program- mers writing them). I have to say that replicating these steps for each and every form can be tedious, so I ended up writing a wizard to generate this code for me on the fly. The wizard is far from perfect, as it doesn’t handle changes automatically, but it is usable. You can find it on my Web site, <a href="http://www.marcocantu.com/">www.marcocantu.com, </a>under the CanTools section. My simple wizard apart, for a large project built according to the principles of object-oriented programming, I recom- mend you consider this or a similar technique.</p>
+
+<h4 id="thecustomizabletagproperty">The Customizable Tag Property</h4>
+
+<p>The Tag property is a strange one, because it has no effect at all. It is merely an extra memory location, present in each component class, where you can store custom values. The kind of information stored and the way it is used are completely up to you.</p>
+
+<p>It is often useful to have an extra memory location to attach information to a component without needing to define your component class. Technically, the Tag property stores a long integer so that, for example, you can store the entry number of an array or list that corre- sponds to an object. Using typecasting, you can store in the Tag property a pointer, an object, or anything else that is four bytes wide. This allows a programmer to associate virtually any- thing with a component using its tag. We’ll see how to use this property in several examples in future chapters, including the ODMenu examples in Chapter 5.</p>
+
+<h2 id="events">Events</h2>
+
+<p>Now that I’ve introduced the TComponent class, there is one more element of Delphi we have to introduce. Delphi components, in fact, are programmed using “PME,” properties, meth- ods, and events. If methods and properties should be clear by now, events have not been fully introduced yet. The reason is that events don’t imply a new language feature but are simply a standard coding technique. An event, in fact, is technically a property, with the only differ- ence being that it refers to a method (a method pointer type, to be precise) instead of other types of data.</p>
+
+<h4 id="eventsindelphi">Events in Delphi</h4>
+
+<p>When a user does something with a component, such as clicking it, the component generates an event. Other events are generated by the system, in response to a method call or a change to one of that component’s properties (or even a different component’s). For example, if you set the focus on a component, the component currently having the focus loses it, triggering the corresponding event.</p>
+
+<p>Technically, most Delphi events are triggered when a corresponding operating system message is received, although the events do not match the messages on a one-to-one basis. Delphi events tend to be higher-level than operating system messages, and Delphi provides a number of extra inter-component messages.</p>
+
+<p>From a theoretical point of view, an event is the result of a request sent to a component or control, which can respond to the message. Following this approach, to handle the click event of a button, we would need to subclass the TButton class and add the new event handler code inside the new class.</p>
+
+<p>In practice, creating a new class for every component you want to use is too complex to be a reasonable solution. In Delphi, the event handler of a component usually is a method of the form that holds the component, not of the component itself. In other words, the component relies on its owner, the form, to handle its events. This technique is called <em>delegation,</em> and it is fundamental to the Delphi component-based model. This way, you don’t have to modify the TButton class, unless you want to define a new type of component, but simply customize its owner to modify the behavior of the button.</p>
+
+<h4 id="methodpointers">Method Pointers</h4>
+
+<p>Events rely on a specific feature of the Object Pascal language: <em>method pointers</em>. A method pointer type is like a procedural type, but one that refers to a method. Technically, a method pointer type is a procedural type that has an implicit Self parameter. In other words, a variable of a proce- dural type stores the address of a function to call, provided it has a given set of parameters. A method pointer variable stores two addresses: the address of the method code and the address of an object instance (data). The address of the object instance will show up as Self inside the method body when the method code is called using this method pointer.</p>
+
+<p>This explains the definition of Delphi’s generic TMethod type, a record with a Code field and a</p>
+
+<p>Data field.</p>
+
+<p>The declaration of a method pointer type is similar to that of a procedural type, except that it has the keywords of object at the end of the declaration:</p>
+
+<p><strong>type</strong></p>
+
+<p>IntProceduralType = <strong>procedure</strong> (Num: Integer); IntMethodPointerType = <strong>procedure</strong> (Num: Integer) <strong>of object</strong>;</p>
+
+<p>z</p>
+
+<p>When you have declared a method pointer, such as the one above, you can declare a variable of this type and assign to it a compatible method—a method that has the same parameters— of another object.</p>
+
+<p>When you add an OnClick event handler for a button, Delphi does exactly that. The but- ton has a method pointer type property, named OnClick, and you can directly or indirectly assign to it a method of another object, such as a form. When a user clicks the button, this method is executed, even if you have defined it inside another class.</p>
+
+<p>What follows is a sketch of the code actually used by Delphi to define the event handler of a button component and the related method of a form:</p>
+
+<p><strong>type</strong></p>
+
+<p>TNotifyEvent = <strong>procedure</strong> (Sender: TObject) <strong>of object</strong>;</p>
+
+<p>MyButton = <strong>class</strong></p>
+
+<p>OnClick: TNotifyEvent;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>TForm1 = <strong>class</strong> (TForm)</p>
+
+<p><strong>procedure</strong> Button1Click (Sender: TObject); Button1: MyButton;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>var</strong></p>
+
+<p>Form1: TForm1;</p>
+
+<p>Now inside a procedure, you can write</p>
+
+<p>MyButton.OnClick := Form1.Button1Click;</p>
+
+<p>The only real difference between this code fragment and the code of VCL is that OnClick is a property name, and the actual data it refers to is called FOnClick. An event that shows up in the Events page of the Object Inspector, in fact, is nothing more than a property of a method pointer type. This means, for example, that you can dynamically modify the event handler attached to a component at design time or even build a new component at run time and assign an event handler to it.</p>
+
+<h4 id="eventsareproperties">Events Are Properties</h4>
+
+<p>Another important concept I’ve already mentioned is that events are properties. This means that to handle an event of a component, you assign a method to the corresponding event property. When you double-click an event in the Object Inspector, a new method is added to the owner form and assigned to the proper event property of the component.</p>
+
+<p>This is why it is possible for several events to share the same event handler or change an event handler at run time. To use this feature, you don’t need much knowledge of the lan- guage. In fact, when you select an event in the Object Inspector, you can press the arrow but- ton on the right of the event name to see a drop-down list of “compatible” methods—a list of methods having the same method pointer type. Using the Object Inspector, it is easy to select the same method for the same event of different components or for different, compatible events of the same component.</p>
+
+<p>As we’ve added some properties to the TDate class in Chapter 3, we can add one event. The event is going to be very simple. It will be called OnChange, and it can be used to warn the user of the component that the value of the date has changed. To define an event, we simply define a property corresponding to it, and we add some data to store the actual method pointer the event refers to. These are the new definitions added to the class, available in the DateEvt example:</p>
+
+<p><strong>type</strong></p>
+
+<p>TDate = <strong>class private</strong></p>
+
+<p>FOnChange: TNotifyEvent;</p>
+
+<p>...</p>
+
+<p><strong>protected</strong></p>
+
+<p><strong>procedure</strong> DoChange; <strong>dynamic</strong>;</p>
+
+<p>...</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>property</strong> OnChange: TNotifyEvent</p>
+
+<p><strong>read</strong> FonChange <strong>write</strong> FOnChange;</p>
+
+<p>...</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The property definition is actually very simple. A user of this class can assign a new value to the property and, hence, to the FOnChange private field. The class doesn’t assign a value to this FOnChange field; it is the user of the component who does the assignment. The TDate class simply calls the method stored in the FOnChange field when the value of the date changes. Of course, the call takes place only if the event property has been assigned. The DoChange method (declared as a dynamic method as it is traditional with event firing methods) makes the test and the method call:</p>
+
+<p><strong>procedure</strong> TDate.DoChange;</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>if</strong> Assigned (FOnChange) <strong>then</strong></p>
+
+<p>FOnChange (<strong>Self</strong>);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The DoChange method in turn is called every time one of the values changes, as in the follow- ing method:</p>
+
+<p><strong>procedure</strong> TDate.SetValue (y, m, d: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := EncodeDate (y, m, d);</p>
+
+<p><em>// fire the event</em></p>
+
+<p>DoChange;</p>
+
+<p>Now if we look at the program that uses this class, we can simplify its code considerably. First, we add a new custom method to the form class:</p>
+
+<p><strong>type</strong></p>
+
+<p>TDateForm = <strong>class</strong>(TForm)</p>
+
+<p>...</p>
+
+<p><strong>procedure</strong> DateChange(Sender: TObject);</p>
+
+<p>The code of this method simply updates the label with the current value of the Text property of the TDate object:</p>
+
+<p><strong>procedure</strong> TDateForm.DateChange;</p>
+
+<p><strong>begin</strong></p>
+
+<p>LabelDate.Caption := TheDay.Text;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This event handler is then installed in the FormCreate method:</p>
+
+<p><strong>procedure</strong> TDateForm.FormCreate(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>TheDay := TDate.Init (2001, 7, 4); LabelDate.Caption := TheDay.Text;</p>
+
+<p><em>// assign the event handler for future changes</em></p>
+
+<p>TheDay.OnChange := DateChange;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Well, this seems like a lot of work. Was I lying when I told you that the event handler would save us some coding? No. Now, after we’ve added some code, we can completely for- get about updating the label when we change some of the data of the object. Here, as an example, is the handler of the OnClick event of one of the buttons:</p>
+
+<p><strong>procedure</strong> TDateForm.BtnIncreaseClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>TheDay.Increase;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The same simplified code is present in many other event handlers. Once we have installed the event handler, we don’t have to remember to update the label continually. That elimi- nates a significant potential source of errors in the program. Also note that we had to write some code at the beginning because this is not a component installed in Delphi but simply a class. With a component, you simply select the event handler in the Object Inspector and write a single line of code to update the label. That’s all.</p>
+
+<p>This is meant to be just a short introduction to defining events. A basic understanding of these features is important for every Delphi programmer. If your aim is to write new components, with complex events, you’ll find a lot more information on all these topics in Chapter 11.</p>
+
+<h2 id="listsandcontainerclasses">Lists and Container Classes</h2>
+
+<p>It is often important to handle groups of components or objects. Besides using standard arrays and dynamic arrays, there are a few classes of VCL that represent lists of other objects. These classes can be divided into three groups: simple lists, collections, and containers. The last group was introduced in Delphi 5 and has been further expanded in Delphi 6.</p>
+
+<h4 id="listsandstringlists">Lists and String Lists</h4>
+
+<p>Lists are represented by the generic list of objects, TList, and by the two lists of strings,</p>
+
+<p>TStrings and TStringList:</p>
+
+<ul>
+<li><p>TList defines a list of pointers, which can be used to store objects of any class. A TList is more flexible than a dynamic array, because it is expanded automatically, simply by adding new items to it. The advantage of dynamic arrays over a TList, instead, is that dynamic arrays allow you to indicate a specific type for contained objects and perform the proper compile-time type checking.</p></li>
+
+<li><p>TStrings is an abstract class to represent all forms of string lists, regardless of their storage implementations. This class defines an abstract list of strings. For this reason, TStrings objects are used only as properties of components capable of storing the strings themselves, such as a list box.</p></li>
+
+<li><p>TStringList, a subclass of TStrings, defines a list of strings with their own storage. You can use this class to define a list of strings in a program.</p></li>
+</ul>
+
+<p>TStringList and TStrings objects have both a list of strings and a list of objects associated with the strings. This opens up a number of different uses for these classes. For example, you can use them for dictionaries of associated objects or to store bitmaps or other elements to be used in a list box.</p>
+
+<p>The two classes of lists of strings also have ready-to-use methods to store or load their contents to or from a text file, SaveToFile and LoadFromFile. To loop through a list, you can use a simple for statement based on its index, as if the list were an array. All these lists have a number of methods and properties. You can operate on lists using the array notation (“[” and “]”) both to read and to change elements. There is a Count property, as well as typical access methods, such as Add, Insert, Delete, Remove, and search methods (for example, IndexOf). In Delphi 6, the TList class has an Assign method that, besides copying the source data, can perform set operations on the two lists, including <em>and</em>, <em>or</em>, and <em>xor</em>.</p>
+
+<p>To fill a string list with items and later check whether one is present, you can write code like this:</p>
+
+<p><strong>var</strong></p>
+
+<p>sl: TStringList; idx: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>sl := TStringList.Create;</p>
+
+<p><strong>try</strong></p>
+
+<p>sl.Add (<em>‘one’</em>);</p>
+
+<p>sl.Add (<em>‘two’</em>);</p>
+
+<p>sl.Add (<em>‘three’</em>);</p>
+
+<p><em>// later</em></p>
+
+<p>idx := sl.IndexOf (<em>‘two’</em>);</p>
+
+<p><strong>if</strong> idx >= 0 <strong>then</strong></p>
+
+<p>ShowMessage (<em>‘String found’</em>);</p>
+
+<p><strong>finally</strong></p>
+
+<p>sl.Free;</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<h5 id="usinglistsofobjects">Using Lists of Objects</h5>
+
+<p>We can write an example focusing on the use of the generic TList class. When you need a list of any kind of data, you can generally declare a TList object, fill it with the data, and then access the data while casting it to the proper type. The ListDemo example demonstrates just this. It also shows the pitfalls of this approach. Its form has a private variable, holding a list of dates:</p>
+
+<p><strong>private</strong></p>
+
+<p>ListDate: TList;</p>
+
+<p>This list object is created when the form itself is created:</p>
+
+<p><strong>procedure</strong> TForm1.FormCreate(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>Randomize;</p>
+
+<p>ListDate := TList.Create;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>A button of the form adds a random date to the list (of course, I’ve included in the project the unit containing the date component built in the previous chapter):</p>
+
+<p><strong>procedure</strong> TForm1.ButtonAddClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>ListDate.Add (TDate.Create (1900 + Random (200), 1 + Random (12),</p>
+
+<p>1 + Random (30)));</p>
+
+<p><strong>end</strong>;</p>
+
+<p>When you extract the items from the list, you have to cast them back to the proper type, as in the following method, which is connected to the List button (you can see its effect in Figure 5.4):</p>
+
+<p><strong>procedure</strong> TForm1.ButtonListDateClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>I: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>ListBox1.Clear;</p>
+
+<p><strong>for</strong> I := 0 <strong>to</strong> ListDate.Count - 1 <strong>do</strong></p>
+
+<p>Listbox1.Items.Add ((TObject(ListDate [I]) <strong>as</strong> TDate).Text);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image244.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E  5 . 4 :</strong></p>
+
+<p>The list of dates shown by the ListDemo example</p>
+
+<p>At the end of the code above, before we can do an as downcast, we first need to hard-cast the pointer returned by the TList into a TObject reference. This kind of expression can result in an invalid typecast exception, or it can generate a memory error when the pointer is not a reference to an object.</p>
+
+<p>To demonstrate that things can indeed go wrong, I’ve added one more button, which adds a TButton object to the list:</p>
+
+<p><strong>procedure</strong> TForm1.ButtonWrongClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>// <em>add a button to the list</em></p>
+
+<p>ListDate.Add (Sender);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>If you click this button and then update one of the lists, you’ll get an error. Finally, remem- ber that when you destroy a list of objects, you should remember to destroy all of the objects of the list first. The ListDemo program does this in the FormDestroy method of the form:</p>
+
+<p><strong>procedure</strong> TForm1.FormDestroy(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>I: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>for</strong> I := 0 <strong>to</strong> ListDate.Count - 1 <strong>do</strong></p>
+
+<p>TObject(ListDate [I]).Free; ListDate.Free;</p>
+
+<p><strong>end</strong>;</p>
+
+<h4 id="collections">Collections</h4>
+
+<p>The second group, collections, contains only two classes, TCollection and TCollectionItem. TCollection defines a homogeneous list of objects, which are owned by the collection class. The objects in the collection must be descendants of the TCollectionItem class. If you need a collection storing specific objects, you have to create both a subclass of TCollection and a matching subclass of TCollectionItem.</p>
+
+<p>Collections are used to specify values of properties of components. It is very unusual to work with collections for storing your own objects, so I won’t discuss them here.</p>
+
+<h4 id="containerclasses">Container Classes</h4>
+
+<p>Delphi 5 introduced a new series of container classes, defined in the Contnrs unit. Delphi 6 extends these classes by adding hashed associative lists, as discussed in the following section. The container classes extend the TList classes by adding the idea of ownership and by defin- ing specific extraction rules (mimicking stacks and queues) or sorting capabilities.</p>
+
+<p>The basic difference between TList and the new TObjectList class, for example, is that the latter is defined as a list of TObject objects, not a list of pointers. Even more important, how- ever, is the fact that if the object list has the OwnsObjects property set to True, it automatically deletes an object when it is replaced by another one and deletes each object when the list itself is destroyed. Here’s a list of all the new container classes:</p>
+
+<ul>
+<li><p>The TObjectList class I’ve already described represents a list of objects, eventually owned by the list itself.</p></li>
+
+<li><p>The inherited class TComponentList represents a list of components, with full support for destruction notification (an important safety feature when two components are connected using their properties; that is, when a component is the value of a property of another component).</p></li>
+
+<li><p>The TClassList class is a list of class references. It inherits from TList and requires no destruction.</p></li>
+
+<li><p>The classes TStack and TObjectStack represent lists of pointers and objects, from which you can only extract elements starting from the last one you’ve inserted. A stack follows the LIFO order (Last In, First Out). The typical methods of a stack are Push for inser- tion, Pop for extraction, and Peek to preview the first item without removing it. You can still use all the methods of the base class, TList.</p></li>
+
+<li><p>The classes TQueue and TObjectQueue represent lists of pointers and objects, from which you always remove the <em>first</em> item you’ve inserted (FIFO: first in, first out). The methods of these classes are the same as those of the stack classes but behave differently.</p></li>
+</ul>
+
+<p><strong>W<em>*</strong>ARNING</em>* Unlike the TObjectList, the TObjectStack and the TObjectQueue do not own the inserted objects and will not destroy those objects left in the data structure when it is destroyed. You can simply Pop all the items, destroy them once you’re finished using them, and then destroy the container.</p>
+
+<p>To demonstrate the use of these classes, I’ve modified the earlier ListDate example into the new Contain example on the CD. First, I changed the type of the ListDate variable to TObjectList. In the FormCreate method, I’ve modified the list creation to the following code, which activates the list ownership:</p>
+
+<p>ListDate := TObjectList.Create (True);</p>
+
+<p>At this point, we can simplify the destruction code, as applying Free to the list will automati- cally free the dates it holds.</p>
+
+<p>I’ve also added to the program a stack and a queue object, filling each of them with numbers. One of the form’s two buttons displays a list of the numbers in each container, and the other removes the last item (displayed in a message box):</p>
+
+<p><strong>procedure</strong> TForm1.btnQueueClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>I: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>ListBox1.Clear;</p>
+
+<p><strong>for</strong> I := 0 <strong>to</strong> Stack.Count - 1 <strong>do begin</strong> ListBox1.Items.Add (IntToStr (Integer (Queue.Peek))); Queue.Push(Queue.Pop);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>ShowMessage (<em>‘Removed: ‘</em> + IntToStr (Integer (Stack.Pop)));</p>
+
+<p><strong>end</strong>;</p>
+
+<p>By pressing the two buttons, you can see that calling Pop for each container returns the last item. The difference is that the TQueue class inserts elements at the beginning, and the TStack class inserts them at the end.</p>
+
+<h5 id="hashedassociativelists">Hashed Associative Lists</h5>
+
+<p>After whetting our appetite in Delphi 5, Borland has pushed the idea of container classes a little further in Delphi 6, introducing a new set of lists, particularly TBucketList and TObjectBucketList. These two lists are associative, which means they have a key and an actual entry. The key is used to identify the items and search for them. To add an item, you call the Add method, with two parameters, the key and the actual data. When you use the Find method, you pass the key and retrieve the data. The same effect is achieved by using the Data array property, passing the key as parameter.</p>
+
+<p>These lists are also based on a hash system. The lists create an internal array of items, called buckets, each having a sub-list of actual elements of the list. As you add an item, its key value is used to compute the <em>hash</em> value, which determines the bucket to add the item to. When search- ing the item, the hash is computed again, and the list immediately grabs the sublist containing the item, searching for it there. This makes for very fast insertion and searches, but only if the hash algorithm distributes the items evenly among the various buckets and if there are enough different entries in the array. In fact, when many elements can be in the same bucket, searching gets slower.</p>
+
+<p>For this reason, as you create the TObjectBucketList you can specify the number of entries for the list, using the parameter of the constructor, choosing a value between 2 and 256. The value of the bucket is determined by taking the first byte of the pointer (or number) passed as key and doing an and operation with a number corresponding to the entries.</p>
+
+<p>I don’t find this algorithm very convincing for a hash system, but replacing it with your own implies only overriding the BucketFor virtual function and eventually changing the number of entries in the array, by setting a different value for the BucketCount property.</p>
+
+<p>Another interesting feature, not available for lists, is the ForEach method, which allows you to execute a given function on each item contained in the list. You pass to the ForEach method a pointer to data of your own and a procedure, which receives four parameters,</p>
+
+<p>including your custom pointer, each key and object of the list, and a Boolean parameter you can set to False to stop the execution. In other words, these are the two signatures:</p>
+
+<p><strong>type</strong></p>
+
+<p>TBucketProc = <strong>procedure</strong>(AInfo, AItem, AData: Pointer;</p>
+
+<p><strong>out</strong> AContinue: Boolean);</p>
+
+<p><strong>function</strong> TCustomBucketList.ForEach(AProc: TBucketProc; AInfo: Pointer): Boolean;</p>
+
+<p>Besides these containers, Delphi includes also a THashedStringList class, which inherits from TStringList. This class has no direct relationship with the hashed lists and is even defined in a different unit, IniFile. The hashed string list has two associated hash tables (of type TStringHash), which are completely refreshed every time the content of the string list changes. So this class is useful only for reading a large set of fixed strings, not for handling a list of strings changing often over time. On the other hand, the TStringHash support class seems to be quite useful in general cases, and has a good algorithm for computing the hash value of a string.</p>
+
+<h4 id="typesafecontainersandlists">Type-Safe Containers and Lists</h4>
+
+<p>Containers and lists have a problem: They are not type-safe, as I’ve shown in both examples by adding a button object to a list of dates. To ensure that the data in a list is homogenous, you can check the type of the data you extract before you insert it, but as an extra safety mea- sure you might also want to check the type of the data while extracting it. However, adding run-time type checking slows down a program and is risky—a programmer might fail to check the type in some cases.</p>
+
+<p>To solve both problems, you can create specific list classes for given data types and fashion the code from the existing TList or TObjectList classes (or another container class). There are two approaches to accomplish this:</p>
+
+<ul>
+<li>Derive a new class from the list class and customize the Add method and the access methods, which relate to the Items property. This is also the approach used by Borland for the container classes, which all derive from TList.</li>
+</ul>
+
+<p>Delphi container classes use static overrides to perform simple type conveniences (parameters and function results of the desired type). Static overrides are not the same as polymorphism; someone using a container class via a TList variable will not be calling the container’s special- ized functions. Static override is a simple and effective technique, but it has one very impor- tant restriction: The methods in the descendent should not do anything beyond simple type- casting, because you aren’t guaranteed that the descendent methods will be called. The list might be accessed and manipulated using the ancestor methods as much as by the descen- dent methods, so their actual operations must be identical. The only difference is the type used in the descendent methods, which allows you to avoid extra typecasting.</p>
+
+<ul>
+<li>Create a brand-new class that contains a TList object, and map the methods of the new class to the internal list using proper type checking. This approach defines a wrapper class, a class that “wraps” around an existing one to provide a different or limited access to its methods (in our case, to perform a type conversion).</li>
+</ul>
+
+<p>I’ve implemented both solutions in the DateList example, which defines lists of TDate objects. In the code that follows, you’ll find the declaration of the two classes, the inheritance- based TDateListI class and the wrapper class TDateListW.</p>
+
+<p><strong>type</strong></p>
+
+<p><em>// inheritance-based</em></p>
+
+<p>TDateListI = <strong>class</strong> (TObjectList)</p>
+
+<p><strong>protected</strong></p>
+
+<p><strong>procedure</strong> SetObject (Index: Integer; Item: TDate);</p>
+
+<p><strong>function</strong> GetObject (Index: Integer): TDate;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>function</strong> Add (Obj: TDate): Integer; <strong>procedure</strong> Insert (Index: Integer; Obj: TDate); <strong>property</strong> Objects [Index: Integer]: TDate</p>
+
+<p><strong>read</strong> GetObject <strong>write</strong> SetObject; <strong>default</strong>; <strong>end</strong>;</p>
+
+<p><em>// wrapper based</em> TDateListW = <strong>class</strong>(TObject) <strong>private</strong></p>
+
+<p>FList: TObjectList;</p>
+
+<p><strong>function</strong> GetObject (Index: Integer): TDate;</p>
+
+<p><strong>procedure</strong> SetObject (Index: Integer; Obj: TDate);</p>
+
+<p><strong>function</strong> GetCount: Integer;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create;</p>
+
+<p><strong>destructor</strong> Destroy; <strong>override</strong>; <strong>function</strong> Add (Obj: TDate): Integer;</p>
+
+<p><strong>function</strong> Remove (Obj: TDate): Integer; <strong>function</strong> IndexOf (Obj: TDate): Integer; <strong>property</strong> Count: Integer <strong>read</strong> GetCount; <strong>property</strong> Objects [Index: Integer]: TDate</p>
+
+<p><strong>read</strong> GetObject <strong>write</strong> SetObject; <strong>default</strong>; <strong>end</strong>;</p>
+
+<p>Obviously, the first class is simpler to write—it has fewer methods, and they simply call the inherited ones. The good thing is that a TDateListI object can be passed to parameters expect- ing a TList. The problem is that the code that manipulates an instance of this list via a generic TList variable will not be calling the specialized methods, because they are not virtual and might end up adding to the list objects of other data types.</p>
+
+<p>Instead, if you decide not to use inheritance, you end up writing a lot of code, because you need to reproduce each and every one of the original TList methods, simply calling the meth- ods of the internal FList object. The drawback is that the TDateListW class is not type com- patible with TList, which limits its usefulness. It can’t be passed as parameter to methods expecting a TList.</p>
+
+<p>Both of these approaches provide good type checking. After you’ve created an instance of one of these list classes, you can add only objects of the appropriate type, and the objects you extract will naturally be of the correct type. This is demonstrated by the DateList example. This program has a few buttons, a combo box to let a user choose which of the lists to show, and a list box to show the actual values of the list. The program stretches the lists by trying to add a button to the list of TDate objects. To add an object of a different type to the TDateListI list, we can simply convert the list to its base class, TList. This might accidentally happen if you pass the list as a parameter to a method that expects a base class object. In contrast, for the TDateListW list to fail we must explicitly cast the object to TDate before inserting it, something a programmer should never do:</p>
+
+<p><strong>procedure</strong> TForm1.ButtonAddButtonClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>ListW.Add (TDate(TButton.Create (<strong>nil</strong>))); TList(ListI).Add (TButton.Create (<strong>nil</strong>)); UpdateList;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The UpdateList call triggers an exception, displayed directly in the list box, because I’ve used an as typecast in the custom list classes. A wise programmer should never write the above code. To summarize, writing a custom list for a specific type makes a program much more robust. Writing a wrapper list instead of one that’s based on inheritance tends to be a little safer, although it requires more coding.</p>
+
+<p>Instead of rewriting wrapper-style list classes for different types, you can use my List Template Wizard, available on my Web site, <a href="http://www.marcocantu.com/"><strong>www.marcocantu.com</strong>.</a></p>
+
+<h2 id="streaming">Streaming</h2>
+
+<p>Another core area of the Delphi class library is its support for streaming, which includes file management, memory, sockets, and other sources of information arranged in a sequence.</p>
+
+<p>The idea of streaming is that you move along the data while reading it, much like the tradi- tional read and write functions used by the Pascal language (and discussed in Chapter 12 of <em>Essential Pascal</em>, available on the companion CD).</p>
+
+<p><strong>The</strong> <strong>*TStream*</strong> <strong>Class</strong></p>
+
+<p>The VCL defines the abstract TStream class and several subclasses. The parent class, TStream, has just a few properties, and you’ll never create an instance of it, but it has an interesting list of methods you’ll generally use when working with derived stream classes.</p>
+
+<p>The TStream class defines two properties, Size and Position. All stream objects have a spe- cific size (which generally grows if you write something after the end of the stream), and you must specify a position within the stream where you want to either read or write information.</p>
+
+<p>Reading and writing bytes depends on the actual stream class you are using, but in both cases you don’t need to know much more than the size of the stream and your relative posi- tion in the stream to read or write data. In fact, that’s one of the advantages of using streams. The basic interface remains the same whether you’re manipulating a disk file, a binary large object (BLOB) field, or a long sequence of bytes in memory.</p>
+
+<p>In addition to the Size and Position properties, the TStream class also defines several important methods, most of which are virtual and abstract. (In other words, the TStream class doesn’t define what these methods do; therefore, derived classes are responsible for imple- menting them.) Some of these methods are important only in the context of reading or writ- ing components within a stream (for instance, ReadComponent and WriteComponent), but some are useful in other contexts, too. In Listing 5.2, you can find the declaration of the TStream class, extracted from the Classes unit.</p>
+
+<p><strong>The public portion of the definition of the</strong> <strong>*TStream*</strong> <strong>class</strong></p>
+
+<p>TStream = <strong>class</strong>(TObject) <strong>public</strong></p>
+
+<p><em>// read and write a buffer</em></p>
+
+<p><strong>function</strong> Read(<strong>var</strong> Buffer; Count: Longint): Longint; <strong>virtual</strong>; <strong>abstract</strong>; <strong>function</strong> Write(<strong>const</strong> Buffer; Count: Longint): Longint; <strong>virtual</strong>; <strong>abstract</strong>; <strong>procedure</strong> ReadBuffer(<strong>var</strong> Buffer; Count: Longint);</p>
+
+<p><strong>procedure</strong> WriteBuffer(<strong>const</strong> Buffer; Count: Longint);</p>
+
+<p><em>// move to a specific position</em></p>
+
+<p><strong>function</strong> Seek(Offset: Longint; Origin: Word): Longint; <strong>overload</strong>; <strong>virtual</strong>; <strong>function</strong> Seek(<strong>const</strong> Offset: Int64; Origin: TSeekOrigin): Int64;</p>
+
+<p><strong>overload; virtual</strong>;</p>
+
+<p><em>// copy the stream</em></p>
+
+<p><strong>function</strong> CopyFrom(Source: TStream; Count: Int64): Int64;</p>
+
+<p><em>// read or write a component</em></p>
+
+<p><strong>function</strong> ReadComponent(Instance: TComponent): TComponent; <strong>function</strong> ReadComponentRes(Instance: TComponent): TComponent; <strong>procedure</strong> WriteComponent(Instance: TComponent);</p>
+
+<p><strong>procedure</strong> WriteComponentRes(<strong>const</strong> ResName: string; Instance: TComponent);</p>
+
+<p><strong>procedure</strong> WriteDescendent(Instance, Ancestor: TComponent);</p>
+
+<p><strong>procedure</strong> WriteDescendentRes(</p>
+
+<p><strong>const</strong> ResName: string; Instance, Ancestor: TComponent);</p>
+
+<p><strong>procedure</strong> WriteResourceHeader(<strong>const</strong> ResName: string; <strong>out</strong> FixupInfo: Integer);</p>
+
+<p><strong>procedure</strong> FixupResourceHeader(FixupInfo: Integer);</p>
+
+<p><strong>procedure</strong> ReadResHeader;</p>
+
+<p><em>// propertie</em>s</p>
+
+<p><strong>property</strong> Position: Int64 <strong>read</strong> GetPosition <strong>write</strong> SetPosition;</p>
+
+<p><strong>property</strong> Size: Int64 <strong>read</strong> GetSize <strong>write</strong> SetSize64;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The basic use of a string involves calling the ReadBuffer and WriteBuffer methods, which are very powerful but not terribly easy to use. The first parameter, in fact, is an untyped buffer in which you can pass the variable to save from or load to. For example, you can save into a file a number (in binary format) and a string, with this code:</p>
+
+<p><strong>var</strong></p>
+
+<p>stream: TStream; n: integer;</p>
+
+<p>str: string;</p>
+
+<p><strong>begin</strong></p>
+
+<p>n := 10;</p>
+
+<p>str := <em>‘test string’</em>;</p>
+
+<p>stream := TFileStream.Create (<em>‘c:\tmp\test’</em>, fmCreate); stream.WriteBuffer (n, sizeOf(integer)); stream.WriteBuffer (str[1], Length (str)); stream.Free;</p>
+
+<p>A totally alternative approach is to let specific components save or load data to and from streams. Many VCL classes define a LoadFromStream or a SaveToStream method, including TStrings, TStringList, TBlobField, TMemoField, TIcon, and TBitmap.</p>
+
+<h4 id="specificstreamclasses">Specific Stream Classes</h4>
+
+<p>Creating a TStream instance makes no sense, because this class is abstract and provides no direct support for saving data. Instead, you can use one of the derived classes to load data from or store it to an actual file, a BLOB field, a socket, or a memory block. Use TFileStream when you want to work with a file, passing the filename and some file access options to the Create method. Use TMemoryStream to manipulate a stream in memory and not an actual file.</p>
+
+<p>Several units define TStream-derived classes. In the Classes unit are the following classes:</p>
+
+<ul>
+<li><p>THandleStream defines a stream that manipulates a disk file represented by a Windows file handle.</p></li>
+
+<li><p>TFileStream defines a stream that manipulates a disk file (a file that exists on a local or network disk) represented by a filename. It inherits from THandleStream.</p></li>
+
+<li><p>TCustomMemoryStream is the base class for streams stored in memory but is not used directly.</p></li>
+
+<li><p>TMemoryStream defines a stream that manipulates a sequence of bytes in memory. It inherits from TCustomMemoryStream.</p></li>
+
+<li><p>TStringStream provides a simple way for associating a stream to a string in memory, so that you can access the string with the TStream interface and also copy the string to and from another stream.</p></li>
+
+<li><p>TResourceStream defines a stream that manipulates a sequence of bytes in memory, and provides read-only access to resource data linked into the executable file of an application (an example of these resource data are the DFM files). It inherits from TCustomMemoryStream.</p></li>
+</ul>
+
+<p>Stream classes defined in other units include</p>
+
+<ul>
+<li><p>TBlobStream defines a stream that provides simple access to database BLOB fields. There are similar BLOB streams for other database access technologies rather than the BDE.</p></li>
+
+<li><p>TOleStream defines a stream for reading and writing information over the interface for streaming provided by an OLE object.</p></li>
+
+<li><p>TWinSocketStream provides streaming support for a socket connection.</p></li>
+</ul>
+
+<h4 id="usingfilestreams">Using File Streams</h4>
+
+<p>Creating and using a file stream can be as simple as creating a variable of a type that descends from TStream and calling components methods to load content from the file:</p>
+
+<p><strong>var</strong></p>
+
+<p>S: TFileStream;</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>if</strong> OpenDialog1.Execute <strong>then begin</strong></p>
+
+<p>S := TFileStream.Create (OpenDialog1.FileName, fmOpenRead);</p>
+
+<p><strong>try</strong></p>
+
+<p>Memo1.Lines.LoadFromStream (S);</p>
+
+<p><strong>finally</strong></p>
+
+<p>S.Free;</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>As you can see in this code, the Create method for file streams has two parameters: the name of the file and a flag indicating the requested access mode. In this case, we want to read the file, so we used the fmOpenRead flag (other available flags are documented in the Delphi help).</p>
+
+<p>Of the different modes, the most important are fmShareDenyWrite, which you’ll use when you’re simply reading data from a shared file, and fmShareExclusive, which you’ll use when you’re writ- ing data to a shared file.</p>
+
+<p>A big advantage of streams over other file access techniques is that they’re very inter- changeable, so you can work with memory streams and then save them to a file, or you can perform the opposite operations. This might be a way to improve the speed of a file-intensive program. Here is a snippet of code, a file-copying function, to give you another idea of how you can use streams:</p>
+
+<p><strong>procedure</strong> CopyFile (SourceName, TargetName: String);</p>
+
+<p><strong>var</strong></p>
+
+<p>Stream1, Stream2: TFileStream;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Stream1 := TFileStream.Create (SourceName, fmOpenRead);</p>
+
+<p><strong>try</strong></p>
+
+<p>Stream2 := TFileStream.Create (TargetName, fmOpenWrite <strong>or</strong> fmCreate);</p>
+
+<p><strong>try</strong></p>
+
+<p>Stream2.CopyFrom (Stream1, Stream1.Size);</p>
+
+<p><strong>finally</strong></p>
+
+<p>Stream2.Free;</p>
+
+<p><strong>end finally</strong></p>
+
+<p>Stream1.Free;</p>
+
+<p><strong>end end;</strong></p>
+
+<p>Another important use of streams is to handle database BLOB fields or other large fields directly. In fact, you can export such data to a stream or read it from one by simply calling the SaveToStream and LoadFromStream methods of the TBlobField class.</p>
+
+<p><strong>The</strong> <strong><em>TReader*</strong> <strong>and</strong> <strong></em>TWriter*</strong> <strong>Classes</strong></p>
+
+<p>By themselves, the stream classes of VCL don’t provide much support for reading or writing data. In fact, stream classes don’t implement much beyond simply reading and writing blocks of data. If you want to load or save specific data types in a stream (and don’t want to perform a great deal of typecasting), you can use the TReader and TWriter classes, which derive from the generic TFiler class.</p>
+
+<p>Basically, the TReader and TWriter classes exist to simplify loading and saving stream data according to its type, and not just as a sequence of bytes. To do this, TWriter embeds special signatures into the stream that specify the type for each object’s data. Conversely, the TReader class reads these signatures from the stream, creates the appropriate objects, and then initial- izes those objects using the subsequent data from the stream.</p>
+
+<p>For example, I could have written out a number and a string to a stream by writing:</p>
+
+<p><strong>var</strong></p>
+
+<p>stream: TStream; n: integer;</p>
+
+<p>str: string; w: TWriter;</p>
+
+<p><strong>begin</strong></p>
+
+<p>n := 10;</p>
+
+<p>str := <em>‘test string’</em>;</p>
+
+<p>stream := TFileStream.Create (<em>‘c:\tmp\test.txt’</em>, fmCreate); w := TWriter.Create (stream, 1024);</p>
+
+<p>w.WriteInteger (n); w.WriteString (str); w.Free; stream.Free;</p>
+
+<p>This time the actual file will include also the extra signature characters, so that I can read back this file only by using a TReader object. For this reason, using the TReader and TWriter is generally confined to components streaming and is seldom applied in general file management.</p>
+
+<h4 id="streamsandpersistency">Streams and Persistency</h4>
+
+<p>In Delphi, streams play a considerable role for persistency. For this reason, many methods of TStream relate to saving and loading a component and its subcomponents. For example, you can store a form in a stream by writing</p>
+
+<p>stream.WriteComponent(Form1);</p>
+
+<p>If you examine the structure of a Delphi DFM file, you’ll discover that it’s really just a resource file that contains a custom format resource. Inside this resource, you’ll find the com- ponent information for the form or data module and for each of the components it contains. As you would expect, the stream classes provide two methods to read and write this custom resource data for components: WriteComponentRes to store the data, and ReadComponentRes to load it.</p>
+
+<p>For your experiment in memory (not involving actual DFM files), though, using WriteComponent is generally better suited. After you create a memory stream and save the current form to it, the problem is how to display it. This can be accomplished by transform- ing the binary representation of forms to a textual representation. Even though the Delphi IDE, since version 5, can save DFM files in text format, the representation used internally for the compiled code is invariably a binary format.</p>
+
+<p>The form conversion can be accomplished by the IDE, generally with the View as Text command of the form designer, and in other ways. There is also a command-line utility, CONVERT.EXE, found in the Delphi Bin directory. Within your own code, the standard way to obtain a conversion is to call the specific methods of VCL. There are four functions for con- verting to and from the internal object format obtained by the WriteComponent method:</p>
+
+<p><strong>procedure</strong> ObjectBinaryToText(Input, Output: TStream); <strong>overload</strong>; <strong>procedure</strong> ObjectBinaryToText(Input, Output: TStream;</p>
+
+<p><strong>var</strong> OriginalFormat: TStreamOriginalFormat); <strong>overload</strong>; <strong>procedure</strong> ObjectTextToBinary(Input, Output: TStream); <strong>overload</strong>; <strong>procedure</strong> ObjectTextToBinary(Input, Output: TStream;</p>
+
+<p><strong>var</strong> OriginalFormat: TStreamOriginalFormat); <strong>overload</strong>;</p>
+
+<p>Four different functions, with the same parameters and names containing the name <em>Resource</em> instead of <em>Binary</em> (as in ObjectResourceToText), convert the resource format obtained by WriteComponentRes. A final method, TestStreamFormat, indicates whether a DFM is storing a binary or textual representation.</p>
+
+<p>In the FormToText program, I’ve used the ObjectBinaryToText method to copy the binary definition of a form into another stream, and then I’ve displayed the resulting stream in a memo, as you can see in Figure 5.5. This is the code of the two methods involved:</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image246.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 5 . 5 :</strong></p>
+
+<p>The textual description of a form component, displayed inside itself by the FormTo- Text example</p>
+
+<p><strong>procedure</strong> TformText.btnCurrentClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>MemStr: TStream;</p>
+
+<p><strong>begin</strong></p>
+
+<p>MemStr := TMemoryStream.Create;</p>
+
+<p><strong>try</strong></p>
+
+<p>MemStr.WriteComponent (<strong>Self</strong>); ConvertAndShow (MemStr);</p>
+
+<p><strong>finally</strong></p>
+
+<p>MemStr.Free</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TformText.ConvertAndShow (aStream: TStream);</p>
+
+<p><strong>var</strong></p>
+
+<p>ConvStream: TStream;</p>
+
+<p><strong>begin</strong></p>
+
+<p>aStream.Position := 0;</p>
+
+<p>ConvStream := TMemoryStream.Create;</p>
+
+<p><strong>try</strong></p>
+
+<p>ObjectBinaryToText (aStream, ConvStream); ConvStream.Position := 0; MemoOut.Lines.LoadFromStream (ConvStream);</p>
+
+<p><strong>finally</strong></p>
+
+<p>ConvStream.Free</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p>Notice that by repeatedly clicking the Current Form Object button you’ll get more and more text, and the text of the memo is included in the stream. After a few times, the entire operation will get extremely slow, so that the program seems to be hung up. In this code, we start to see some of the flexibility of using streams—we can write a generic procedure we can use to convert any stream.</p>
+
+<p>It’s important to stress that after you’ve written data to a stream, you must explicitly seek back to the beginning (or set the Position property to 0) before you can use the stream further, unless you want to append data to the stream, of course.</p>
+
+<p>Another button, labeled Panel Object, shows the textual representation of a specific compo- nent, the panel, passing the component to the WriteComponent method. The third button, Form in Executable File, does a different operation. Instead of streaming an existing object in memory, it loads in a TResourceStream object the design-time representation of the form— that is, its DFM file—from the corresponding resource embedded in the executable file:</p>
+
+<p><strong>procedure</strong> TformText.btnResourceClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>ResStr: TResourceStream;</p>
+
+<p><strong>begin</strong></p>
+
+<p>ResStr := TResourceStream.Create(hInstance, <em>‘TFORMTEXT’</em>, RT_RCDATA);</p>
+
+<p><strong>try</strong></p>
+
+<p>ConvertAndShow (ResStr);</p>
+
+<p><strong>finally</strong></p>
+
+<p>ResStr.Free</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p>By clicking the buttons in sequence (or modifying the form of the program) you can com- pare the form saved in the DFM file to the current run-time object.</p>
+
+<h5 id="writingacustomstreamclass">Writing a Custom Stream Class</h5>
+
+<p>Besides using the existing stream classes, Delphi programmers can write their own stream classes, and use them in place of the existing ones. To accomplish this, you need only specify how a generic block of raw data is saved and loaded, and VCL will be able to use your new class wherever you call for it. You may not need to create a brand-new stream class for work- ing with a new type of media, but only need to customize an existing stream. In that case, all you have to do is write the proper read and write methods.</p>
+
+<p>As an example, I created a class to encode and decode a generic file stream. Although this example is limited by its use of a totally dumb encoding mechanism, it fully integrates with VCL and works properly. The new stream class simply declares the two core reading and writing methods and has a property that stores a key.</p>
+
+<p><strong>type</strong></p>
+
+<p>TEncodedStream = <strong>class</strong> (TFileStream)</p>
+
+<p><strong>private</strong></p>
+
+<p>FKey: Char;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create(<strong>const</strong> FileName: string; Mode: Word); <strong>function</strong> Read(var Buffer; Count: Longint): Longint; <strong>override</strong>; <strong>function</strong> Write(const Buffer; Count: Longint): Longint; <strong>override</strong>; <strong>property</strong> Key: Char <strong>read</strong> FKey <strong>write</strong> FKey;</p>
+
+<p><strong>end</strong>;</p>
+
+<h2 id="summarizingthecorevclandbaseclxunits">Summarizing the Core VCL and BaseCLX Units</h2>
+
+<p>We’ve spent most of the space of this chapter discussing the classes of a single unit of the library, Classes. This unit is certainly important, but it is not the only core unit of the library (although there aren’t many others). In this section, I’m providing an overview of these units and their content.</p>
+
+<h4 id="theclassesunit">The Classes Unit</h4>
+
+<p>The Classes unit is at the heart of both VCL and CLX libraries, and though it sees many internal changes from the last version of Delphi, there is little new for the average users. (Most changes are related to modified IDE integration and are meant for expert component writers.)</p>
+
+<p>Here is a list of what you can find in the Classes unit, a unit that every Delphi programmer should spend some time with:</p>
+
+<ul>
+<li><p>Many enumerated types, the standard method pointer types (including TNotifyEvent), and many exception classes.</p></li>
+
+<li><p>Core library classes, including TPersistent and TComponent but also TBasicAction and</p></li>
+</ul>
+
+<p>TBasicActionLink.</p>
+
+<ul>
+<li><p>List classes, including TList, TThreadList (a thread-safe version of the list), TInterfaceList (a list of interfaces, used internally), TCollection, TCollectionItem, TOwnedCollection (which is simply a collection with an owner), TStrings, and TStringList.</p></li>
+
+<li><p>All the stream classes I discussed in the previous section but won’t list here again. There are also the TFiler, TReader, and TWriter classes and a TParser class used internally for DFM parsing.</p></li>
+
+<li><p>Utility classes, such as TBits for binary manipulation and a few utility routines (for example, point and rectangle constructors, and string list manipulation routines such as LineStart and ExtractStrings). There are also many registration classes, to notify the system of the existence of components, classes, special utility functions you can replace, and much more.</p></li>
+
+<li><p>The TDataModule class, a simple object container alternative to a form. Data modules can contain only nonvisual components and are generally used in database and Web applications.</p></li>
+</ul>
+
+<p>In past versions of Delphi, the TDataModule class was defined in the Forms unit; now it has been moved to the Classes unit. This was done to eliminate the code overhead of the GUI classes from non-visual applications (for example, Web server modules) and to better separate non-portable Windows code from OS-independent classes, such as TDataModule. Other changes relate to the data modules, for example, to allow the creation of Web applications with multiple data modules, something not possible in Delphi 5.</p>
+
+<ul>
+<li><p>New interface-related classes, such as TInterfacedPersistent, aimed at providing fur- ther support for interfaces. This particular class allows Delphi code to hold onto a ref- erence to a TPersistent object or any descendent implementing interfaces, and is a core element of the new support for interfaced objects in the Object Inspector (see Chapter 11 for an example).</p></li>
+
+<li><p>The new TRecall class, used to maintain a temporary copy of an object, particularly useful for graphical-based resources.</p></li>
+
+<li><p>The new TClassFinder class used for finding a registered class instead of the Find- Class method.</p></li>
+
+<li><p>The TThread class, which provides the core to operating system–independent support for multithreaded applications.</p></li>
+</ul>
+
+<h4 id="othercoreunits">Other Core Units</h4>
+
+<p>Other units that are part of the RTL package are not directly used by typical Delphi pro- grammers as often as Classes. Here is a list:</p>
+
+<ul>
+<li><p>The TypInfo unit includes support for Accessing RTTI information for published properties, as we’ve seen in the section “Accessing Properties by Name.”</p></li>
+
+<li><p>The SyncObjs unit contains a few generic classes for thread synchronization.</p></li>
+</ul>
+
+<p>Of course, the RTL package also includes the units with functions and procedures dis- cussed in the preceding chapter, such as Math, SysUtils, Variants, VarUtils, StrUtils, DateUtils, and so on.</p>
+
+<h2 id="whatsnext">What’s Next?</h2>
+
+<p>As we have seen in this chapter, the Delphi class library has a few root classes that play a con- siderable role and that you should learn to leverage to the maximum possible extent. Some programmers tend to become expert on the components they use every day, and this is impor- tant, but without understanding the core classes (and ideas such as ownership and streaming), you’ll have a tough time grasping the full power of Delphi.</p>
+
+<p>Of course, in this book, we also need to discuss visual and database classes, which I will do in the next chapter. Now that we’ve seen all the base elements of Delphi (language, RTL, core classes), we are ready to discuss the development of real applications with this tool.</p>
+
+<p>Part II of the book, which starts with the next chapter, is fully devoted to examples of the use of the various components, particularly visual components with the development of the user interface. We’ll start with the advanced use of traditional controls and menus, discuss the actions architecture, cover the TForm class, and then examine toolbars, status bars, dialog boxes, and MDI applications in later chapters. Then we’ll move to the development of database appli- cations in Part III of the book.</p>
