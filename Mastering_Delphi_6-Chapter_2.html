@@ -1,0 +1,1193 @@
+<ol>
+<li>
+
+
+<ol>
+<li>sadsad</li></ol>
+</li>
+</ol>
+
+<p><strong>M</strong>ost modern programming languages support <em>object-oriented programming</em> (OOP). OOP languages are based on three fundamental concepts: encapsulation (usually implemented with classes), inheritance, and polymorphism (or late binding).</p>
+
+<p>You can write Delphi applications even without knowing the details of Object Pascal. As you create a new form, add new components, and handle events, Delphi prepares most of the related code for you automatically. But knowing the details of the language and its implemen- tation will help you to understand precisely what Delphi is doing and to master the language completely.</p>
+
+<p>A single chapter doesn’t allow space for a full introduction to the principles of object-oriented programming and the Object Pascal language. Instead, I will outline the key OOP features of the language and show how they relate to everyday Delphi programming. Even if you don’t have a precise knowledge of OOP, the chapter will introduce each of the key concepts so that you won’t need to refer to other sources.</p>
+
+<h2 id="thepascallanguage">The Pascal Language</h2>
+
+<p>The Object Pascal language used by Delphi is an OOP extension of the classic Pascal language, which Borland pushed forward for many years with its Turbo Pascal compilers. The syntax of the Pascal language is known to be quite verbose and more readable than, for example, the C language. Its OOP extension follows the same approach, delivering the same power of the recent breed of OOP languages, from Java to C#.</p>
+
+<p>In this chapter, I’ll discuss only the object-oriented extensions of the Pascal language avail- able in Delphi. However, I’ll highlight recent additions Borland has done to the core lan- guage. These features have been introduced in Delphi 6 and are, at least partially, related to the Linux version of Delphi.</p>
+
+<p>New Pascal features include the $IF and $ELSEIF directives for conditional compilation, the $WARN and $MESSAGE directives, and the platform, library, and deprecated hint direc- tives. These topics are discussed in the following sections. Changes to the assembler (with new directives, support for MMX and Pentium Pro instructions, and many more features) are really beyond the scope of this book.</p>
+
+<p>Other relatively minor changes in the language include a change in the default value for the $WRITEABLECONST compiler switch, which is now disabled. This option allows programs to modify the value of typed constants and should generally be left disabled, using variables instead of constants for modifyable values. Another change is the support for the Int64 data type in variants. Finally, you can assign specific values to the elements of an enumeration (as in the C/C++ language), instead of using the default sequence of values.</p>
+
+<h4 id="thenewdifcompilerdirective">The New <em>$IF</em> Compiler Directive</h4>
+
+<p>Delphi has always had a $IFDEF directive you could use to test whether a specific symbol was defined. (Delphi also has a $IFNDEF directive, with the opposite test.) This is used to obtain conditional compilation, as in</p>
+
+<p><em>{$IFDEF DEBUG}</em></p>
+
+<p><em>// executes only if the DEBUG directive is set</em></p>
+
+<p>ShowMessage (<em>‘Executing critical code’</em>);</p>
+
+<p><em>{$ENDIF}</em></p>
+
+<p>By setting or not setting the DEBUG directive and recompiling, the extra line of code will be included or skipped by the compiler.</p>
+
+<p>This code directive is powerful, but checking for multiple versions of Delphi and operating systems can force you to use multiple-nested $IFDEF directives, making the code totally unread- able. For this reason, Borland has introduced a new and more powerful directive for condi- tional compilation, $IF. Inside the directive you can use the Defined function to check whether a conditional symbol is defined, or use the Declared function to see whether a language con- stant is defined and use these constants within a constant Boolean expression. Here is some code that shows how to use a constant within the $IF directive (you can find this and other code excerpts of this and the next section in the IfDirective example on the companion CD):</p>
+
+<p><strong>const</strong></p>
+
+<p>DebugControl = 2;</p>
+
+<p><em>{$IF Defined(DEBUG) and (DebugControl > 3)}</em></p>
+
+<p>ShowMessage (<em>‘Executing critical code’</em>);</p>
+
+<p><em>{$IFEND}</em></p>
+
+<p>Notice that the statement is closed by a $IFEND and that you can also have an optional $ELSE branch. You can also concatenate conditions with the $ELSEIF directive, followed by another condition and evaluated only as an alternative to the $IF directive it refers to:</p>
+
+<p><em>{$IF one}</em></p>
+
+<p>...</p>
+
+<p><em>{$ELSEIF two}</em></p>
+
+<p><em>...</em></p>
+
+<p><em>{$ELSE}</em></p>
+
+<p><em>...</em></p>
+
+<p><em>{$IFEND}</em></p>
+
+<p>Within the expressions of the $IF directive, you can use only untyped constants, which are really and invariably treated as constants by the compiler. You can follow the general rules of Pascal constant expressions. You can use all the language operators, the and, or, xor, and not Boolean operators, and mathematical ones including div, mod, +, -, *, /, > and &lt;, to mention just a few common ones. You can also use predefined functions such as SizeOf, High, Low, Prev, Succ, and others listed in the Delphi Help page “Constant expressions.” The expression can use constant symbols of any type, including floats and strings, so long as the expression itself ultimately evaluates to a True or False value.</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* In these constant expressions, it is not possible to use type constants, which can be optionally modified in the code depending on the status of the writeable-typed constants directive ($J or</p>
+
+<p>$WRITEABLECONST). In any case, using constants you can modify is quite a bad idea in the first place.</p>
+
+<p>Delphi provides a few predefined conditional symbols, including compiler version, the operating system, the GUI environment, and so on. I’ve listed the most important ones in Table 2.1. You can also use the RTLVersion constant defined in the System unit to test which version of Delphi (and its run-time library) you are compiling on. The predefined symbol ConditionalExpressions can be used to shield the new directives from older versions of Delphi:</p>
+
+<p><em>{$IFDEF ConditionalExpressions}</em></p>
+
+<p><em>{$IF System.RTLVersion > 14.0}</em></p>
+
+<p><em>// do something</em></p>
+
+<p><em>{$IFEND}</em></p>
+
+<p><em>{$ENDIF}</em></p>
+
+<p><strong>TABLE 2.1:</strong> Commonly Used Predefined Conditional Symbols</p>
+
+<p><strong>Symbol</strong>                   <strong>Description</strong></p>
+
+<p>VER140                 Compiling with Delphi 6, which is the 14.0 version of the Borland Pascal com- piler; Delphi 5 used VER130, with lower numbers for past versions.</p>
+
+<p>MSWINDOWS        Compiling on the Windows platform (new in Delphi 6).</p>
+
+<p>LINUX                 Compiling on the Linux platform. On Kylix, there are also the LINUX32, POSIX, and ELF predefined symbols.</p>
+
+<p>WIN32                  Compiling only on the 32-bit Windows platform. This symbol was introduced in Delphi 2 to distinguish from 16-bit Windows compilations (Delphi 1 defined the WINDOWS symbol). You should use WIN32 only to mark code specifically for Win32, not Win16 or future Win64 platforms (for which the WIN64 symbol has been reserved). Use MSWINDOWS, instead, to distinguish between Win- dows and other operating systems.</p>
+
+<p>CONSOLE        Compiling a console application, and not a GUI one. This symbol is meaningful only under Windows, as all Linux applications are console applications.</p>
+
+<p>BCB                   Defined when the C++Builder IDE invokes the Pascal compiler.</p>
+
+<p>ConditionalExpressions   Indicates that the $IF directive is available. It is defined in Kylix and Delphi 6,</p>
+
+<p>but not in earlier versions.</p>
+
+<p>I recommend using conditional compilation sparingly and only when it is really required. It is generally better, whenever possible, to write code that can adapt to different situations—for example, adding different versions of the same class (or different inherited classes) to the same program. Excessive use of conditional compilation makes a program hard to read and to debug.</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* Remember to issue a Build All command when you change a conditional symbol or a constant, which can affect a conditional compilation; otherwise the affected units won’t be recompiled unless their source code changes.</p>
+
+<h4 id="newhintdirectives">New Hint Directives</h4>
+
+<p>Supporting multiple operating systems within the same source code base implies a number of compatibility issues. Besides a modified run-time library and a wholly new component library (discussed in Chapter 4, “The Run-Time Library,” and Chapter 5, “Core Library Classes”), Delphi 6 includes special directives Borland uses to mark special portions of the code. As they introduced the idea of custom warnings and messages (described in the previous section), they’ve added a few special predefined ones.</p>
+
+<p><strong>The</strong> <strong>*platform*</strong> <strong>Directive</strong></p>
+
+<p>The first directive of this group is the platform directive, used to mark nonportable code. This directive can be used to mark procedures, variables, types, and almost any defined symbol. Borland uses platform in its libraries, so that when you use a platform-specific capability (for example, calling the IncludeTrailingBackslash function of the SysUtils unit), you’ll receive a warning message, such as:</p>
+
+<p>Symbol ‘IncludeTrailingBackslash’ is specific to a platform.</p>
+
+<p>This warning is a hint for developers who plan to port their code between the Linux and Windows platforms, even in the future. In many cases, you’ll be able to find an alternative approach that is fully platform independent. Check the help file (or eventually the library source code) for hints in this direction. In the case of the IncludeTrailingBackslash func- tion, there is now a new version, called IncludeTrailingDelimiter, that is also portable to a Unix-based file system.</p>
+
+<p>Of course you can use the platform directive to mark your code, for example, if you write a component or library that has platform-specific features. Here are a few examples:</p>
+
+<p><strong>var</strong></p>
+
+<p>windowsversion: Integer = 2000 <strong>platform</strong>;</p>
+
+<p><strong>procedure</strong> Test; <strong>platform</strong>; <strong>begin</strong></p>
+
+<p>Beep;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>type</strong></p>
+
+<p>TWinClass = <strong>class</strong></p>
+
+<p>x: Integer;</p>
+
+<p><strong>end platform</strong>;</p>
+
+<p>The code fragments of this section are available, for your experiments, in the IfDirective example on the companion CD.</p>
+
+<p>The position of semicolons for hint directives can be quite confusing at first. The rule is that a hint directive must appear before the semicolon following the symbol it modifies. But a proce- dure, function, or unit header declaration can be followed only by reserved words, so its hint directive can appear following the semicolon. A type, variable, or constant declaration can be followed by another identifier, so the hint directive must come before the semicolon closing its declaration. Part of the rationale behind this is that the hint directives are not reserved words, so they can be used as the name of an identifier.</p>
+
+<p><strong>The</strong> <strong>*deprecated*</strong> <strong>Directive</strong></p>
+
+<p>The deprecated directive works in a similar way to the platform directive; the only real dif- ferences are that it is used in a different context and produces a different compiler warning. The role of deprecated is to mark identifiers that are still part of the system for compatibility reasons, but either are going to be removed in the future or expose you to risks of incompati- bility. This symbol is used sparingly in the Delphi library.</p>
+
+<p><strong>The</strong> <strong>*library*</strong> <strong>Directive</strong></p>
+
+<p>The library directive works in a similar way to deprecated and platform; its role is to mark out code or components that are specific to a library (either VCL or CLX) and are not portable among them. However, apparently this symbol is never used within the Delphi library.</p>
+
+<p><strong>The</strong> <strong>*$WARN*</strong> <strong>Directive</strong></p>
+
+<p>The $WARNINGS directive (and the corresponding compiler option) allows you to turn off all the warning messages. Most programmers like to keep the messages on and tend to work with programs that compile with no hints and warnings. With the advent of the three hint directives discussed in the last section, however, there are programs specifically aimed for a platform, which cannot compile without compatibility warnings.</p>
+
+<p>To overcome this situation, Delphi 6 introduces the $WARN directive, specifically aimed at disabling hint directives. As an example, you’ll disable platform hints by writing this code:</p>
+
+<p><em>{$WARN SYMBOL_PLATFORM OFF}</em></p>
+
+<p>The $WARN directive has five different parameters, related to the three hint directives, and can use the ON and OFF values for each:</p>
+
+<p>·      SYMBOL<em>PLATFORM and UNIT</em>PLATFORM can be used to disable the platform directive in the current unit or in the unit where the directive is specified. The warning, in fact, is issued while compiling the code that uses the symbol, not while compiling the code with the definition.</p>
+
+<p>·      SYMBOL<em>LIBRARY and UNIT</em>LIBRARY work on the library directive in the same manner as the platform-related parameters above.</p>
+
+<p>·      SYMBOL_DEPRECATED can be used to disable the deprecated directive.</p>
+
+<p><strong>The</strong> <strong>*$MESSAGE*</strong> <strong>Directive</strong></p>
+
+<p>The compiler has now the ability to generate warnings in many different situations, so that the developer of a library or a portion of a program can let other programmers know of a given problem or risk in using a given feature, when the program can still legally compile. An exten- sion to this idea is to let programmers insert custom warning messages in the code, with this syntax:</p>
+
+<p><em>{$MESSAGE ‘Old version of the unit: consider using the updated version’}</em></p>
+
+<p>Compiling this code will issue a hint message with the text provided. This feature can be used to indicate possible problems, suggest alternative approaches, mark unfinished code, and more. This is probably more reliable than using a TODO item (discussed in the preceding chapter), because a programmer might not open the To-Do List window but the compiler will remind him of the pending problem. However, it is the compiler that issues the message, so you’ll see it even if the given portion of the code is not really used by the program because the linker will remove it from the executable file.</p>
+
+<p>These type of free messages, like the hint directives, become very useful to let the developer of a component communicate with the programmers using it, warning of potential pitfalls.</p>
+
+<h2 id="introducingclassesandobjects">Introducing Classes and Objects</h2>
+
+<p>The cornerstone of the OOP extensions available in Object Pascal is represented by the class keyword, which is used inside type declarations. Classes define the blueprint of the objects you create in Delphi. As the terms <em>class</em> and <em>object</em> are commonly used and often misused, let’s be sure we agree on their definitions.</p>
+
+<p>A <em>class</em> is a user-defined data type, which has a state (its representation) and some operations (its behavior). A class has some internal data and some methods, in the form of procedures or functions, and usually describes the generic characteristics and behavior of some similar objects.</p>
+
+<p>An <em>object</em> is an instance of a class, or a variable of the data type defined by the class. Objects are <em>actual</em> entities. When the program runs, objects take up some memory for their internal representation. The relationship between object and class is the same as the one between variable and type.</p>
+
+<p>To declare a new class data type in Object Pascal, with some local data fields and some methods, use the following syntax:</p>
+
+<p><strong>type</strong></p>
+
+<p>TDate = <strong>class</strong></p>
+
+<p>Month, Day, Year: Integer;</p>
+
+<p><strong>procedure</strong> SetValue (m, d, y: Integer);</p>
+
+<p><strong>function</strong> LeapYear: Boolean;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The convention in Delphi is to use the letter <em>T</em> as a prefix for the name of every class you write and every other type (<em>T</em> stands for <em>Type</em>). This is just a convention—to the compiler, <em>T</em> is just a letter like any other—but it is so common that following it will make your code easier to understand.</p>
+
+<p>The following is a complete class definition, with two methods declared and not yet fully defined. The definition of these two methods (the LeapYear function and the SetValue pro- cedure) must be present in the same unit of the class declaration and are written with this syntax:</p>
+
+<p><strong>procedure</strong> TDate.SetValue (m, d, y: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>Month := m; Day := d; Year := y;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>function</strong> TDate.LeapYear: Boolean;</p>
+
+<p><strong>begin</strong></p>
+
+<p><em>// call IsLeapYear in SysUtils.pas</em></p>
+
+<p>Result := IsLeapYear (Year);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The method names are prefixed with the class name (using the dot-notation), because a unit can hold multiple classes, possibly with methods having the same names. You can actually avoid retyping the method names and parameter list by using the class completion feature of the editor. Simply type or modify the class definition and press Ctrl+Shift+C while the cursor is within the class definition itself; this will allow Delphi to generate a skeleton of the defini- tion of the methods, including the begin and end statements.</p>
+
+<p>Once the class has been defined, we can create an object and use it as follows:</p>
+
+<p><strong>var</strong></p>
+
+<p>ADay: TDate;</p>
+
+<p><strong>begin</strong></p>
+
+<p><em>// create an object</em></p>
+
+<p>ADay := TDate.Create;</p>
+
+<p><em>// use the object</em> ADay.SetValue (1, 1, 2000); <strong>if</strong> ADay.LeapYear <strong>then</strong></p>
+
+<p>ShowMessage (<em>‘Leap year: ‘</em> + IntToStr (ADay.Year));</p>
+
+<p><em>// destroy the object</em></p>
+
+<p>ADay.Free;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Notice that ADay.LeapYear is an expression similar to ADay.Year, although the first is a function call and the second a direct data access. You can optionally add parentheses after the call of a function with no parameters. You can find the code snippets above in the source code of the Date1 example; the only difference is that the program creates a date based on the year provided in an edit box.</p>
+
+<h4 id="classesobjectsandvisualprogramming">Classes, Objects, and Visual Programming</h4>
+
+<p>When I teach classes about OOP in Delphi, I always tell my students that regardless of how much OOP you know and how much you use it, Delphi forces you in the OOP direction. Even if you simply create a new application with a form and place a button over it to execute some code when the button is pressed, you are building an object-oriented application. In fact, the form is an object of a new class (by default TForm1, which inherits from the base TForm class provided by Borland), and the button is an instance of the TButton class, provided by Borland, as you can see in the following code snippet:</p>
+
+<p><strong>type</strong></p>
+
+<p>TForm1 = <strong>class</strong>(TForm) Button1: TButton;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Given these premises, it would be very hard to build a Delphi application without using classes and objects. Yes, I know it is technically possible, but I doubt it would make a lot of sense. Not using objects and classes with Delphi would probably be more difficult than using them, as you have to give up all of the design-time tools for visual programming.</p>
+
+<p>In any case, the real challenge is using OOP properly, something I’ll try to teach you in this chapter (and in the rest of the book), along with an introduction to the key elements of the Object Pascal language.</p>
+
+<p><strong>The</strong> <strong>*Self*</strong> <strong>Keyword</strong></p>
+
+<p>Methods are very similar to procedures and functions. The real difference is that methods have an implicit parameter, which is a reference to the current object. Within a method you can refer to this parameter—the current object—using the Self keyword. This extra hidden parameter is needed when you create several objects of the same class, so that each time you apply a method to one of the objects, the method will operate only on its own data and not affect sibling objects.</p>
+
+<p>For example, in the SetValue method of the TDate class, listed earlier, we simply use Month, Year, and Day to refer to the fields of the current object, something you might express as</p>
+
+<p><strong>Self</strong>.Month := m;</p>
+
+<p><strong>Self</strong>.Day := d;</p>
+
+<p>This is actually how the Delphi compiler translates the code, <em>not</em> how you are supposed to write it. The Self keyword is a fundamental language construct used by the compiler, but at times it is used by programmers to resolve name conflicts and to make tricky code more readable.</p>
+
+<p>The C++ and Java languages have a similar feature based on the keyword this.</p>
+
+<p>All you really need to know about Self is that the technical implementation of a call to a method differs from that of a call to a generic subroutine. Methods have an extra hidden parameter, Self. Because all this happens behind the scenes, you do not need to know how Self works at this time.</p>
+
+<p>If you look at the definition of the TMethod data type in the System unit, you’ll see that it is a record with a Code field and a Data field. The first is a pointer to the function’s address in memory; the second the value of the Self parameter to use when calling that function address. We’ll discuss method pointers in Chapter 5.</p>
+
+<h4 id="overloadedmethods">Overloaded Methods</h4>
+
+<p>Object Pascal supports overloaded functions and methods: you can have multiple methods with the same name, provided that the parameters are different. By checking the parameters, the compiler can determine which of the versions of the routine you want to call.</p>
+
+<p>There are two basic rules:</p>
+
+<p>·      Each version of the method must be followed by the overload keyword.</p>
+
+<p>·      The differences must be in the number or type of the parameters or both. The return type cannot be used to distinguish between two methods.</p>
+
+<p>Overloading can be applied to global functions and procedures and to methods of a class. As an example of overloading, I’ve added to the TDate class two different versions of the SetValue method:</p>
+
+<p><strong>type</strong></p>
+
+<p>TDate = <strong>class public</strong></p>
+
+<p><strong>procedure</strong> SetValue (y, m, d: Integer); <strong>overload</strong>; <strong>procedure</strong> SetValue (NewDate: TDateTime); <strong>overload</strong>;</p>
+
+<p><em>...//the rest of the class declaration</em></p>
+
+<p><strong>procedure</strong> TDate.SetValue (y, m, d: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := EncodeDate (y, m, d);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TDate.SetValue(NewDate: TDateTime);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := NewDate;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>In Delphi 6, the compiler has been enhanced to improve the resolution of overloaded meth- ods, allowing the compilation of calls that were considered ambiguous. In particular, the com- piler handles the difference between AnsiString and WideString types. The overload resolution also has better support for variant-type parameters (which will provide matches in case there is no exact match for another overloaded version) and interfaces (which are given precedence to object types). Finally, the compiler allows the nil value to match an interface- type parameter. Some of these improvements were already introduced in the Kylix compiler.</p>
+
+<h4 id="creatingcomponentsdynamically">Creating Components Dynamically</h4>
+
+<p>In Delphi, the Self keyword is often used when you need to refer to the current form explic- itly in one of its methods. The typical example is the creation of a component at run time, where you must pass the owner of the component to its Create constructor and assign the same value to its Parent property. (The difference between Owner and Parent properties is discussed in the next chapter.) In both cases, you have to supply the current form as parameter or value, and the best way to do this is to use the Self keyword.</p>
+
+<p>To demonstrate this kind of code, I’ve written the CreateC example (the name stands for <em>Create Component</em>) included on the companion CD. This program has a simple form with no components and a handler for its OnMouseDown event. I’ve used OnMouseDown because it receives as its parameter the position of the mouse click (unlike the OnClick event). I need this information to create a button component in that position. Here is the code of the method:</p>
+
+<p><strong>procedure</strong> TForm1.FormMouseDown (Sender: TObject;</p>
+
+<p>Button: TMouseButton; Shift: TShiftState; X, Y: Integer);</p>
+
+<p><strong>var</strong></p>
+
+<p>Btn: TButton;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Btn := TButton.Create (<strong>Self</strong>); Btn.Parent := <strong>Self</strong>;</p>
+
+<p>Btn.Left := X; Btn.Top := Y;</p>
+
+<p>Btn.Width := Btn.Width + 50;</p>
+
+<p>Btn.Caption := Format (<em>‘Button at %d, %d’</em>, [X, Y]);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The effect of this code is to create buttons at mouse-click positions, with a caption indicat- ing the exact location, as you can see in Figure 2.1. In the code above, notice in particular the use of the Self keyword, as the parameter of the Create method and as the value of the Parent property. I’ll discuss these two elements (ownership and the Parent property) in Chapter 5.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image152.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 2 . 1 :</strong></p>
+
+<p>The output of the CreateC example, which creates Button components at run time</p>
+
+<p>It is very common to write code like the above method using a with statement, as in the following listing:</p>
+
+<p><strong>procedure</strong> TForm1.FormMouseDown (Sender: TObject;</p>
+
+<p>Button: TMouseButton; Shift: TShiftState; X, Y: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>with</strong> TButton.Create (<strong>Self</strong>) <strong>do begin</strong></p>
+
+<p>Parent := <strong>Self</strong>; Left := X;</p>
+
+<p>Top := Y;</p>
+
+<p>Width := Width + 50;</p>
+
+<p>Caption := Format (<em>‘Button in %d, %d’</em>, [X, Y]);</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p>When writing a procedure like the code you’ve just seen, you might be tempted to use the Form1 variable instead of Self. In this specific example, that change wouldn’t make any prac- tical difference, but if there are multiple instances of a form, using Form1 would be an error. In fact, if the Form1 variable refers to the first form of that type being created, by clicking in another form of the same type, the new button will always be displayed in the first form. Its Owner and Parent will be Form1 and not the form the user has clicked. In general, referring to a particular instance of a class when the current object is required is bad OOP practice.</p>
+
+<h4 id="classmethodsandclassdata">Class Methods and Class Data</h4>
+
+<p>When you define a field in a class, you actually specify that the field should be added to each object of that class. Each instance has its own independent representation (referred to by the Self pointer). In some cases, however, it might be useful to have a field that is shared by all the objects of a class.</p>
+
+<p>Other object-oriented programming languages have formal constructs to express this, while in Object Pascal we can simulate this feature using the encapsulation provided at the unit level. You can simply add a variable in the implementation portion of a unit, to obtain a class variable—a single memory location shared by all of the objects of a class.</p>
+
+<p>If you need to access this value from outside the unit, you might use a method of the class. However, this forces you to apply this method to one of the instances of the class. An alterna- tive solution is to declare a <em>class method</em>. A class method cannot access the data of any single object but can be applied to a class as a whole rather than to a particular instance.</p>
+
+<p>To declare a class method in Object Pascal, you simply add the class keyword in front of it:</p>
+
+<p><strong>type</strong></p>
+
+<p>MyClass = <strong>class</strong></p>
+
+<p><strong>class function</strong> ClassMeanValue: Integer;</p>
+
+<p>The use of class methods is not very common in Object Pascal, because you can obtain the same effect by adding a procedure or function to a unit declaring a class. Object-oriented purists, however, will definitely prefer the use of a class method over a routine unrelated to a class. For example, an OOP purist would add a class method for getting the current date to a TDate class instead of using a global function (also because some OOP languages, including Java, don’t have the notion of global functions).</p>
+
+<p>We’ll see several class methods in the next chapter, when we’ll examine the structure of the</p>
+
+<p>TObject class.</p>
+
+<p>Contrary to other OOP languages, Delphi class methods can also be virtual, so they can be overridden and used to obtain polymorphism (a technique discussed later in this chapter).</p>
+
+<h2 id="encapsulation">Encapsulation</h2>
+
+<p>A class can have any amount of data and any number of methods. However, for a good object- oriented approach, data should be hidden, or <em>encapsulated,</em> inside the class using it. When you access a date, for example, it makes no sense to change the value of the day by itself. In fact, changing the value of the day might result in an invalid date, such as February 30. Using methods to access the internal representation of an object limits the risk of generating erro- neous situations, as the methods can check whether the date is valid and refuse to modify the new value if it is not. Encapsulation is important because it allows the class writer to modify the internal representation in a future version.</p>
+
+<p>The concept of encapsulation is often indicated by the idea of a “black box,” where you don’t know about the internals: You only know how to interface with it or how to use it regardless of its internal structure. The “how to use” portion, called the <em>class interface,</em> allows other parts of a program to access and use the objects of that class. However, when you use the objects, most of their code is hidden. You seldom know what internal data the object has, and you usually have no way to access the data directly. Of course, you are supposed to use methods to access the data, which is shielded from unauthorized access. This is the object- oriented approach to a classical programming concept known as <em>information hiding</em>.</p>
+
+<p>Delphi implements this class-based encapsulation but still supports the classic module- based encapsulation using the structure of units. Because the two are strictly related, let me recap the traditional approach first.</p>
+
+<h4 id="encapsulationandunits">Encapsulation and Units</h4>
+
+<p>A unit in Object Pascal is a secondary source-code file, with the main source-code file being represented by the project source code. Every unit has two main sections, called interface and implementation, as well as two optional ones for initialization and finalization code. I want to focus here on the information hiding implemented by units.</p>
+
+<p>In short, every identifier (type, routine, variable, and so on) that you declare in the interface portion of a unit becomes visible to any other unit of the program, provided there is a uses statement referring back to the unit that defines the identifier. All the routines and methods you declare in the interface portion of the unit must later be fully defined in the implemented portion of the same unit. In the interface section of a unit, however, you cannot write any actual statements to execute.</p>
+
+<p>On the other hand, any identifier you declare in the implementation portion of the unit is local to the unit and is not visible outside it. A unit can have local data, local support func- tions, and even local types that the rest of the program is not allowed to access. This provides a direct way to hide the implementation details of an abstraction from its users, so you can later change your code without affecting other units of the program (and without even hav- ing to notify the changes to other programmers writing those units).</p>
+
+<p>When you write classes in a unit, you’ll generally define them in the interface portion of a unit, but some special keywords allow you to hide portions of this class interface.</p>
+
+<h4 id="privateprotectedandpublic">Private, Protected, and Public</h4>
+
+<p>For class-based encapsulation, the Object Pascal language has three access specifiers: private, protected, and public. A fourth, published, controls RTTI and design time information and will be discussed in more detail in Chapter 5. Here are the three <em>classic</em> access specifiers:</p>
+
+<p>·      The private directive denotes fields and methods of a class that are not accessible out- side the unit (the source code file) that declares the class.</p>
+
+<p>·      The protected directive is used to indicate methods and fields with limited visibility. Only the current class and its subclasses can access protected elements. We’ll discuss this keyword again in the “Protected Fields and Encapsulation” section.</p>
+
+<p>·      The public directive denotes fields and methods that are freely accessible from any other portion of a program as well as in the unit in which they are defined.</p>
+
+<p>Generally, the fields of a class should be private; the methods are usually public. How- ever, this is not always the case. Methods can be private or protected if they are needed only internally to perform some partial computation. Fields can be protected so that you can manipulate them in subclasses, but only if you are fairly sure that their type definition is not going to change. Access specifiers only restrict code outside your unit from accessing certain members of classes declared in the interface section of your unit. This means that if two classes are in the same unit, there is no protection for their private fields. Only by placing a class in the interface portion of a unit will you limit the visibility from classes and functions in other units to the public method and fields of the class.</p>
+
+<p>As an example, consider this new version of the TDate class:</p>
+
+<p><strong>type</strong></p>
+
+<p>TDate = <strong>class private</strong></p>
+
+<p>Month, Day, Year: Integer;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>procedure</strong> SetValue (y, m, d: Integer); <strong>overload</strong>; <strong>procedure</strong> SetValue (NewDate: TDateTime); <strong>overload</strong>; <strong>function</strong> LeapYear: Boolean;</p>
+
+<p><strong>function</strong> GetText: string;</p>
+
+<p><strong>procedure</strong> Increase;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>In this version, the fields are now declared to be private, and there are some new methods. The first, GetText, is a function that returns a string with the date. You might think of adding other functions, such as GetDay, GetMonth, and GetYear, which simply return the correspond- ing private data, but similar direct data-access functions are not always needed. Providing access functions for each and every field might reduce the encapsulation and make it harder to modify the internal implementation of a class. Access functions should be provided only if they are part of the logical interface of the class you are implementing.</p>
+
+<p>Another new method is the Increase procedure, which increases the date by one day. This is far from simple, because you need to consider the different lengths of the various months as well as leap and non–leap years. What I’ll do to make it easier to write the code is change the internal implementation of the class to Delphi’s TDateTime type for the internal imple- mentation. The class definition will change to (the complete code will be in the next example, DateProp):</p>
+
+<p><strong>type</strong></p>
+
+<p>TDate = <strong>class private</strong></p>
+
+<p>fDate: TDateTime;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>procedure</strong> SetValue (y, m, d: Integer); <strong>overload</strong>; <strong>procedure</strong> SetValue (NewDate: TDateTime); <strong>overload</strong>; <strong>function</strong> LeapYear: Boolean;</p>
+
+<p><strong>function</strong> GetText: string;</p>
+
+<p><strong>procedure</strong> Increase;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Notice that because the only change is in the private portion of the class, you won’t have to modify any of your existing programs that use it. This is the advantage of encapsulation!</p>
+
+<p>The TDateTime type is actually a floating-point number. The integral portion of the number indi- cates the date since 12/30/1899, the same base date used by OLE Automation and Microsoft applications. (Use negative values to express previous years.) The decimal portion indicates the time as a fraction. For example, a value of 3.75 stands for the second of January 1900, at 6:00 A.M. (three-quarters of a day). To add or subtract dates, you can add or subtract the number of days, which is much simpler than adding days with a day/month/year representation.</p>
+
+<h4 id="encapsulatingwithproperties">Encapsulating with Properties</h4>
+
+<p>Properties are a very sound OOP mechanism, or a very well thought out application of the idea of encapsulation. Essentially, you have a name that completely hides its implementation details. This allows you to modify the class extensively without affecting the code using it. A good definition of properties is that of <em>virtual fields</em>. From the perspective of the user of the class that defines them, properties look exactly like fields, as you can generally read or write their value. For example, you can read the value of the Caption property of a button and assign it to the Text property of an edit box with the following code:</p>
+
+<p>Edit1.Text := Button1.Caption;</p>
+
+<p>This looks like we are reading and writing fields. However, properties can be directly mapped to data, as well as to access methods, for reading and writing the value. When prop- erties are mapped to methods, the data they access can be part of the object or outside of it, and they can produce side effects, such as repainting a control after you change one of its val- ues. Technically, a property is an identifier that is mapped to data or methods using a read and a write clause. For example, here is the definition of a Month property for a date class:</p>
+
+<p><strong>property</strong> Month: Integer <strong>read</strong> FMonth <strong>write</strong> SetMonth;</p>
+
+<p>To access the value of the Month property, the program reads the value of the private field FMonth, while to change the property value it calls the method SetMonth (which must be defined inside the class, of course). Different combinations are possible (for example, we could also use a method to read the value or directly change a field in the write directive), but the use of a method to change the value of a property is very common. Here are two alternative definitions for the property, mapped to two access methods or mapped directly to data in both directions:</p>
+
+<p><strong>property</strong> Month: Integer <strong>read</strong> GetMonth <strong>write</strong> SetMonth;</p>
+
+<p><strong>property</strong> Month: Integer <strong>read</strong> FMonth <strong>write</strong> FMonth;</p>
+
+<p>When you write code that accesses a property, it is important to realize that a method might be called. The issue is that some of these methods take some time to execute; they can also produce side effects, often including a (slow) repainting of the component on the screen. Although side effects of properties are seldom documented, you should be aware that they exist, particularly when you are trying to optimize your code.</p>
+
+<p>Often, the actual data and access methods are private (or protected) while the property is public. This means you must use the property to have access to those methods or data, a technique that provides both an extended and a simplified version of encapsulation. It is an <em>extended</em> encapsulation because not only can you change the representation of the data and its access functions, but you can also add or remove access functions without changing the call- ing code at all. A user only needs to recompile the program using the property.</p>
+
+<h5 id="classcompletionforproperties">Class Completion for Properties</h5>
+
+<p>Properties provide a <em>simplified</em> encapsulation because when extra code is not required, you map the properties directly to fields, without writing tedious and useless access methods. And even when you want to write those methods, the IDE can use class completion (the Ctrl+Shift+C key combination) to generate the skeleton of the access methods of the properties for you. If you simply type in a class (say TMyClass),</p>
+
+<p><strong>property</strong> X: Integer;</p>
+
+<p>and activate class completion, Delphi generates a SetX method for the property and adds the</p>
+
+<p>FX field to the class. The resulting code looks like this:</p>
+
+<p><strong>type</strong></p>
+
+<p>TMyClass = <strong>class</strong>(TForm) <strong>private</strong></p>
+
+<p>FX: Integer;</p>
+
+<p><strong>procedure</strong> SetX(<strong>const</strong> Value: Integer);</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>property</strong> X: Integer <strong>read</strong> FX <strong>write</strong> SetX;</p>
+
+<p><strong>end</strong>; <strong>implementation</strong></p>
+
+<p><strong>procedure</strong> TMyClass.SetX(<strong>const</strong> Value: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>FX := Value;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This really saves a lot of typing. You can even partially control how class completion gen- erates Set and Get methods for the property. In fact, if you first type the property declaration including the read and write directives, as in</p>
+
+<p><strong>property</strong> X: Integer <strong>read</strong> GetX <strong>write</strong> SetX;</p>
+
+<p>Class completion will generate the requested methods or add the field definition. If you want both the field and the methods, type in only the property name and its data type (as in the first example above), and let Delphi expand the declaration. At this point, fix the expanded declaration by replacing the FX field with a GetX method in the read portion, and invoke class completion a second time.</p>
+
+<h5 id="propertiesforthetdateclass">Properties for the <em>TDate</em> Class</h5>
+
+<p>As an example, I’ve added properties for accessing the year, the month, and the day to an object of the TDate class discussed earlier. These properties are not mapped to specific fields, but they all map to the single fDate field storing the entire date information. This is the new definition of the class:</p>
+
+<p><strong>type</strong></p>
+
+<p>TDate = <strong>class private</strong></p>
+
+<p>fDate: TDateTime;</p>
+
+<p><strong>procedure</strong> SetDay(<strong>const</strong> Value: Integer); <strong>procedure</strong> SetMonth(<strong>const</strong> Value: Integer); <strong>procedure</strong> SetYear(<strong>const</strong> Value: Integer); <strong>function</strong> GetDay: Integer;</p>
+
+<p><strong>function</strong> GetMonth: Integer;</p>
+
+<p><strong>function</strong> GetYear: Integer;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>procedure</strong> SetValue (y, m, d: Integer); <strong>overload</strong>; <strong>procedure</strong> SetValue (NewDate: TDateTime); <strong>overload</strong>; <strong>function</strong> LeapYear: Boolean;</p>
+
+<p><strong>function</strong> GetText: string;</p>
+
+<p><strong>procedure</strong> Increase;</p>
+
+<p><strong>property</strong> Year: Integer <strong>read</strong> GetYear <strong>write</strong> SetYear; <strong>property</strong> Month: Integer <strong>read</strong> GetMonth <strong>write</strong> SetMonth; <strong>property</strong> Day: Integer <strong>read</strong> GetDay <strong>write</strong> SetDay;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Each of the Get and Set methods is easily implemented using functions available in the new DateUtils unit (discuss in more detail in Chapter 4). Here is the code for two of them (the others are very similar):</p>
+
+<p><strong>function</strong> TDate.GetYear: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Result := YearOf (fDate);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TDate.SetYear(<strong>const</strong> Value: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := RecodeYear (fDate, Value);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The code for this class is available in the DateProp example. The program uses a secondary unit for the definition of the TDate class to enforce encapsulation and creates a single-date object stored in a form variable and kept in memory for the entire execution of the program. Using a standard approach, the object is created in the form OnCreate event handler and destroyed in the form OnDestroy event handler.</p>
+
+<p>The form of the program (see Figure 2.2) has three edit boxes and buttons to copy the values of these edit boxes to and from the properties of the date object:</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image156.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 2 . 2 :</strong></p>
+
+<p>The form of the DateProp example</p>
+
+<p><strong>procedure</strong> TDateForm.BtnReadClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>EditYear.Text := IntToStr (TheDay.Year); EditMonth.Text := IntToStr (TheDay.Month); EditDay.Text := IntToStr (TheDay.Day);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* When writing the values, the program uses the SetValue method instead of setting each of the properties. In fact, assigning the month and the day separately can cause you trouble when the month is not valid for the current day. For example, the day is currently January 31, and you want to assign to it February 20. If you assign the month first, this part of the assign- ment will fail, as February 31 does not exist. If you assign the day first, the problem will arise when doing the reverse assignment. Due to the validity rules for dates, it is better to assign everything at once.</p>
+
+<h5 id="advancedfeaturesofproperties">Advanced Features of Properties</h5>
+
+<p>Properties have several advanced features I’ll focus on in future chapters, specifically the introduction to the base classes of the library in Chapter 5 and writing custom Delphi com- ponents in Chapter 11, “Creating Components.” This is a short summary of these more advanced features:</p>
+
+<ul>
+<li><p>The write directive of a property can be omitted, making it a <em>read-only</em> property. The compiler will issue an error if you try to change it. You can also omit the read directive and define a <em>write-only</em> property, but that doesn’t make much sense and is used infrequently.</p></li>
+
+<li><p>The Delphi IDE gives special treatment to <em>design-time</em> properties, declared with the published access specifier and generally displayed in the Object Inspector for the selected component. More on the published keyword and its effect is in Chapter 5.</p></li>
+
+<li><p>The other properties, often called <em>run-time only</em> properties, are those declared with the public access specifier. These properties can be used in the program code.</p></li>
+
+<li><p>You can define <em>array-based</em> properties, which use the typical notation with square brack- ets to access an element of a list. The <em>string list–based</em> properties, such as the Lines of a list box, are a typical example of this group.</p></li>
+
+<li><p>Properties have special directives, including stored and default, which control the component streaming system,* introduced in Chapter 5 and detailed in Chapter 11.</p></li>
+</ul>
+
+<p>You can usually assign a value to a property or read it, and you can even use properties in expressions, but you cannot always pass a property as a parameter to a procedure or method. This is because a property is not a memory location, so it cannot be used as a var parameter; it cannot be passed by reference.</p>
+
+<h4 id="encapsulationandforms">Encapsulation and Forms</h4>
+
+<p>One of the key ideas of encapsulation is to reduce the number of global variables used by a program. A global variable can be accessed from every portion of a program. For this reason, a change in a global variable affects the whole program. On the other hand, when you change the representation of a class’s field, you only need to change the code of some methods of that class and nothing else. Therefore, we can say that information hiding refers to <em>encapsu- lating changes</em>.</p>
+
+<p>Let me clarify this idea with an example. When you have a program with multiple forms, you can make some data available to every form by declaring it as a global variable in the interface portion of the unit of one of the forms:</p>
+
+<p><strong>var</strong></p>
+
+<p>Form1: TForm1; nClicks: Integer;</p>
+
+<p>This works but has two problems. First, the data is not connected to a specific instance of the form, but to the entire program. If you create two forms of the same type, they’ll share the data. If you want every form of the same type to have its own copy of the data, the only solution is to add it to the form class:</p>
+
+<p><strong>type</strong></p>
+
+<p>TForm1 = <strong>class</strong>(TForm) <strong>public</strong></p>
+
+<p>nClicks: Integer;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The second problem is that if you define the data as a global variable or as a public field of a form, you won’t be able to modify its implementation in the future without affecting the code that uses the data. For example, if you only have to read the current value from other forms, you can declare the data as private and provide a method to read the value:</p>
+
+<p><strong>type</strong></p>
+
+<p>TForm1 = <strong>class</strong>(TForm) <strong>public</strong></p>
+
+<p><strong>function</strong> GetClicks: Integer;</p>
+
+<p><strong>private</strong></p>
+
+<p>nClicks: Integer;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>function</strong> TForm1.GetClicks: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Result := nClicks;</p>
+
+<p><strong>end</strong>;</p>
+
+<h5 id="addingpropertiestoforms">Adding Properties to Forms</h5>
+
+<p>An even better solution is to add a property to the form. Every time you want to make some information of a form available to other forms, you should really use a property, for all the reasons discussed in the previous section. Simply change the field declaration of the form, shown in the preceding listing, by adding the keyword property in front of it and then press Ctrl+Shift+C to activate code completion. Delphi will automatically generate all of the extra code you need. In the form, you also need to handle the OnClick event, increasing the value of the property (and showing it in the form caption):</p>
+
+<p><strong>procedure</strong> TForm1.FormClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>Inc (FClicks);</p>
+
+<p>Caption := <em>‘Clicks: ‘</em> + IntToStr (FClicks);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The complete code for this form class is available in the FormProp example and illustrated in Figure 2.3. The program can create multi-instances of the form (that is, multiple objects based on the same form class), each with its own click count. Clicking the Create Form but- ton creates the secondary forms, using the following code:</p>
+
+<p><strong>procedure</strong> TForm1.btnCreateFormClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>with</strong> TForm1.Create (<strong>Self</strong>) <strong>do</strong></p>
+
+<p>Show;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image158.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 2 . 3 :</strong></p>
+
+<p>Two forms of the FormProp example at run time</p>
+
+<p>Notice that adding a property to a form doesn’t add to the list of the form properties in the Object Inspector.</p>
+
+<p>In my opinion, properties should also be used in the form classes to encapsulate the access to the components of a form. For example, if you have a main form with a status bar used to display some information (and with the SimplePanel property set to True) and you want to modify the text from a secondary form, you might be tempted to write:</p>
+
+<p>Form1.StatusBar1.SimpleText := <em>‘new text’</em>;</p>
+
+<p>This is a standard practice in Delphi, but it’s not a good one, because it doesn’t provide any encapsulation of the form structure or components. If you have similar code in many places throughout an application, and you later decide to modify the user interface of the form (replac- ing StatusBar with another control or activating multiple panels), you’ll have to fix the code in many places. The alternative is to use a method or, even better, a property to hide the specific control. Simply type</p>
+
+<p><strong>property</strong> StatusText: string <strong>read</strong> GetText <strong>write</strong> SetText;</p>
+
+<p>and press the Ctrl+Shift+C combination again, to let Delphi add the definition of both meth- ods for reading and writing the property:</p>
+
+<p><strong>function</strong> TForm1.GetText: string;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Result := StatusBar1.SimpleText;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TForm1.SetText(<strong>const</strong> Value: string);</p>
+
+<p><strong>begin</strong></p>
+
+<p>StatusBar1.SimpleText := Value;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>In the other forms of the program, you can simply refer to the StatusText property of the form, and if the user interface changes, only the Set and Get methods of the property are affected.</p>
+
+<p>See Chapter 5 for a detailed discussion of how you can avoid having published form fields for components, which will improve encapsulation. But don’t rush there: the description requires a good knowledge of Delphi, and the technique discussed has a few drawbacks!</p>
+
+<h2 id="constructors">Constructors</h2>
+
+<p>As I’ve mentioned, to allocate the memory for the object, we call the Create method. This is a <em>constructor,</em> a special method that you can apply to a class to allocate memory for an instance of that class. The instance is returned by the constructor and can be assigned to a variable for storing the object and using it later on. The default TObject.Create constructor initializes all the data of the new instance to zero.</p>
+
+<p>If you want your instance data to start out with a nonzero value, then you need to write a custom constructor to do that. The new constructor can be called Create, or it can have any other name; use the constructor keyword in front of it. Notice that you don’t need to call TObject.Create: it is Delphi that allocates the memory for the new object, not the class con- structor. All you have to do is to initialize the class base.</p>
+
+<p>If you create objects without initializing them, calling methods later may result in odd behavior or even a run-time error. A consistent use of constructors to initialize objects’ data is an important <em>preventive</em> technique to avoid these errors in the first place. For example, we must call the SetValue procedure of the TDate class after we’ve created the object. As an alternative, we can provide a customized constructor, which creates the object and gives it an initial value.</p>
+
+<p>Although you can use any name for a constructor, you should stick to the standard name, Create. If you use a name other than Create, the Create constructor of the base TObject class will still be available, but a programmer calling this default constructor might bypass the initialization code you’ve provided because they don’t recognize the name.</p>
+
+<p>By defining a Create constructor with some parameters, you replace the default definition with a new one and make its use compulsory. For example, after you define</p>
+
+<p><strong>type</strong></p>
+
+<p>TDate = <strong>class public</strong></p>
+
+<p><strong>constructor</strong> Create (y, m, d: Integer);</p>
+
+<p><strong>constructor</strong> TDate.Create (y, m, d: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := EncodeDate (y, m, d);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>you’ll be able to call this constructor and not the standard Create:</p>
+
+<p><strong>var</strong></p>
+
+<p>ADay: TDate;</p>
+
+<p><strong>begin</strong></p>
+
+<p><em>// Error, does not compile:</em></p>
+
+<p>ADay := TDate.Create;</p>
+
+<p><em>// OK:</em></p>
+
+<p>ADay := TDate.Create (1, 1, 2000);</p>
+
+<p>The rules for writing constructors for custom components are different, as we’ll see in Chapter 11. In short, when you inherit from TComponent, you should override the default Create constructor with one parameter and avoid disabling it.</p>
+
+<h4 id="overloadedconstructors">Overloaded Constructors</h4>
+
+<p><em>Overloading</em> is particularly relevant for constructors, because we can add to a class multiple constructors and call them all Create, which makes them easy to remember.</p>
+
+<p>Historically, overloading was added to C++ to allow the use of multiple constructors that have the same name (the name of the class). In Object Pascal, this feature was considered unneces- sary because multiple constructors can have different specific names. The increased integra- tion of Delphi with C++Builder has motivated Borland to make this feature available in both languages, starting with Delphi 4. Technically, when C++Builder constructs an instance of a Delphi VCL class, it looks for a Delphi constructor named Create and nothing but Create. If the Delphi class has constructors by other names, they cannot be used from C++Builder code. Therefore, when creating classes and components you intend to share with C++Builder pro- grammers, you should be careful to name all your constructors Create and distinguish between them by their parameter lists (using overload). Delphi does not require this, but it is required for C++Builder to use your Delphi classes.</p>
+
+<p>As an example, I’ve added to the class two separate Create constructors: one with no para- meters, which hides the default constructor, and one with the initialization values. The con- structor with no parameter uses as the default value today’s date:</p>
+
+<p><strong>type</strong></p>
+
+<p>TDate = <strong>class public</strong></p>
+
+<p><strong>constructor</strong> Create; <strong>overload</strong>;</p>
+
+<p><strong>constructor</strong> Create (y, m, d: Integer); <strong>overload</strong>;</p>
+
+<p><strong>constructor</strong> TDate.Create (y, m, d: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := EncodeDate (y, m, d);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>constructor</strong> TDate.Create;</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := Date;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Having these two constructors makes it possible to define a new TDate object in two differ- ent ways:</p>
+
+<p><strong>var</strong></p>
+
+<p>Day1, Day2: TDate;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Day1 := TDate.Create (2001, 12, 25); Day2 := TDate.Create; <em>// today</em></p>
+
+<p>See the section “The Complete <em>TDate</em> Class” later in this chapter for the DateView exam- ple, which includes the code of these constructors.</p>
+
+<h4 id="destructors">Destructors</h4>
+
+<p>In the same way that a class can have a custom constructor, it can have a custom destructor, a method declared with the destructor keyword and called Destroy, which can perform some resource cleanup before an object is destroyed. Just as a constructor call allocates memory for the object, a destructor call frees the memory.</p>
+
+<p>We can write code for a destructor, generally overriding the default Destroy destructor, to let the object execute some code before it is destroyed. Destructors are needed only for objects that acquire resources in their constructors or during their lifetime. In your code, of course, you don’t have to handle memory de-allocation—this is something Delphi does for you.</p>
+
+<p>Destroy is a virtual destructor of the TObject class. Most of the classes that require custom clean-up code when the objects are destroyed override this virtual method. The reason you should never define a new destructor is that objects are usually destroyed by calling the Free method, and this method calls the Destroy virtual destructor of the specific class (virtual meth- ods will be discussed later in this chapter).</p>
+
+<p><strong><em>Free*</strong> <strong>(and</strong> <strong></em>nil*</strong> <strong>)</strong></p>
+
+<p>Free is a method of the TObject class, inherited by all other classes. The Free method basi- cally checks whether the current object (Self) is not nil before calling the Destroy virtual destructor. Here is its pseudocode (the actual Delphi code is written in assembler):</p>
+
+<p><strong>procedure</strong> TObject.Free;</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>if Self</strong> &lt;> <strong>nil then</strong></p>
+
+<p>Destroy;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>By looking at this code, you can see that calling Free doesn’t set the object to nil automati- cally; this is something you should do yourself! The reason is that the object doesn’t know which variables may be referring to it, so it has no way to set them all to nil.</p>
+
+<p>Automatically setting an object to nil is not possible. You might have several references to the same object, and Delphi doesn’t track them. At the same time, within a method (such as Free) we can operate on the object, but we know nothing about the object reference—the memory address of the variable we’ve used to call the method. In other words, inside the Free method or any other method of a class, we know the memory address of the object (Self), but we don’t know the memory location of the variable referring to the object.</p>
+
+<p>Delphi 5 introduced a FreeAndNil procedure you can use to free an object and set its refer- ence to nil at the same time. Simply call</p>
+
+<p>FreeAndNil (Obj1)</p>
+
+<p>instead of writing</p>
+
+<p>Obj1.Free; Obj1 := <strong>nil</strong>;</p>
+
+<p>The FreeAndNil procedure knows about the object reference, passed as a parameter, and can act on it. Here is Delphi code for FreeAndNil:</p>
+
+<p><strong>procedure</strong> FreeAndNil(<strong>var</strong> Obj);</p>
+
+<p><strong>var</strong></p>
+
+<p>P: TObject;</p>
+
+<p><strong>begin</strong></p>
+
+<p>P := TObject(Obj);</p>
+
+<p><em>// clear the reference before destroying the object</em></p>
+
+<p>TObject(Obj) := <strong>nil</strong>; P.Free;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>There’s more on this topic in the section “Destroying Objects Only Once” later in this chapter.</p>
+
+<p><strong>The Complete</strong> <strong>*TDate*</strong> <strong>Class</strong></p>
+
+<p>In the initial portion of this chapter, I’ve shown you bits and pieces of the source code for dif- ferent versions of a TDate class. In Listing 2.1 is the complete interface portion of the unit that defines the TDate class.</p>
+
+<p><strong>unit</strong> Dates;</p>
+
+<p><strong>interface type</strong></p>
+
+<h6 id="thetdateclassfromtheviewdateexample">The <em>TDate</em> class, from the ViewDate example</h6>
+
+<p>TDate = <strong>class private</strong></p>
+
+<p>fDate: TDateTime;</p>
+
+<p><strong>procedure</strong> SetDay(<strong>const</strong> Value: Integer); <strong>procedure</strong> SetMonth(<strong>const</strong> Value: Integer); <strong>procedure</strong> SetYear(<strong>const</strong> Value: Integer); <strong>function</strong> GetDay: Integer;</p>
+
+<p><strong>function</strong> GetMonth: Integer;</p>
+
+<p><strong>function</strong> GetYear: Integer;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create; <strong>overload</strong>;</p>
+
+<p><strong>constructor</strong> Create (y, m, d: Integer); <strong>overload</strong>; <strong>procedure</strong> SetValue (y, m, d: Integer); <strong>overload</strong>; <strong>procedure</strong> SetValue (NewDate: TDateTime); <strong>overload</strong>; <strong>function</strong> LeapYear: Boolean;</p>
+
+<p><strong>procedure</strong> Increase (NumberOfDays: Integer = 1); <strong>procedure</strong> Decrease (NumberOfDays: Integer = 1); <strong>function</strong> GetText: string;</p>
+
+<p><strong>property</strong> Year: Integer <strong>read</strong> GetYear <strong>write</strong> SetYear; <strong>property</strong> Month: Integer <strong>read</strong> GetMonth <strong>write</strong> SetMonth; <strong>property</strong> Day: Integer <strong>read</strong> GetDay <strong>write</strong> SetDay;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>implementation uses</strong></p>
+
+<p>SysUtils, DateUtils;</p>
+
+<p><strong>procedure</strong> TDate.SetValue (y, m, d: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := EncodeDate (y, m, d);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>function</strong> TDate.LeapYear: Boolean;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Result := IsInLeapYear(fDate);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TDate.Increase (NumberOfDays: Integer = 1);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := fDate + NumberOfDays;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>function</strong> TDate.GetText: string;</p>
+
+<p><strong>begin</strong></p>
+
+<p>GetText := DateToStr (fDate);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TDate.Decrease (NumberOfDays: Integer = 1);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := fDate - NumberOfDays;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>constructor</strong> TDate.Create (y, m, d: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := EncodeDate (y, m, d);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>constructor</strong> TDate.Create;</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := Date;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TDate.SetValue(NewDate: TDateTime);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := NewDate;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TDate.SetDay(<strong>const</strong> Value: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := RecodeDay (fDate, Value);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TDate.SetMonth(<strong>const</strong> Value: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := RecodeMonth (fDate, Value);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TDate.SetYear(<strong>const</strong> Value: Integer);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := RecodeYear (fDate, Value);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>function</strong> TDate.GetDay: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Result := DayOf (fDate);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>function</strong> TDate.GetMonth: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Result := MonthOf (fDate);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>function</strong> TDate.GetYear: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Result := YearOf (fDate);</p>
+
+<p><strong>end</strong>; <strong>end.</strong></p>
+
+<p>The aim of the Increase and Decrease methods, which have a default value for their parameter, is quite easy to understand. If called with no parameter, they change the value of the date to the next or previous day. If a NumberOfDays parameter is part of the call, they add or subtract that number.</p>
+
+<p>GetText returns a string with the formatted date, using the DateToStr function.</p>
+
+<p>The form of the example I’ve built to show you how to use the TDate class, as illustrated in Figure 2.4, has a caption to display a date and six buttons, which can be used to modify the date. To make the label component look nice, I’ve given it a big font, made it as wide as the form, set its Alignment property to taCenter, and set its AutoSize property to False.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image164.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 2 . 4 :</strong></p>
+
+<p>The output of the ViewDate example at startup</p>
+
+<p>The startup code of this program is in the OnCreate event handler. In the corresponding method, we create an instance of the TDate class, initialize this object, and then show its tex- tual description in the Caption of the label.</p>
+
+<p><strong>procedure</strong> TDateForm.FormCreate(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>TheDay := TDate.Create (2001, 12, 25); LabelDate.Caption := TheDay.GetText;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>TheDay is a private field of the class of the form, TDateForm. (By the way, the name for the form class is automatically chosen by Delphi when we change the Name property of the form to DateForm.) The object is then destroyed along with the form:</p>
+
+<p><strong>procedure</strong> TDateForm.FormDestroy(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>TheDay.Free;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>When the user clicks one of the six buttons, we need to apply the corresponding method to the TheDay object and then display the new value of the date in the label:</p>
+
+<p><strong>procedure</strong> TDateForm.BtnTodayClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>TheDay.SetValue (Date); LabelDate.Caption := TheDay.GetText;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Notice that in this code we reuse an existing object, assigning a new date to it. We could also create a new object and assign it to the existing TheDate variable, but this can lead to confusing situations, as explained in the next section.</p>
+
+<h2 id="delphisobjectreferencemodel">Delphi’s Object Reference Model</h2>
+
+<p>In some OOP languages, declaring a variable of a class type creates an instance of that class. Object Pascal, instead, is based on an <em>object reference model</em>. The idea is that a variable of a class type, such as the TheDay variable in the preceding ViewDate example, does not hold the value of the object. Rather, it contains a reference, or a <em>pointer,</em> to indicate the memory loca- tion where the object has been stored. You can see this structure depicted in Figure 2.5.</p>
+
+<p>The only problem with this approach is that when you declare a variable, you don’t create an object in memory; you only reserve the memory location for a reference to an object.</p>
+
+<p>Object instances must be created manually, at least for the objects of the classes you define. Instances of the components you place on a form are built automatically by Delphi.</p>
+
+<p>You’ve seen how to create an instance of an object by applying a constructor to its class. Once you have created an object and you’ve finished using it, you need to dispose of it (to avoid filling up memory you don’t need any more, which causes what is known as a <em>memory leak</em>). This can be accomplished by calling the Free method. As long as you create objects when you need them and free them when you’re finished with them, the object reference model works without a glitch. The object reference model has many consequences on assign- ing object and on managing memory, as we’ll see in the next two sections.</p>
+
+<h4 id="assigningobjects">Assigning Objects</h4>
+
+<p>If a variable holding an object only contains a reference to the object in memory, what happens if you copy the value of that variable? Suppose we write the BtnTodayClick method of the ViewDate example in the following way:</p>
+
+<p><strong>procedure</strong> TDateForm.BtnTodayClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>NewDay: TDate;</p>
+
+<p><strong>begin</strong></p>
+
+<p>NewDay := TDate.Create; TheDay := NewDay;</p>
+
+<p>LabelDate.Caption := TheDay.GetText;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This code copies the memory address of the NewDay object to the TheDay variable (as shown in Figure 2.6); it doesn’t copy the data of an object into the other. In this particular circum- stance, this is not a very good approach, as we keep allocating memory for a new object every time the button is pressed, but we never release the memory of the object the TheDay variable was previously pointing to. This specific issue can be solved by freeing the old object, as in the following code (which is also simplified, without the use of an explicit variable for the newly created object):</p>
+
+<p><strong>procedure</strong> TDateForm.BtnTodayClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>TheDay.Free;</p>
+
+<p>TheDay := TDate.Create;</p>
+
+<p>The important thing to keep in mind is that, when you assign an object to another object, Delphi copies the reference to the object in memory to the new object/reference. You should not consider this a negative: In many cases, being able to define a variable referring to an exist- ing object can be a plus. For example, you can store the object returned by calling a function or accessing a property and use it in subsequent statements, as this code snippet indicates:</p>
+
+<p><strong>var</strong></p>
+
+<p>ADay: TDate;</p>
+
+<p><strong>begin</strong></p>
+
+<p>ADay: UserInformation.GetBirthDate;</p>
+
+<p><em>// use a ADay</em></p>
+
+<p>The same happens if you pass an object as a parameter to a function: You don’t create a new object, but you refer to the same one in two different places of the code. For example, by writing this procedure and calling it as follows, you’ll modify the Caption property of the Button1 object, not of a copy of its data in memory (which would be totally useless):</p>
+
+<p><strong>procedure</strong> CaptionPlus (Button: TButton);</p>
+
+<p><strong>begin</strong></p>
+
+<p>Button.Caption := Button.Caption + <em>‘+’</em>;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><em>// call...</em></p>
+
+<p>CaptionPlus (Button1)</p>
+
+<p>What if you really want to change the data inside an existing object, so that it matches the data of another object? You have to copy each field of the object, which is possible only if they are all public, or provide a specific method to copy the internal data. Some classes of the VCL have an Assign method, which does this copy operation. To be more precise, most of the VCL classes inheriting from TPersistent, but not inheriting from TComponent, have the Assign method. Other TComponent-derived classes have this method but raise an exception when it is called.</p>
+
+<p>In the DateCopy example, slightly modified from the ViewDate program, I’ve added an Assign method to the TDate class, and I’ve called it from the Today button, with the follow- ing code:</p>
+
+<p><strong>procedure</strong> TDate.Assign (Source: TDate);</p>
+
+<p><strong>begin</strong></p>
+
+<p>fDate := Source.fDate;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TDateForm.BtnTodayClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>NewDay: TDate;</p>
+
+<p><strong>begin</strong></p>
+
+<p>NewDay := TDate.Create; TheDay.Assign(NewDay); LabelDate.Caption := TheDay.GetText; NewDay.Free;</p>
+
+<p><strong>end</strong>;</p>
+
+<h4 id="objectsandmemory">Objects and Memory</h4>
+
+<p>Memory management in Delphi is subject to three rules: Every object must be created before it can be used; every object must be destroyed after it has been used; and every object must be destroyed only once. Whether you have to do these operations in your code, or you can let Delphi handle memory management for you, depends on the model you choose among the different approaches provided by Delphi.</p>
+
+<p>Delphi supports three types of memory management for dynamic elements (that is, elements not in the stack and the global memory area):</p>
+
+<ul>
+<li><p>Every time you create an object explicitly, in the code of your application, you should also free it. If you fail to do so, the memory used by that object won’t be released for other objects until the program terminates.</p></li>
+
+<li><p>When you create a component, you can specify an owner component, passing the owner to the component constructor. The owner component (often a form) becomes responsible for destroying all the objects it owns. In other words, when you free the form, it frees all the components it owns. So, if you create a component and give it an owner, you don’t have to remember to destroy it. This is the standard behavior of the components you create at design time by placing them on a form or data module.</p></li>
+
+<li><p>When you allocate memory for strings, dynamic arrays, and objects referenced by interface variables (discussed in Chapter 3), Delphi automatically frees the memory when the reference goes out of scope. You don’t need to free a string: when it becomes unreachable, its memory is released.</p></li>
+</ul>
+
+<h5 id="destroyingobjectsonlyonce">Destroying Objects Only Once</h5>
+
+<p>Another problem is that if you call the Destroy destructor of an object twice, you get an error. If you remember to set the object to nil, you can call Free twice with no problem.</p>
+
+<p>You might wonder why you can safely call Free if the object reference is nil, but you can’t call Destroy. The reason is that Free is a known method at a given memory location, whereas the virtual function Destroy is determined at run time by looking at the type of the object, a very dangerous operation if the object doesn’t exist any more.</p>
+
+<p>To sum things up, here are a couple of guidelines:</p>
+
+<ul>
+<li><p>Always call Free to destroy objects, instead of calling the Destroy destructor.</p></li>
+
+<li><p>Use FreeAndNil, or set object references to nil after calling Free, unless the reference is going out of scope immediately afterward.</p></li>
+</ul>
+
+<p>In general, you can also check whether an object is nil by using the Assigned function. So the following two statements are equivalent, at least in most cases:</p>
+
+<p><strong>if</strong> Assigned (ADate) <strong>then</strong> ...</p>
+
+<p><strong>if</strong> ADate &lt;> <strong>nil then</strong> ...</p>
+
+<p>Notice that these statements test only whether the pointer is not nil; they do not check whether it is a valid pointer. If you write the following code, the test will be satisfied, and you’ll get an error on the line with the call to the method of the object:</p>
+
+<p>ToDestroy.Free;</p>
+
+<p><strong>if</strong> ToDestroy &lt;> <strong>nil then</strong></p>
+
+<p>ToDestroy.DoSomething;</p>
+
+<p>It is important to realize that calling Free doesn’t set the object to nil.</p>
+
+<h2 id="whatsnext">What’s Next?</h2>
+
+<p>In this chapter, we have discussed the foundations of object-oriented programming (OOP) in Object Pascal. We have considered the definition of classes, the use of methods, encapsulation, and memory management, but also some more advanced concepts such as properties and the dynamic creation of components.</p>
+
+<p>This is certainly a lot of information if you are a newcomer, but if you are fluent in another OOP language or if you’ve already used past versions of Delphi, you should be able to apply the topics covered in this chapter to your programming.</p>
+
+<p>The next chapter continues on the same line, highlighting inheritance in particular, along with virtual functions and interfaces. It also includes a discussion on exception handling and class references, so that at the end you’ll have a complete overview of the language. At that point, you’ll be ready to start focusing on the libraries the compiler relies on, and we’ll get back to see how properties are used by Delphi and its IDE (in Chapter 5). Other chapters will provide further information on applying the OOP concepts to Delphi programming. You’ll find OOP tips throughout the entire book, but particularly in Chapter 11, devoted to writing custom Delphi components.</p>
+
