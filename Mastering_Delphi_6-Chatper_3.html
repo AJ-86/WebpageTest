@@ -1,0 +1,1199 @@
+<ol>
+<li>sadsdf</li>
+
+<li>asdf</li>
+</ol>
+
+<p><strong>A</strong>fter the introduction to classes and objects we’ve seen over the last chapter, let’s move on to another key element of the language, <em>inheritance</em>. Deriving a class from an existing one is the real revolutionary idea of object-oriented programming, and it goes along with polymorphism, virtual functions, abstract functions, and many other topics discussed in this chapter.</p>
+
+<p>We’ll focus also on interfaces, another intriguing idea of the most recent OOP languages, and we’ll cover a few more elements of Object Pascal, such as exception handling and class references. Together with the previous chapter, this will provide an almost complete roundup of the language.</p>
+
+<h2 id="inheritingfromexistingtypes">Inheriting from Existing Types</h2>
+
+<p>We often need to use a slightly different version of an existing class that we have written or that someone has given to us. For example, you might need to add a new method or slightly change an existing one. You can do this easily by modifying the original code, unless you want to be able to use the two different versions of the class in different circumstances. Also, if the class was originally written by someone else (including Borland), you might want to keep your changes separate.</p>
+
+<p>A typical alternative is to make a copy of the original type definition, change its code to support the new features, and give a new name to the resulting class. This might work, but it also might create problems: In duplicating the code you also duplicate the bugs; and if you want to add a new feature, you’ll need to add it two or more times, depending on the number of copies of the original code you’ve made. This approach results in two completely different data types, so the compiler cannot help you take advantage of the similarities between the two types.</p>
+
+<p>To solve these kinds of problems in expressing similarities between classes, Object Pascal allows you to define a new class directly from an existing one. This technique is known as <em>inheritance</em> (or <em>subclassing</em>) and is one of the fundamental elements of object-oriented program- ming languages. To inherit from an existing class, you only need to indicate that class at the beginning of the declaration of the subclass. For example, Delphi does this automatically each time you create a new form:</p>
+
+<p><strong>type</strong></p>
+
+<p>TForm1 = <strong>class</strong>(TForm) <strong>end</strong>;</p>
+
+<p>This simple definition indicates that the TForm1 class inherits all the methods, fields, proper- ties, and events of the TForm class. You can apply any public method of the TForm class to an object of the TForm1 type. TForm, in turn, inherits some of its methods from another class, and so on, up to the TObject base class.</p>
+
+<p>As an example of inheritance, we can change the ViewDate program, deriving a new class from TDate and modifying its GetText function. You can find this code in the DATES.PAS file of the NewDate example on the companion CD.</p>
+
+<p><strong>type</strong></p>
+
+<p>TNewDate = <strong>class</strong> (TDate)</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>function</strong> GetText: string;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>In this example, the TNewDate class is derived from TDate. It is common to say that TDate is an <em>ancestor</em> class or <em>parent</em> class of TNewDate and that TNewDate is a <em>subclass, descendant</em> class, or <em>child</em> class of TDate.</p>
+
+<p>To implement the new version of the GetText function, I used the FormatDateTime function, which uses (among other features) the predefined month names available in Windows; these names depend on the user’s regional and language settings. Many of these regional settings are actually copied by Delphi into constants defined in the library, such as LongMonthNames, ShortMonthNames, and many others you can find under the “Currency and date/time formatting variables” topic in the Delphi Help file. Here is the GetText method, where <em>‘dddddd’</em> stands for the long date format:</p>
+
+<p><strong>function</strong> TNewDate.GetText: string;</p>
+
+<p><strong>begin</strong></p>
+
+<p>GetText := FormatDateTime (<em>‘dddddd’</em>, fDate);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Using regional information, the NewDate program automatically adapts itself to different Windows user settings. If you run this same program on a computer with regional settings referring to a language other than English, it will automatically show month names in that language. To test this behavior, you just need to change the regional settings; you don’t need a new version of Windows. Notice that regional-setting changes immediately affect the run- ning programs.</p>
+
+<p>Once we have defined the new class, we need to use this new data type in the code of the form of the NewDate example. Simply define the TheDay object of type TNewDate, and call its constructor in the FormCreate method:</p>
+
+<p><strong>type</strong></p>
+
+<p>TDateForm = <strong>class</strong>(TForm)</p>
+
+<p>...</p>
+
+<p><strong>private</strong></p>
+
+<p>TheDay: TNewDate; <em>// updated declaration</em></p>
+
+<p><strong>end</strong>; </p>
+
+<p><strong>procedure</strong> TDateForm.FormCreate(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>TheDay := TNewDate.Create (2001, 12, 25); <em>// updated</em></p>
+
+<p>DateLabel.Caption := TheDay.GetText;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Without any other changes, the new NewDate example will work properly. The TNewDate class inherits the methods to increase the date, add a number of days, and so on. In addition, the older code calling these methods still works. Actually, to call the new version of the GetText method, we don’t need to change the source code! The Delphi compiler will automatically bind that call to a new method. The source code of all the other event handlers remains exactly the same, although its meaning changes considerably, as the new output demonstrates (see Figure 3.1).</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image197.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 3 . 1 :</strong></p>
+
+<p>The output of the NewDate program, with the name of the month and of the day depending on Windows regional settings</p>
+
+<h4 id="protectedfieldsandencapsulation">Protected Fields and Encapsulation</h4>
+
+<p>The code of the GetText method of the TNewDate class compiles only if it is written in the same unit as the TDate class. In fact, it accesses the fDate private field of the ancestor class. If we want to place the descendant class in a new unit, we must either declare the fDate field as protected or add a protected access method in the ancestor class to read the value of the private field.</p>
+
+<p>Many developers believe that the first solution is always the best, because declaring most of the fields as protected will make a class more extensible and will make it easier to write sub- classes. However, this violates the idea of encapsulation. In a large hierarchy of classes, chang- ing the definition of some protected fields of the base classes becomes as difficult as changing some global data structures. If ten derived classes are accessing this data, changing its defini- tion means potentially modifying the code in each of the ten classes.</p>
+
+<p>In other words, flexibility, extension, and encapsulation often become conflicting objec- tives. When this happens, you should try to favor encapsulation. If you can do so without sacrificing flexibility, that will be even better. Often this intermediate solution can be obtained by using a virtual method, a topic I’ll discuss in detail later in the section “Late Binding and Polymorphism.” If you choose not to use encapsulation in order to obtain faster coding of the subclasses, then your design might not follow the object-oriented principles.</p>
+
+<p>At this point, you might think there is no way to access the protected data of a class defined in a different unit. (This is what Delphi manuals and most Delphi books say.) However, there is a way around it. Consider what happens if you create an apparently useless derived class, such as</p>
+
+<p><strong>type</strong></p>
+
+<p>TFake = class (TTest);</p>
+
+<p>Now, if you make a direct cast of the object to the new class and access the protected data through it, this is how the code will look:</p>
+
+<p><strong>procedure</strong> TForm1.Button2Click(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>Obj: TTest;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Obj := TTest.Create; Obj.PublicData := 10;</p>
+
+<p>TFake (Obj).ProtectedData := 20; <em>// compiles!</em></p>
+
+<p>ShowMessage (Obj.GetValue); Obj.Free;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This code compiles and works properly, as you can see by running the Protection program. How is it possible for this approach to work? Well, if you think about it, the TFake class auto- matically inherits the protected fields of the TTest base class, and because the TFake class is in the same unit as the code that tries to access the data in the inherited fields, the protected data is accessible. As you would expect, if you move the declaration of the TFake class to a secondary unit, the program won’t compile any more.</p>
+
+<p>Now that I’ve shown you how to do this, I must warn you that violating the class-protection mechanism this way is likely to cause errors in your program (from accessing data that you really shouldn’t), and it runs counter to good OOP technique. However, there are times when using this technique is the best solution, as you’ll see by looking at the VCL source code and the code of many Delphi components. Two examples that come to mind are accessing the Text property of the TControl class and the Row and Col positions of the DBGrid control. These two ideas are demonstrated by the TextProp and DBGridCol examples, respectively. (These examples are quite advanced, so I suggest that only programmers with a good back- ground of Delphi programming read them at this point in the text—other readers might come back later.) Although the first example shows a reasonable example of using the typecast <em>cracker,</em> the DBGrid example of Row and Col is actually a counterexample, one that illustrates the risks of accessing bits that the class writer chose not to expose. The row and column of a DBGrid do not mean the same thing as they do in a DrawGrid or StringGrid (the base classes). First, DBGrid does not count the fixed cells as actual cells (it distinguishes data cells</p>
+
+<h4 id="inheritanceandtypecompatibility">Inheritance and Type Compatibility</h4>
+
+<p>Pascal is a strictly typed language. This means that you cannot, for example, assign an integer value to a Boolean variable, unless you use an explicit typecast. The rule is that two values are type-compatible only if they are of the same data type, or (to be more precise) if their data type refers to a single type definition.</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* If you redefine the same data type in two different units, they won’t be compatible, even if their name is identical. A program using two equally named types of two different units will be a nightmare to compile and debug.</p>
+
+<p>There is an important exception to this rule in the case of class types. If you declare a class, such as TAnimal, and derive from it a new class, say TDog, you can then assign an object of type TDog to a variable of type TAnimal. That is because a dog is an animal! So, although this might surprise you, the following constructor calls are both legal:</p>
+
+<p><strong>var</strong></p>
+
+<p>MyAnimal1, MyAnimal2: TAnimal;</p>
+
+<p><strong>begin</strong></p>
+
+<p>MyAnimal1 := TAnimal.Create; MyAnimal2 := TDog.Create;</p>
+
+<p>As a general rule, you can use an object of a descendant class any time an object of an ancestor class is expected. However, the reverse is not legal; you cannot use an object of an ancestor class when an object of a descendant class is expected. To simplify the explanation, here it is again in code terms:</p>
+
+<p><strong>type</strong></p>
+
+<p>TDog = <strong>class</strong> (TAnimal)</p>
+
+<p>...</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>var</strong></p>
+
+<p>MyAnimal: TAnimal; MyDog: TDog;</p>
+
+<p><strong>begin</strong></p>
+
+<p>MyAnimal := MyDog; <em>// This is OK</em></p>
+
+<p>MyDog := MyAnimal; <em>// This is an error!!!</em></p>
+
+<p>Before we look at the implications of this important feature of the language, you can try out the Animals1 example from the companion CD, which defines the two TAnimal and TDog classes:</p>
+
+<p><strong>type</strong></p>
+
+<p>TAnimal = <strong>class public</strong></p>
+
+<p><strong>constructor</strong> Create;</p>
+
+<p><strong>function</strong> GetKind: string;</p>
+
+<p><strong>private</strong></p>
+
+<p>Kind: string;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>TDog = <strong>class</strong> (TAnimal)</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The two Create methods set the value of Kind, which is returned by the GetKind function. The form displayed by this example, shown in Figure 3.2, has a private field MyAnimal of type TAnimal. An instance of this class is created and initialized when the form is created and each time one of the radio buttons is selected:</p>
+
+<p><strong>procedure</strong> TFormAnimals.FormCreate(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>MyAnimal := TAnimal.Create;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>procedure</strong> TFormAnimals.RadioDogClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>MyAnimal.Free;</p>
+
+<p>MyAnimal := TDog.Create;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image201.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 3 . 2 :</strong></p>
+
+<p>The form of the Animals1 example</p>
+
+<p>Finally, the Kind button calls the GetKind method for the current animal and displays the result in the label:</p>
+
+<p><strong>procedure</strong> TFormAnimals.BtnKindClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>KindLabel.Caption := MyAnimal.GetKind;</p>
+
+<p><strong>end</strong>;</p>
+
+<h2 id="latebindingandpolymorphism">Late Binding and Polymorphism</h2>
+
+<p>Pascal functions and procedures are usually based on <em>static</em> or <em>early binding</em>. This means that a method call is resolved by the compiler and linker, which replace the request with a call to the specific memory location where the function or procedure resides. (This is known as the <em>address</em> of the function.) OOP languages allow the use of another form of binding, known as <em>dynamic</em> or <em>late binding</em>. In this case, the actual address of the method to be called is deter- mined at run time based on the type of the instance used to make the call.</p>
+
+<p>The advantage of this technique is known as <em>polymorphism</em>. Polymorphism means you can write a call to a method, applying it to a variable, but which method Delphi actually calls depends on the type of the object the variable relates to. Delphi cannot determine until run time the actual class of the object the variable refers to, because of the type-compatibility rule discussed in the previous section.</p>
+
+<p>The term <em>polymorphism</em> is quite a mouthful. A glance at the dictionary tells us that in a general sense, it refers to something having more than one form. In the OOP sense, then, it refers to the facts that there may be several versions of a given method across several related classes and that a single method call on an object instance of a particular class type can refer to one of these versions. Which version of the method gets called depends on the type of the object instance used to make the call at run time.</p>
+
+<p>For example, suppose that a class and its subclass (let’s say TAnimal and TDog) both define a method, and this method has late binding. Now you can apply this method to a generic vari- able, such as MyAnimal, which at run time can refer either to an object of class TAnimal or to an object of class TDog. The actual method to call is determined at run time, depending on the class of the current object.</p>
+
+<p>The Animals2 example extends the Animals1 program to demonstrate this technique. In the new version, the TAnimal and the TDog classes have a new method: Voice, which means to output the sound made by the selected animal, both as text and as sound. This method is defined as virtual in the TAnimal class and is later overridden when we define the TDog class, by the use of the virtual and override keywords:</p>
+
+<p><strong>type</strong></p>
+
+<p>TAnimal = <strong>class public</strong></p>
+
+<p><strong>function</strong> Voice: string; <strong>virtual</strong>;</p>
+
+<p>TDog = <strong>class</strong> (TAnimal)</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>function</strong> Voice: string; <strong>override</strong>;</p>
+
+<p>Of course, the two methods also need to be implemented. Here is a simple approach:</p>
+
+<p><strong>uses</strong></p>
+
+<p>MMSystem;</p>
+
+<p><strong>function</strong> TAnimal.Voice: string;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Voice := <em>‘Voice of the animal’</em>; PlaySound (<em>‘Anim.wav’</em>, 0, snd_Async);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>function</strong> TDog.Voice: string;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Voice := <em>‘Arf Arf’</em>;</p>
+
+<p>PlaySound (<em>‘dog.wav’</em>, 0, snd_Async);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This example uses a call to the PlaySound API function, defined in the MMSystem unit. The first parameter of this function is the name of the WAV sound file or the system sound you want to execute. The second parameter indicates an optional resource file containing the sound. The third parameter indicates (among other options) whether the call should be synchronous or asynchronous; that is, whether the program should wait for the sound to finish before continuing with the following statements.</p>
+
+<p>Now what is the effect of the call MyAnimal.Voice? It depends. If the MyAnimal variable currently refers to an object of the TAnimal class, it will call the method TAnimal.Voice. If it refers to an object of the TDog class, it will call the method TDog.Voice instead. This happens only because the function is virtual (as you can experiment by removing this keyword and recompiling).</p>
+
+<p>The call to MyAnimal.Voice will work for an object that is an instance of any descendant of the TAnimal class, even classes that are defined in other units—or that haven’t been written yet! The compiler doesn’t need to know about all the descendants in order to make the call compat- ible with them; only the ancestor class is needed. In other words, this call to MyAnimal.Voice is compatible with all future TAnimal subclasses.</p>
+
+<p>This is the key technical reason why object-oriented programming languages favor reusability. You can write code that uses classes within a hierarchy without any knowledge of the specific classes that are part of that hierarchy. In other words, the hierarchy—and the program—is still extensible, even when you’ve written thousands of lines of code using it. Of course, there is one condition: the ancestor classes of the hierarchy need to be designed very carefully.</p>
+
+<p>The Animals2 program demonstrates the use of these new classes and has a form similar to that of the previous example. This code is executed by clicking the button:</p>
+
+<p><strong>procedure</strong> TFormAnimals.BtnVerseClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>LabelVoice.Caption := MyAnimal.Voice;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>In Figure 3.3, you can see an example of the output of this program. By running it, you’ll also hear the corresponding sounds produced by the PlaySound API call.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image203.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 3 . 3 :</strong></p>
+
+<p>The output of the Animals2 example</p>
+
+<h4 id="overridingandredefiningmethods">Overriding and Redefining Methods</h4>
+
+<p>As we have just seen, to override a late-bound method in a descendant class, you need to use the override keyword. Note that this can take place only if the method was defined as virtual in the ancestor class. Otherwise, if it was a static method, there is no way to activate late binding, other than by changing the code of the ancestor class.</p>
+
+<p>The rules are simple: A method defined as static remains static in every subclass, unless you hide it with a new virtual method having the same name. A method defined as virtual remains late-bound in every subclass. There is no way to change this, because of the way the compiler generates different code for late-bound methods.</p>
+
+<p>The new C# programming language proposed by Microsoft (which is in essence a clone of Java) has the same notion as the Object Pascal language of marking the overridden version of a method with a specific keyword.</p>
+
+<p>To redefine a static method, you add a method to a subclass having the same parameters or different parameters than the original one, without any further specifications. To override a virtual method, you must specify the same parameters and use the override keyword:</p>
+
+<p><strong>type</strong></p>
+
+<p>MyClass = <strong>class procedure</strong> One; <strong>virtual</strong>;</p>
+
+<p><strong>procedure</strong> Two; <em>{static method}</em></p>
+
+<p><strong>end</strong>;</p>
+
+<p>MySubClass = <strong>class</strong> (MyClass) <strong>procedure</strong> One; <strong>override</strong>; <strong>procedure</strong> Two;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>There are typically two ways to override a method. One is to replace the method of the ancestor class with a new version. The other is to add some more code to the existing method. This can be accomplished by using the inherited keyword to call the same method of the ancestor class. For example, you can write</p>
+
+<p><strong>procedure</strong> MySubClass.One;</p>
+
+<p><strong>begin</strong></p>
+
+<p><em>// new code</em></p>
+
+<p>...</p>
+
+<p><em>// call inherited procedure MyClass.One</em></p>
+
+<p><strong>inherited</strong> One;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>You might wonder why you need to use the override keyword. In other languages, when you redefine a method in a subclass, you automatically override the original one. However, having a specific keyword allows the compiler to check the correspondence between the names of the methods of the ancestor class and the subclass (misspelling a redefined function is a com- mon error in other OOP languages), check that the method was virtual in the ancestor class, and so on.</p>
+
+<p>When you override an existing virtual method of a base class, you must use the same parameters. When you introduce a new version of a method in a descendent class, you can declare it with the parameters you want. In fact, this will be a new method unrelated to the ancestor method of the same name. They only happen to use the same name. Here is an example:</p>
+
+<p><strong>type</strong></p>
+
+<p>TMyClass = <strong>class procedure</strong> One;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>TMySubClass = <strong>class</strong> (TMyClass)</p>
+
+<p><strong>procedure</strong> One (S: string);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Using the class definitions above, when you create an object of the TMySubClass class, you can apply to it the One method with the string parameter, but not the parameter-less version defined in the base class. If this is what you need, it can be accomplished by marking the re- declared method (the one in the derived class) with the overload keyword. If the method has different parameters than the version in the base class, it becomes effectively an over- loaded method; otherwise it replaces the base class method. Notice that the method doesn’t need to be marked as overload in the base class. However, if the method in the base class is virtual, the compiler issues the warning “Method ‘One’ hides virtual method of base type ‘TMyClass.’” To avoid this message and to instruct the compiler more precisely on your inten- tions, you can use the reintroduce directive. If you are interested in this advanced topic, you can find this code in the Reintr example on the companion CD and experiment with it further.</p>
+
+<h4 id="virtualversusdynamicmethods">Virtual versus Dynamic Methods</h4>
+
+<p>In Delphi, there are two different ways to activate late binding. You can declare the method as virtual, as we have seen before, or declare it as dynamic. The syntax of these two key- words is exactly the same, and the result of their use is also the same. What is different is the internal mechanism used by the compiler to implement late binding.</p>
+
+<p>virtual methods are based on a <em>virtual method table</em> (VMT, also known as a <em>vtable</em>), which is an array of method addresses. For a call to a virtual method, the compiler generates code to jump to an address stored in the <em>n</em>th slot in the object’s virtual method table.</p>
+
+<p>Virtual method tables allow fast execution of the method calls. Their main drawback is that they require an entry for each virtual method for each descendant class, even if the method is not overridden in the subclass. At times, this has the effect of propagating VMT entries throughout a class hierarchy (even for methods that aren’t redefined). This might require a lot of memory just to store the same method address multiple times.</p>
+
+<p>Dynamic method calls, on the other hand, are dispatched using a unique number indicating the method. The search for the corresponding function is generally slower than the one-step table lookup for virtual methods. The advantage is that dynamic method entries only prop- agate in descendants when the descendants override the method. For large or deep object hierarchies, using dynamic methods instead of virtual methods can result in significant memory savings with only a minimal speed penalty.</p>
+
+<p>From a programmer’s perspective, the difference between these two approaches lies only in a different internal representation and slightly different speed or memory usage. Apart from this, virtual and dynamic methods are the same.</p>
+
+<h5 id="messagehandlers">Message Handlers</h5>
+
+<p>A late-bound method can be used to handle a Windows message, too, although the technique is somewhat different. For this purpose Delphi provides yet another directive, message, to define message-handling methods, which must be procedures with a single var parameter.</p>
+
+<p>The message directive is followed by the number of the Windows message the method wants to handle.</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* The message directive is also available in Delphi for Linux and is fully supported by the lan- guage and the RTL. However, the visual portion of the CLX application framework does not use message methods to dispatch notifications to controls. For this reason, whenever possible, you should use a virtual method provided by the library rather than handle a Windows mes- sage directly. Of course, this matters only if you want your code to be more portable.</p>
+
+<p>For example, the following code allows you to handle a user-defined message, with the numeric value indicated by the wm_User Windows constant:</p>
+
+<p><strong>type</strong></p>
+
+<p>TForm1 = <strong>class</strong>(TForm)</p>
+
+<p>...</p>
+
+<p><strong>procedure</strong> WmUser (<strong>var</strong> Msg: TMessage);</p>
+
+<p><strong>message</strong> wm_User;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The name of the procedure and the actual type of the parameters are up to you, although there are several predefined record types for the various Windows messages. You could later send this message, invoking the corresponding method, by writing:</p>
+
+<p>PostMessage (Form1.Handle, wm_User, 0, 0);</p>
+
+<p>This technique can be extremely useful for veteran Windows programmers, who know all about Windows messages and API functions. You can also dispatch a message to an object by calling the TObject.Dispatch method on the object. This will be a synchronous message call, not asynchronous like PostMessage. TObject.Dispatch is fully platform independent.</p>
+
+<p>The ability to handle Windows messages and call API functions as you do when you are programming Windows with the C language may horrify some programmers and delight others. But in Delphi, when writing Windows applications, you will seldom need to use message methods or call Windows APIs directly. Obviously, these techniques will also affect the portability of your code to other platforms.</p>
+
+<h4 id="abstractmethods">Abstract Methods</h4>
+
+<p>The abstract keyword is used to declare methods that will be defined only in subclasses of the current class. The abstract directive fully defines the method; it is not a forward declara- tion. If you try to provide a definition for the method, the compiler will complain. In Object Pascal, you can create instances of classes that have abstract methods. However, when you try to do so, Delphi’s 32-bit compiler issues the warning message “Constructing instance of</p>
+
+<p><class name> containing abstract methods.” If you happen to call an abstract method at run time, Delphi will raise an exception, as demonstrated by the following Animals3 example.</p>
+
+<p>C++ and Java use a more strict approach: in these languages, you cannot create instances of classes containing abstract methods.</p>
+
+<p>You might wonder why you would want to use abstract methods. The reason lies in the use of polymorphism. If class TAnimal has the abstract method Voice, every subclass can redefine it. The advantage is that you can now use the generic MyAnimal object to refer to each animal defined by a subclass and invoke this method. If this method was not present in the interface of the TAnimal class, the call would not have been allowed by the compiler, which performs static type checking. Using a generic MyAnimal object, you can call only the method defined by its own class, TAnimal.</p>
+
+<p>You cannot call methods provided by subclasses, unless the parent class has at least the dec- laration of this method—in the form of an abstract method. The next example, Animals3, demonstrates the use of abstract methods and the abstract call error. In Listing 3.1, you can see the interfaces of the classes of this new example. (Here TAnimal is an abstract class.)</p>
+
+<p><strong>type</strong></p>
+
+<p>TAnimal = <strong>class public</strong></p>
+
+<p><strong>constructor</strong> Create;</p>
+
+<p><strong>function</strong> GetKind: string;</p>
+
+<p><strong>function</strong> Voice: string; <strong>virtual</strong>; <strong>abstract</strong>; <strong>private</strong></p>
+
+<p>Kind: string;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>TDog = <strong>class</strong> (TAnimal)</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create;</p>
+
+<p><strong>function</strong> Voice: string; <strong>override</strong>; <strong>function</strong> Eat: string; <strong>virtual</strong>;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>TCat = <strong>class</strong> (TAnimal)</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create;</p>
+
+<p><strong>function</strong> Voice: string; <strong>override</strong>; <strong>function</strong> Eat: string; <strong>virtual</strong>;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The most interesting portion of Listing 3.1 is the definition of the class TAnimal, which includes a virtual abstract method: Voice. It is also important to notice that each derived class overrides this definition and adds a new virtual method, Eat. What are the implications of these two different approaches? To call the Voice function, we can write the same code as in the previous version of the program:</p>
+
+<p>LabelVoice.Caption := MyAnimal.Voice;</p>
+
+<p>How can we call the Eat method? We cannot apply it to an object of the TAnimal class. The statement</p>
+
+<p>LabelVoice.Caption := MyAnimal.Eat;</p>
+
+<p>generates the compiler error “Field identifier expected.”</p>
+
+<p>To solve this problem, you can use run-time type information (RTTI) to cast the TAnimal object to a TCat or TDog object; but without the proper cast, the program will raise an exception. You will see an example of this approach in the next section. Adding the method definition to the TAnimal class is a typical solution to the problem, and the presence of the abstract keyword favors this choice.</p>
+
+<p>What happens if a method overriding an abstract method calls inherited? In past versions of Delphi, this resulted in an abstract method call. In Delphi 6, the compiler has been enhanced to notice the presence of the abstract method and simply skip the inherited call. This means you can safely always use inherited in every overridden method, unless you specifically want to disable executing some code of the base class.</p>
+
+<h2 id="typesafedowncasting">Type-Safe Down-Casting</h2>
+
+<p>The Object Pascal type-compatibility rule for descendant classes allows you to use a descendant class where an ancestor class is expected. As I mentioned earlier, the reverse is not possible.</p>
+
+<p>Now suppose that the TDog class has an Eat method, which is not present in the TAnimal class. If the variable MyAnimal refers to a dog, it should be possible to call the function. But if you try, and the variable is referring to another class, the result is an error. By making an explicit typecast, we could cause a nasty run-time error (or worse, a subtle memory overwrite problem), because the compiler cannot determine whether the type of the object is correct and the methods we are calling actually exist.</p>
+
+<p>To solve the problem, we can use techniques based on <em>run-time type information</em> (RTTI, for short). Essentially, because each object “knows” its type and its parent class, and we can ask for this information with the is operator or using the InheritsFrom method of the TObject class. The parameters of the is operator are an object and a class type, and the return value is a Boolean:</p>
+
+<p><strong>if</strong> MyAnimal <strong>is</strong> TDog <strong>then</strong> ...</p>
+
+<p>The is expression evaluates as True only if the MyAnimal object is currently referring to an object of class TDog or a type descendant from TDog. This means that if you test whether a TDog object is of type TAnimal, the test will succeed. In other words, this expression evaluates as True if you can safely assign the object (MyAnimal) to a variable of the data type (TDog).</p>
+
+<p>Now that you know for sure that the animal is a dog, you can make a safe typecast (or type conversion). You can accomplish this direct cast by writing the following code:</p>
+
+<p><strong>var</strong></p>
+
+<p>MyDog: TDog;</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>if</strong> MyAnimal <strong>is</strong> TDog <strong>then begin</strong></p>
+
+<p>MyDog := TDog (MyAnimal); Text := MyDog.Eat;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This same operation can be accomplished directly by the second RTTI operator, as, which converts the object only if the requested class is compatible with the actual one. The parameters of the as operator are an object and a class type, and the result is an object converted to the new class type. We can write the following snippet:</p>
+
+<p>MyDog := MyAnimal <strong>as</strong> TDog; Text := MyDog.Eat;</p>
+
+<p>If we only want to call the Eat function, we might also use an even shorter notation:</p>
+
+<p>(MyAnimal <strong>as</strong> TDog).Eat;</p>
+
+<p>The result of this expression is an object of the TDog class data type, so you can apply to it any method of that class. The difference between the traditional cast and the use of the as cast is that the second raises an exception if the type of the object is incompatible with the type you are trying to cast it to. The exception raised is EInvalidCast (exceptions are described at the end of this chapter).</p>
+
+<p>To avoid this exception, use the is operator and, if it succeeds, make a plain typecast (in fact, there is no reason to use is and as in sequence, doing the type check twice):</p>
+
+<p><strong>if</strong> MyAnimal <strong>is</strong> TDog <strong>then</strong></p>
+
+<p>TDog(MyAnimal).Eat;</p>
+
+<p>Both RTTI operators are very useful in Delphi because you often want to write generic code that can be used with several components of the same type or even of different types. When a component is passed as a parameter to an event-response method, a generic data type is used (TObject), so you often need to cast it back to the original component type:</p>
+
+<p><strong>procedure</strong> TForm1.Button1Click(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>if</strong> Sender <strong>is</strong> TButton <strong>then</strong></p>
+
+<p>...</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This is a common technique in Delphi, and I’ll use it in examples throughout the book. The two RTTI operators, is and as, are extremely powerful, and you might be tempted to consider them as standard programming constructs. Although they are indeed powerful, you should probably limit their use to special cases. When you need to solve a complex problem involving several classes, try using polymorphism first. Only in special cases, where polymorphism alone cannot be applied, should you try using the RTTI operators to complement it. <em>Do not use RTTI instead of polymorphism.</em> This is bad programming practice, and it results in slower programs.</p>
+
+<p>RTTI, in fact, has a negative impact on performance, because it must walk the hierarchy of classes to see whether the typecast is correct. As we have seen, virtual method calls require just a memory lookup, which is much faster.</p>
+
+<p>There is actually more to run-time type information (RTTI) than the is and as operators. You can access to detailed class and type information at run time, particularly for published prop- erties, events, and methods. More on this topic in Chapter 5.</p>
+
+<h2 id="usinginterfaces">Using Interfaces</h2>
+
+<p>When you define an abstract class to represent the base class of a hierarchy, you can come to a point in which the abstract class is so abstract that it only lists a series of virtual functions without providing any actual implementation. This kind of <em>purely abstract class</em> can also be defined using a specific technique, an interface. For this reason, we refer to these classes as <em>interfaces</em>.</p>
+
+<p>Technically, an interface is not a class, although it may resemble one. Interfaces are not classes, because they are considered a totally separate element with distinctive features:</p>
+
+<p>·      Interface type objects are reference-counted and automatically destroyed when there are no more references to the object. This mechanism is similar to how Delphi man- ages long strings and makes memory management almost automatic.</p>
+
+<p>·      A class can inherit from a single base class, but it can implement multiple interfaces.</p>
+
+<p>·      As all classes descend from TObject, all interfaces descend from IInterface, forming a totally separate hierarchy.</p>
+
+<p>The base interface class used to be IUnknown until Delphi 5, but Delphi 6 introduces a new name for it, IInterface, to mark even more clearly the fact that this language feature is sepa- rate from Microsoft’s COM. In fact, Delphi interfaces are available also in the Linux version of the product.</p>
+
+<p>You can use this rule: Interface types describing things that relate to COM and the related operating-system services should inherit from IUnknown. Interface types that describe things that do not necessarily require COM (for example, interfaces used for the internal applica- tion structure) should inherit from IInterface. Doing this consistently in your applications will make it easier to identify which portions of your application probably assume or require the Windows operating system and which portions are probably OS-independent.</p>
+
+<p>Borland introduced interfaces in Delphi 3 along with the support COM programming. Though the interface language syntax may have been created to support COM, interfaces do not require COM. You can use interfaces to implement abstraction layers within your applications, without building COM server objects. For example, the Delphi IDE uses interfaces extensively in its internal architecture. COM is discussed in Chapter 19.</p>
+
+<p>From a more general point of view, interfaces support a slightly different object-oriented programming model than classes. Objects implementing interfaces are subject to polymorphism for each of the interfaces they support. Indeed, the interface-based model is powerful. But having said that, I’m not interested in trying to assess which approach is better in each case. Certainly, interfaces favor encapsulation and provide a looser connection between classes than inheritance. Notice that the most recent OOP languages, from Java to C#, have the notion of interfaces.</p>
+
+<p>Here is the syntax of the declaration of an interface (which, by convention, starts with the letter <em>I</em>):</p>
+
+<p><strong>type</strong></p>
+
+<p>ICanFly = <strong>interface</strong></p>
+
+<p>[<em>‘{EAD9C4B4-E1C5-4CF4-9FA0-3B812C880A21}’</em>]</p>
+
+<p><strong>function</strong> Fly: string;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The above interface has a GUID, a numeric ID following its declaration and based on Windows conventions. You can generate these identifiers (called GUIDs in jargon) by pressing Ctrl+Shift+G in the Delphi editor.</p>
+
+<p>Although you can compile and use interfaces even without specifying a GUID (as in the code above) for them, you’ll generally want to do it, as this is required to perform QueryInterface or dynamic as typecasts using that interface type. Since the whole point of interfaces is (usually) to take advantage of greatly extended type flexibility at run time, if compared with class types, interfaces without GUIDs are not very useful.</p>
+
+<p>Once you’ve declared an interface, you can define a class to implement it, as in:</p>
+
+<p><strong>type</strong></p>
+
+<p>TAirplane = <strong>class</strong> (TInterfacedObject, ICanFly)</p>
+
+<p><strong>function</strong> Fly: string;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The RTL already provides a few base classes to implement the basic behavior required by the</p>
+
+<p>IInterface interface. The simplest one is the TInterfacedObject class I’ve used in this code.</p>
+
+<p>You can implement interface methods with static methods (as in the code above) or with virtual methods. You can override virtual methods in subclasses by using the override direc- tive. If you don’t use virtual methods, you can still provide a new implementation in a sub- class by redeclaring the interface type in the subclass, rebinding the interface methods to new versions of the static methods. At first sight, using virtual methods to implement interfaces seems to allow for smoother coding in subclasses, but both approaches are equally powerful and flexible. However, the use of virtual methods affects code size and memory.</p>
+
+<p>The compiler has to generate stub routines to fix up the interface call entry points to the matching method of the implementing class, and adjust the self pointer. The interface method stubs for static methods are very simple: adjust self and jump to the real method in the class. The interface method stubs for virtual methods are much more complicated, requir- ing about four times more code (20 to 30 bytes) in each stub than the static case. Also, adding more virtual methods to the implementing class just bloats the virtual method table (VMT) that much more in the implementing class and all its descendents. Interfaces already have their own VMT, and redeclaring interfaces in descendents to rebind the interface to new methods in the descendent is just as polymorphic as using virtual methods, but much smaller in code size.</p>
+
+<p>Now that we have defined an implementation of the interface, we can write some code to use an object of this class, as usual:</p>
+
+<p><strong>var</strong></p>
+
+<p>Airplane1: TAirplane;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Airplane1 := TAirplane.Create; Airplane1.Fly;</p>
+
+<p>Airplane1.Free;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>But we can also use an interface-type variable:</p>
+
+<p><strong>var</strong></p>
+
+<p>Flyer1: ICanFly;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Flyer1 := TAirplane.Create; Flyer1.Fly;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>As soon as you assign an object to an interface-type variable, Delphi automatically checks to see whether the object implements that interface, using the as operator. You can explicitly express this operation as follows:</p>
+
+<p>Flyer1 := TAirplane.Create <strong>as</strong> ICanFly;</p>
+
+<p>The compiler generates different code for the as operator when used with interfaces or with classes. With classes, the compiler introduces run-time checks to verify that the object is effec- tively “type-compatible” with the given. With interfaces, the compiler sees at compile time that it can extract the necessary interface from the available class type, so it does. This opera- tion is like a “compile-time as,” not something that exists at run time.</p>
+
+<p>Whether we use the direct assignment or the as statement, Delphi does one extra thing: it calls the _AddRef method of the object (defined by IInterface and implemented by TInterfacedObject), increasing its reference count. At the same time, as soon as the Flyer1 variable goes out of scope, Delphi calls the _Release method (again part of IInterface), which decreases the reference count, checks whether the reference count is zero, and if necessary, destroys the object. For this reason in the listing above, there is no code to free the object we’ve created.</p>
+
+<p>In other words, in Delphi, objects referenced by interface variables are reference-counted, and they are automatically de-allocated when no interface variable refers to them any more.</p>
+
+<p><strong>W<em>*</strong>ARNING</em>* When using interface-based objects, you should generally access them only with object vari- ables or only with interface variables. Mixing the two approaches breaks the reference count- ing scheme provided by Delphi and can cause memory errors that are extremely difficult to track. In practice, if you’ve decided to use interfaces, you should probably use exclusively inter- face-based variables.</p>
+
+<h4 id="interfacepropertiesdelegationredefinitionsaggregationandreferencecountingblues">Interface Properties, Delegation, Redefinitions, Aggregation, and Reference Counting Blues</h4>
+
+<p>To demonstrate a few technical elements related to interfaces, I’ve written the IntfDemo example. This example is based on two different interfaces, IWalker and IJumper, defined as follows:</p>
+
+<p>IWalker = <strong>interface</strong></p>
+
+<p>[<em>‘{0876F200-AAD3-11D2-8551-CCA30C584521}’</em>]</p>
+
+<p><strong>function</strong> Walk: string;</p>
+
+<p><strong>function</strong> Run: string;</p>
+
+<p><strong>procedure</strong> SetPos (Value: Integer);</p>
+
+<p><strong>function</strong> GetPos: Integer;</p>
+
+<p><strong>property</strong> Position: Integer <strong>read</strong> GetPos <strong>write</strong> SetPos;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>IJumper = <strong>interface</strong></p>
+
+<p>[<em>‘{0876F201-AAD3-11D2-8551-CCA30C584521}’</em>]</p>
+
+<p><strong>function</strong> Jump: string;</p>
+
+<p><strong>function</strong> Walk: string;</p>
+
+<p><strong>procedure</strong> SetPos (Value: Integer);</p>
+
+<p><strong>function</strong> GetPos: Integer;</p>
+
+<p><strong>property</strong> Position: Integer <strong>read</strong> GetPos <strong>write</strong> SetPos;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Notice that the first interface also defines a property. An interface property is just a name mapped to a read and a write method. You cannot map an interface property to a field, simply because an interface cannot have a data field.</p>
+
+<p>Here comes a sample implementation of the IWalker interface. Notice that you don’t have to define the property, only its access methods:</p>
+
+<p>TRunner = <strong>class</strong> (TInterfacedObject, IWalker)</p>
+
+<p><strong>private</strong></p>
+
+<p>Pos: Integer;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>function</strong> Walk: string;</p>
+
+<p><strong>function</strong> Run: string;</p>
+
+<p><strong>procedure</strong> SetPos (Value: Integer);</p>
+
+<p><strong>function</strong> GetPos: Integer;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The code is trivial, so I’m going to skip it (you can find it in the IntfDemo example, where there is also a destructor showing a message, used to verify that reference counting works properly). I’ve implemented the same interface also in another class, TAthlete, that I’ll dis- cuss in a second.</p>
+
+<p>As I want to implement also the IJumper interface in two different classes, I’ve followed a different approach. Delphi allows you to delegate the implementation of an interface inside a class to an object exposed with a property. In other words, I want to share the actual imple- mentation code for an interface implemented by several unrelated classes.</p>
+
+<p>To support this technique, Delphi has a special keyword, implements. For example, you can write:</p>
+
+<p>TMyJumper = <strong>class</strong> (TInterfacedObject, IJumper)</p>
+
+<p><strong>private</strong></p>
+
+<p>fJumpImpl: IJumper;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create;</p>
+
+<p><strong>property</strong> Jumper: IJumper <strong>read</strong> fJumpImpl <strong>implements</strong> IJumper;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>In this case the property refers to an interface variable, but you can also use a plain object variable (my preferred approach). The constructor is required for initializing the internal <em>implementation</em> object:</p>
+
+<p><strong>constructor</strong> TMyJumper.Create;</p>
+
+<p><strong>begin</strong></p>
+
+<p>fJumpImpl := TJumperImpl.Create;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>As a first attempt (and in the last edition of the book), I defined the implementation class as follows:</p>
+
+<p>TJumperImpl = <strong>class</strong> (TInterfacedObject, IJumper)</p>
+
+<p><strong>private</strong></p>
+
+<p>Pos: Integer;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>function</strong> Jump: string;</p>
+
+<p><strong>function</strong> Walk: string;</p>
+
+<p><strong>procedure</strong> SetPos (Value: Integer);</p>
+
+<p><strong>function</strong> GetPos: Integer;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>If you try this code, the program will compile and everything will run smoothly, until you try to check out what happens with reference counting. It won’t work, period. The problem lies in the fact that when the program extracts the IJumper interface from the TMyJumper object, it actually increases and decreases the reference counting of the inner object, instead of the external one. In other words, you have a single compound object and two separate reference counts going on. This can lead to objects being both kept in memory and released too soon.</p>
+
+<p>The solution to this problem is to have a single reference count, by redirecting the _AddRef and _Release calls of the internal object to the external one (actually we need to do the same also for QueryInterface). In the example, I’ve used the TAggregatedObject provided in Delphi 6 by the system unit; refer to the sidebar “Implementing Aggregates” for more details.</p>
+
+<p>As a result of this approach, the implementation class is now defined as follows:</p>
+
+<p>TJumperImpl = <strong>class</strong> (TAggregatedObject, IJumper)</p>
+
+<p><strong>private</strong></p>
+
+<p>Pos: Integer;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>function</strong> Jump: string;</p>
+
+<p><strong>function</strong> Walk: string;</p>
+
+<p><strong>procedure</strong> SetPos (Value: Integer);</p>
+
+<p><strong>function</strong> GetPos: Integer;</p>
+
+<p><strong>property</strong> Position: Integer <strong>read</strong> GetPos <strong>write</strong> SetPos;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>An object using this class for implementing the IJumper interface must have a Create con- structor, to create the internal object, and a destructor, to destroy it. The constructor of the aggregate object requires the container object as parameter, so that it can redirect back the IInterface calls. The key element, of course, is the property mapped to the interface with the implements keyword:</p>
+
+<p>TMyJumper = <strong>class</strong> (TInterfacedObject, IJumper)</p>
+
+<p><strong>private</strong></p>
+
+<p>fJumpImpl: TJumperImpl;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create;</p>
+
+<p><strong>property</strong> Jumper: TJumperImpl <strong>read</strong> fJumpImpl <strong>implements</strong> IJumper;</p>
+
+<p><strong>destructor</strong> Destroy; <strong>override</strong>; <strong>end</strong>;</p>
+
+<p><strong>constructor</strong> TMyJumper.Create;</p>
+
+<p><strong>begin</strong></p>
+
+<p>fJumpImpl := TJumperImpl.Create (self);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>This example is simple, but in general, things get more complex as you start to modify some of the methods or add other methods that still operate on the data of the internal fJumpImpl object. This final step is demonstrated, along with other features, by the TAthlete class, which implements both the IWalker and IJumper interfaces:</p>
+
+<p>TAthlete = <strong>class</strong> (TInterfacedObject, IWalker, IJumper)</p>
+
+<p><strong>private</strong></p>
+
+<p>fJumpImpl: TJumperImpl;</p>
+
+<p><strong>public</strong></p>
+
+<p><strong>constructor</strong> Create; <strong>destructor</strong> Destroy; <strong>override</strong>; <strong>function</strong> Run: string; <strong>virtual</strong>; <strong>function</strong> Walk1: string; <strong>virtual</strong>;</p>
+
+<p><strong>function</strong> IWalker.Walk = Walk1; <strong>procedure</strong> SetPos (Value: Integer); <strong>function</strong> GetPos: Integer;</p>
+
+<p><strong>property</strong> Jumper: TJumperImpl <strong>read</strong> fJumpImpl <strong>implements</strong> IJumper;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>One of the interfaces is implemented directly, whereas the other is delegated to the inter- nal fJumpImpl object. Notice also that by implementing two interfaces that have a method in common, we end up with a name clash. The solution is to rename one of the methods, with the statement</p>
+
+<p><strong>function</strong> IWalker.Walk = Walk1;</p>
+
+<p>This declaration indicates that the class implements the Walk method of the IWalker inter- face with a method called Walk1 (instead of with a method having the same name). Finally, in the implementation of all of the methods of this class, we need to refer to the Position prop- erty of the fJumpImpl internal object. By declaring a new implementation for the Position property, we’ll end up with two positions for a single athlete, a rather odd situation. Here are a couple of examples:</p>
+
+<p><strong>function</strong> TAthlete.GetPos: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Result := fJumpImpl.Position;</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>function</strong> TAthlete.Run: string;</p>
+
+<p><strong>begin</strong></p>
+
+<p>fJumpImpl.Position := fJumpImpl.Position + 2; Result := IntToStr (fJumpImpl.Position) + <em>‘: Run’</em>;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>You can further experiment with the IntfDemo example, which has a simple form with buttons to create and call methods of the various objects. Nothing fancy, though, as you can see in Figure 3.4. Simply keep in mind that each call returns the position after the requested movement and a description of the movement itself. Also, each object notifies with a message when it is destroyed.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image207.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E  3 . 4 :</strong></p>
+
+<p>The IntfDemo example </p>
+
+<h2 id="workingwithexceptions">Working with Exceptions</h2>
+
+<p>Another key feature of Object Pascal I’ll cover in this chapter is the support for <em>exceptions</em>. The idea of exceptions is to make programs more robust by adding the capability of handling soft- ware or hardware errors in a uniform way. A program can survive such errors or terminate gracefully, allowing the user to save data before exiting. Exceptions allow you to separate the error-handling code from your normal code, instead of intertwining the two. You end up writ- ing code that is more compact and less cluttered by maintenance chores unrelated to the actual programming objective.</p>
+
+<p>Another benefit is that exceptions define a uniform and universal error-reporting mechanism, which is also used by Delphi components. At run time, Delphi raises exceptions when some- thing goes wrong (in the run-time code, in a component, in the operating system). From the point of the code in which it is raised, the exception is passed to its calling code, and so on. Ultimately, if no part of your code handles the exception, Delphi handles it, by displaying a standard error message and trying to continue the program, by handing the next system mes- sage or user request.</p>
+
+<p>The whole mechanism is based on four keywords:</p>
+
+<p><strong>*try*</strong> delimits the beginning of a protected block of code.</p>
+
+<p><strong>*except*</strong> delimits the end of a protected block of code and introduces the exception-han- dling statements, with this syntax form:</p>
+
+<p><strong>on</strong> <em>exception-type</em> <strong>do</strong> <em>statement</em></p>
+
+<p><strong>*finally*</strong> is used to specify blocks of code that must always be executed, even when excep- tions occur. This block is generally used to perform cleanup operations that should always be executed, such as closing files or database tables, freeing objects, and releasing memory and other resources acquired in the same program block.</p>
+
+<p><strong><em>raise*</strong> is the statement used to generate an exception. Most exceptions you’ll encounter in your Delphi programming will be generated by the system, but you can also raise excep- tions in your own code when it discovers invalid or inconsistent data at run time. The raise keyword can also be used inside a handler to *re-raise</em> an exception; that is, to propa- gate it to the next handler.</p>
+
+<p>The most important element to notice up front is that exception handling is no substitute for if statements or for tests on input parameters of functions. So <em>in theory</em> we could write this code:</p>
+
+<p><strong>function</strong> DivideTwicePlusOne (A, B: Integer): Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>try</strong></p>
+
+<p><em>// error if B equals 0</em></p>
+
+<p>Result := A <strong>div</strong> B;</p>
+
+<p><em>// do something else... skip if exception is raised</em></p>
+
+<p>Result := Result <strong>div</strong> B; Result := Result + 1;</p>
+
+<p><strong>except</strong></p>
+
+<p><strong>on</strong> EDivByZero <strong>do</strong></p>
+
+<p>Result := 0;</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p><em>In practice</em>, however, this is certainly not a good way of writing your programs. The except block above, like most of the except blocks of the simple examples presented here, has almost no sense at all. In the code above, you should probably not handle the exception but let the program display the error message to the user. An algorithm calling this DivideTwicePlusOne function should not continue (with a meaningless zero value) when this internal error is encountered.</p>
+
+<p><strong>Program Flow and the</strong> <strong>*finally*</strong> <strong>Block</strong></p>
+
+<p>But how do we stop the algorithm? The power of exceptions in Delphi relates to the fact that they are “passed” from a routine or method to the calling one, up to a global handler (if the program provides one, as Delphi applications generally do). So the real problem you might have is not how to stop an exception but how to execute some code when an exception is raised.</p>
+
+<p>Consider this method (part of the TryFinally example from the CD), which performs some time-consuming operations and uses the hourglass cursor to show the user that it’s doing something:</p>
+
+<p><strong>procedure</strong> TForm1.BtnWrongClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>I, J: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Screen.Cursor := crHourglass; J := 0;</p>
+
+<p><em>// long (and wrong) computation...</em></p>
+
+<p><strong>for</strong> I := 1000 <strong>downto</strong> 0 <strong>do</strong></p>
+
+<p>J := J + J <strong>div</strong> I;</p>
+
+<p>MessageDlg (<em>‘Total: ‘</em> + IntToStr (J), mtInformation, [mbOK], 0); Screen.Cursor := crDefault;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Because there is an error in the algorithm (as the variable I can reach a value of 0 and is also used in a division), the program will break, but it won’t reset the default cursor. This is what a try/finally block is for:</p>
+
+<p><strong>procedure</strong> TForm1.BtnTryFinallyClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>I, J: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Screen.Cursor := crHourglass; J := 0;</p>
+
+<p><strong>try</strong></p>
+
+<p><em>// long (and wrong) computation...</em></p>
+
+<p><strong>for</strong> I := 1000 <strong>downto</strong> 0 <strong>do</strong></p>
+
+<p>J := J + J <strong>div</strong> I;</p>
+
+<p>MessageDlg (<em>‘Total: ‘</em> + IntToStr (J), mtInformation, [mbOK], 0);</p>
+
+<p><strong>finally</strong></p>
+
+<p>Screen.Cursor := crDefault;</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p>When the program executes this function, it always resets the cursor, whether an exception (of any sort) occurs or not.</p>
+
+<p>This code doesn’t handle the exception; it merely makes the program robust in case an exception is raised. As a try block can be followed by either an except or a finally statement, but not both of them at the same time, the typical solution if you want to also handle the exception is to use two nested try blocks. In this case, you associate the internal one with a finally statement and the external one with an except statement, or vice versa as the situa- tion requires. Here is the code of this third button of the TryFinally example:</p>
+
+<p><strong>procedure</strong> TForm1.BtnTryTryClick(Sender: TObject);</p>
+
+<p><strong>var</strong></p>
+
+<p>I, J: Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p>Screen.Cursor := crHourglass; J := 0;</p>
+
+<p><strong>try try</strong></p>
+
+<p><em>// long (and wrong) computation...</em></p>
+
+<p><strong>for</strong> I := 1000 <strong>downto</strong> 0 <strong>do</strong></p>
+
+<p>J := J + J <strong>div</strong> I;</p>
+
+<p>MessageDlg (<em>‘Total: ‘</em> + IntToStr (J), mtInformation, [mbOK], 0);</p>
+
+<p><strong>finally</strong></p>
+
+<p>Screen.Cursor := crDefault;</p>
+
+<p><strong>end</strong>; <strong>except</strong></p>
+
+<p><strong>on</strong> E: EDivByZero <strong>do begin</strong></p>
+
+<p><em>// re-raise the exception with a new message</em></p>
+
+<p><strong>raise</strong> Exception.Create (<em>‘Error in Algorithm’</em>);</p>
+
+<p><strong>end</strong>; <strong>end</strong>;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>Every time you have some finalization code at the end of a method, you should place this code in a finally block. You should always, invariably, and continuously (how can I stress this more?) protect your code with finally statements, to avoid resource or memory leaks in case an exception is raised.</p>
+
+<p>Handling the exception is generally much less important than using finally blocks, since Del- phi can survive most of them. And too many exception-handling blocks in your code probably indicate errors in the program flow and possibly a misunderstanding of the role of exceptions in the language. In the examples in the rest of the book you’ll see many try/finally blocks, a few raise statements, and almost no try/except blocks.</p>
+
+<h4 id="exceptionclasses">Exception Classes</h4>
+
+<p>In exception-handling statements shown earlier, we caught the EDivByZero exception, which is defined by Delphi’s RTL. Other such exceptions refer to run-time problems (such as a wrong dynamic cast), Windows resource problems (such as out-of-memory errors), or com- ponent errors (such as a wrong index). Programmers can also define their own exceptions; you can create a new subclass of the default exception class or one of its subclasses:</p>
+
+<p><strong>type</strong></p>
+
+<p>EArrayFull = <strong>class</strong> (Exception);</p>
+
+<p>When you add a new element to an array that is already full (probably because of an error in the logic of the program), you can raise the corresponding exception by creating an object of this class:</p>
+
+<p><strong>if</strong> MyArray.Full <strong>then</strong></p>
+
+<p><strong>raise</strong> EArrayFull.Create (<em>‘Array full’</em>);</p>
+
+<p>This Create method (inherited from the Exception class) has a string parameter to describe the exception to the user. You don’t need to worry about destroying the object you have created for the exception, because it will be deleted automatically by the exception-handler mechanism.</p>
+
+<p>The code presented in the previous excerpts is part of a sample program, called Exception1. Some of the routines have actually been slightly modified, as in the following DivideTwicePlusOne function:</p>
+
+<p><strong>function</strong> DivideTwicePlusOne (A, B: Integer): Integer;</p>
+
+<p><strong>begin</strong></p>
+
+<p><strong>try</strong></p>
+
+<p><em>// error if B equals 0</em></p>
+
+<p>Result := A <strong>div</strong> B;</p>
+
+<p><em>// do something else... skip if exception is raised</em></p>
+
+<p>Result := Result <strong>div</strong> B; Result := Result + 1;</p>
+
+<p><strong>except</strong></p>
+
+<p><strong>on</strong> EDivByZero <strong>do begin</strong></p>
+
+<p>Result := 0;</p>
+
+<p>MessageDlg (<em>‘Divide by zero corrected.’</em>, mtError, [mbOK], 0);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>on</strong> E: Exception <strong>do begin</strong></p>
+
+<p>Result := 0;</p>
+
+<p>MessageDlg (E.<strong>Message</strong>, mtError, [mbOK], 0);</p>
+
+<p><strong>end</strong>;</p>
+
+<p><strong>end</strong>; <em>// end except</em></p>
+
+<p><strong>end</strong>;</p>
+
+<p>In the Exception1 code there are two different exception handlers after the same try block. You can have any number of these handlers, which are evaluated in sequence. For this reason, you need to place the broader handlers (the handlers of the ancestor Exception classes) at the end.</p>
+
+<p>In fact, using a hierarchy of exceptions, a handler is also called for the subclasses of the type it refers to, as any procedure will do. This is polymorphism in action again. But keep in mind that using a handler for every exception, such as the one above, is not usually a good choice. It is better to leave unknown exceptions to Delphi. The default exception handler in the VCL displays the error message of the exception class in a message box, and then resumes normal operation of the program. You can actually modify the normal exception handler with the Application.OnException event, as demonstrated in the ErrorLog example later in this chapter.</p>
+
+<p>Another important element of the code above is the use of the exception object in the handler (see on E: Exception do). The object E of class Exception receives the value of the exception object passed by the raise statement. When you work with exceptions, remember this rule: You raise an exception by creating an object and handle it by indicating its type.</p>
+
+<p>This has an important benefit, because as we have seen, when you handle a type of exception, you are really handling exceptions of the type you specify as well as any descendant type.</p>
+
+<p>Delphi defines a hierarchy of exceptions, and you can choose to handle each specific type of exception in a different way or handle groups of them together.</p>
+
+<h4 id="loggingerrors">Logging Errors</h4>
+
+<p>Most of the time, you don’t know which operation is going to raise an exception, and you cannot (and should not) wrap each and every piece of code in a try/except block. The gen- eral approach is to let Delphi handle all the exceptions and eventually pass them all to you, by handling the OnException event of the global Application object. This can be done rather easily with the ApplicationEvents component.</p>
+
+<p>In the ErrorLog example, I’ve added to the main form a copy of the ApplicationEvents component and added a handler for its OnException event:</p>
+
+<p><strong>procedure</strong> TFormLog.LogException(Sender: TObject; E: Exception);</p>
+
+<p><strong>var</strong></p>
+
+<p>Filename: string; LogFile: TextFile;</p>
+
+<p><strong>begin</strong></p>
+
+<p><em>// prepares log file</em></p>
+
+<p>Filename := ChangeFileExt (Application.Exename, <em>‘.log’</em>); AssignFile (LogFile, Filename);</p>
+
+<p><strong>if</strong> FileExists (FileName) <strong>then</strong></p>
+
+<p>Append (LogFile) <em>// open existing file</em></p>
+
+<p><strong>else</strong></p>
+
+<p>Rewrite (LogFile); <em>// create a new one</em></p>
+
+<p><em>// write to the file and show error</em></p>
+
+<p>Writeln (LogFile, DateTimeToStr (Now) + <em>‘:’</em> + E.Message);</p>
+
+<p><strong>if not</strong> CheckBoxSilent.Checked <strong>then</strong></p>
+
+<p>Application.ShowException (E);</p>
+
+<p><em>// close the file</em></p>
+
+<p>CloseFile (LogFile);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The ErrorLog example uses the text file support provided by the traditional Turbo Pascal TextFile data type. You can assign a text file variable to an actual file and then read or write it. You can find more on TextFile operations in Chapter 12 of <em>Essential Pascal</em>, available on the companion CD.</p>
+
+<p>In the global exceptions handler, you can write to the log, for example, the date and time of the event, and also decide whether to show the exception as Delphi usually does (executing the ShowException method of the TApplication class). In fact, Delphi by default executes ShowException only if there is no OnException handler installed.</p>
+
+<p>Finally, remember to close the file, flushing the buffers, every time the exception is handled or when the program terminates. I’ve chosen the first approach to avoid keeping the log file open for the lifetime of the application, potentially making it difficult to work on it. You can accomplish this in the OnDestroy event handler of the form:</p>
+
+<p><strong>procedure</strong> TFormLog.FormDestroy(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>CloseFile (LogFile);</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The form of the program includes a check box to determine its behavior and two buttons generating exceptions. In Figure 3.5, you can see the ErrorLog program running and a sample exceptions log open in Notepad.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image212.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 3 . 5 :</strong></p>
+
+<p>The ErrorLog example and the log it produces</p>
+
+<h2 id="classreferences">Class References</h2>
+
+<p>The final language feature I want to discuss in this chapter is <em>class references</em>, which implies the idea of manipulating classes themselves (not just class instances) within your code. The first point to keep in mind is that a class reference isn’t a class, it isn’t an object, and it isn’t a refer- ence to an object; it is simply a reference to a class type.</p>
+
+<p>A class reference type determines the type of a class reference variable. Sounds confusing? A few lines of code might make this a little clearer. Suppose you have defined the class TMy- Class. You can now define a new class reference type, related to that class:</p>
+
+<p><strong>type</strong></p>
+
+<p>TMyClassRef = <strong>class of</strong> TMyClass;</p>
+
+<p>Now you can declare variables of both types. The first variable refers to an object, the second to a class:</p>
+
+<p><strong>var</strong></p>
+
+<p>AClassRef: TMyClassRef; AnObject: TMyClass;</p>
+
+<p><strong>begin</strong></p>
+
+<p>AClassRef := TMyClass; AnObject := TMyClass.Create;</p>
+
+<p>You may wonder what class references are used for. In general, class references allow you to manipulate a class data type at run time. You can use a class reference in any expression where the use of a data type is legal. Actually, there are not many such expressions, but the few cases are interesting. The simplest case is the creation of an object. We can rewrite the two lines above as follows:</p>
+
+<p>AClassRef := TMyClass; AnObject := AClassRef.Create;</p>
+
+<p>This time I’ve applied the Create constructor to the class reference instead of to an actual class; I’ve used a class reference to create an object of that class.</p>
+
+<p>Class references remind us of the concept of <em>metaclass</em> available in other OOP languages. In Object Pascal, however, a class reference is not itself a class but only a type pointer. Therefore, the analogy with metaclasses (classes describing other classes) is a little misleading. Actually, TMetaclass is also the term used in Borland C++Builder.</p>
+
+<p>Class reference types wouldn’t be as useful if they didn’t support the same type-compatibility rule that applies to class types. When you declare a class reference variable, such as MyClassRef above, you can then assign to it that specific class and any subclass. So if MyNewClass is a sub- class of my class, you can also write</p>
+
+<p>AClassRef := MyNewClass;</p>
+
+<p>Delphi declares a lot of class references in the run-time library and the VCL, including the following:</p>
+
+<p>TClass = <strong>class of</strong> TObject; ExceptClass = <strong>class of</strong> Exception; TComponentClass = <strong>class of</strong> TComponent; TControlClass = <strong>class of</strong> TControl; TFormClass = <strong>class of</strong> TForm;</p>
+
+<p>In particular, the TClass class reference type can be used to store a reference to any class you write in Delphi, because every class is ultimately derived from TObject. The TFormClass refer- ence, instead, is used in the source code of most Delphi projects. The CreateForm method of the Application object, in fact, requires as parameter the class of the form to create:</p>
+
+<p>Application.CreateForm(TForm1, Form1);</p>
+
+<p>The first parameter is a class reference; the second is a variable that stores a reference to the created object instance.</p>
+
+<p>Finally, when you have a class reference you can apply to it the class methods of the related class. Considering that each class inherits from TObject, you can apply to each class reference some of the methods of TObject, as we’ll see in the next chapter.</p>
+
+<h4 id="creatingcomponentsusingclassreferences">Creating Components Using Class References</h4>
+
+<p>What is the <em>practical</em> use of class references in Delphi? Being able to manipulate a data type at run time is a fundamental element of the Delphi environment. When you add a new compo- nent to a form by selecting it from the Component Palette, you select a data type and create an object of that data type. (Actually, that is what Delphi does for you behind the scenes.) In other words, class references give you polymorphism for object construction.</p>
+
+<p>To give you a better idea of how class references work, I’ve built an example named ClassRef. The form displayed by this example is quite simple. It has three radio buttons, placed inside a panel in the upper portion of the form. When you select one of these radio buttons and click the form, you’ll be able to create new components of the three types indicated by the button labels: radio buttons, push buttons, and edit boxes.</p>
+
+<p>To make this program run properly, you need to change the names of the three compo- nents. The form must also have a class reference field:</p>
+
+<p><strong>private</strong></p>
+
+<p>ClassRef: TControlClass; Counter: Integer;</p>
+
+<p>The first field stores a new data type every time the user clicks one of the three radio buttons. Here is one of the three methods:</p>
+
+<p><strong>procedure</strong> TForm1.RadioButtonRadioClick(Sender: TObject);</p>
+
+<p><strong>begin</strong></p>
+
+<p>ClassRef := TRadioButton;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The other two radio buttons have OnClick event handlers similar to this one, assigning the value TEdit or TButton to the ClassRef field. A similar assignment is also present in the han- dler of the OnCreate event of the form, used as an initialization method.</p>
+
+<p>The interesting part of the code is executed when the user clicks the form. Again, I’ve cho- sen the OnMouseDown event of the form to hold the position of the mouse click:</p>
+
+<p><strong>procedure</strong> TForm1.FormMouseDown(Sender: TObject; Button: TMouseButton; Shift: TShiftState; X, Y: Integer);</p>
+
+<p><strong>var</strong></p>
+
+<p>NewCtrl: TControl; MyName: String;</p>
+
+<p><strong>begin</strong></p>
+
+<p><em>// create the control</em></p>
+
+<p>NewCtrl := ClassRef.Create (<strong>Self</strong>);</p>
+
+<p><em>// hide it temporarily, to avoid flickering</em></p>
+
+<p>NewCtrl.Visible := False;</p>
+
+<p><em>// set parent and position</em> NewCtrl.Parent := <strong>Self</strong>; NewCtrl.Left := X; NewCtrl.Top := Y;</p>
+
+<p><em>// compute the unique name (and caption)</em></p>
+
+<p>Inc (Counter);</p>
+
+<p>MyName := ClassRef.ClassName + IntToStr (Counter); Delete (MyName, 1, 1);</p>
+
+<p>NewCtrl.Name := MyName;</p>
+
+<p><em>// now show it</em></p>
+
+<p>NewCtrl.Visible := True;</p>
+
+<p><strong>end</strong>;</p>
+
+<p>The first line of the code for this method is the key. It creates a new object of the class data type stored in the ClassRef field. We accomplish this simply by applying the Create con- structor to the class reference. Now you can set the value of the Parent property, set the position of the new component, give it a name (which is automatically used also as Caption or Text), and make it visible.</p>
+
+<p>Notice in particular the code used to build the name; to mimic Delphi’s default naming con- vention, I’ve taken the name of the class with the expression ClassRef.ClassName, using a class method of the TObject class. Then I’ve added a number at the end of the name and removed the initial letter of the string. For the first radio button, the basic string is TRadioButton, plus the <em>1</em> at the end, and minus the <em>T</em> at the beginning of the class name—RadioButton1.</p>
+
+<p>Sound familiar?</p>
+
+<p>You can see an example of the output of this program in Figure 3.6. Notice that the nam- ing is not exactly the same as used by Delphi. Delphi uses a separate counter for each type of control; I’ve used a single counter for all of the components. If you place a radio button, a push button, and an edit box in a form of the ClassRef example, their names will be RadioButton1, Button2, and Edit3.</p>
+
+<p>For polymorphic construction to work, the base class type of the class reference must have a vir- tual constructor. If you use a virtual constructor (as in the example), the constructor call applied to the class reference will call the constructor of the type that the class reference variable <em>currently refers to</em>. But without a virtual constructor, your code will call the constructor of <em>fixed class type</em> indicated in the class reference declaration. Virtual constructors are required for poly- morphic construction in the same way that virtual methods are required for polymorphism.</p>
+
+<p><img src="https://aj-86.github.io/WebpageTest/Mastering%20Delphi%206%20-%20Part%201_files/image214.jpg" alt="img" /></p>
+
+<p><strong>F I G U R E 3 . 6 :</strong></p>
+
+<p>An example of the output of the ClassRef example</p>
+
+<h2 id="whatsnext">What’s Next?</h2>
+
+<p>In this chapter, we have discussed the more advanced elements of object-oriented program- ming in Object Pascal. We have considered inheritance, virtual and abstract methods, poly- morphism, safe typecasting, interfaces, exceptions, and class references.</p>
+
+<p>Understanding the secrets of Object Pascal and the structure of the Delphi library is vital for becoming an expert Delphi programmer. These topics form the foundation of working with the VCL and CLX class libraries; after exploring them in the next two chapters, we’ll <em>finally</em> go on in Part II of the book to explore the development of real applications using all the various components provided by Delphi.</p>
+
+<p>In the meantime, the next chapter will give you an over view of the Delphi run-time library, mainly a collection of functions with little OOP involved. The RTL is an assorted collection of routines and tasks for performing basic tasks with Delphi, and it has been largely extended in Delphi 6.</p>
+
+<p>Chapter 5 will give you more information about the Object Pascal language, discussing features related to the structure of the Delphi class library, such as the effect of the published keyword and the role of events. The chapter, as a whole, will discuss the overall architecture of the component library.</p>
